@@ -1,0 +1,34 @@
+{
+  "name": "ts-to-owcode",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "ShuangYa",
+  "license": "AGPL",
+  "scripts": {
+    "start": "ts-node ./demo/index.ts",
+    "build": ""
+  },
+  "dependencies": {
+    "typescript": "^3.7.5",
+    "uuid": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^13.7.0",
+    "@types/uuid": "^3.4.7",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "lint-staged": "^10.0.7",
+    "prettier": "^1.19.1",
+    "ts-node": "^8.6.2",
+    "tslint": "^6.0.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.1.0"
+  },
+  "lint-staged": {
+    "./src/**/*.ts": [
+      "tslint --fix"
+    ]
+  }
+}
