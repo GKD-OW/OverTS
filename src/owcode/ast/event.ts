@@ -2,12 +2,15 @@ import { Events } from "../type/event";
 import { Heros } from "../type/hero";
 import { Team } from "../type/variable";
 
+export const GlobalEvents = [Events.GLOBAL_ONGOING];
+export const SubEvents = [Events.SUB];
+
 export interface OWEvent {
-  name: Events;
+  kind: string;
 }
 
 export function isGlobalEvent(obj: any): obj is OWEvent {
-  return obj && obj.name === Events.GLOBAL_ONGOING;
+  return obj && GlobalEvents.includes(obj.kind);
 }
 
 export interface PlayerEvent extends OWEvent {
@@ -24,5 +27,5 @@ export interface SubEvent extends OWEvent {
 }
 
 export function isSubEvent(obj: any): obj is SubEvent {
-  return obj && obj.name === Events.SUB;
+  return obj && SubEvents.includes(obj.kind);
 }

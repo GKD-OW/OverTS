@@ -1,0 +1,212 @@
+import * as ts from 'typescript';
+import { ConstantNamespaces } from '../owcode/ast/constants';
+import { GlobalEvents, OWEvent, PlayerEvent, SubEvent, SubEvents } from '../owcode/ast/event';
+import { CallExpression, ExpressionKind, OWExpression } from '../owcode/ast/expression';
+import { Events, Team, Heros } from '../owcode/type';
+import { DefinedContants } from './var';
+import { getFinalText } from './utils';
+
+export function getCallExpression(expression: ts.CallExpression, definedContants: DefinedContants = {}, globalVariables: string[] = []): CallExpression {
+  let callName = '';
+  if (ts.isIdentifier(expression.expression)) {
+    callName = expression.expression.text;
+  } else {
+    throw new Error('无法识别调用');
+  }
+  // 尝试从definedContants里面取一下
+  if (typeof(definedContants[callName]) !== 'undefined') {
+    const nameExp = definedContants[callName];
+    if (ts.isStringLiteral(nameExp)) {
+      callName = nameExp.text;
+    }
+  }
+  const result: CallExpression = {
+    kind: ExpressionKind.CALL,
+    text: callName.replace(/([A-Z])/g, '_$1').toUpperCase(),
+    arguments: expression.arguments.map(arg => parseExpression(arg, definedContants, globalVariables))
+  };
+  return result;
+}
+
+// 普通算数运算符
+const SimpleCalc = [
+  ts.SyntaxKind.PlusToken,
+  ts.SyntaxKind.MinusToken,
+  ts.SyntaxKind.AsteriskToken,
+  ts.SyntaxKind.SlashToken,
+  ts.SyntaxKind.PercentToken,
+];
+// 运算后赋值的运算符
+const CalcAndSet: { [x: number]: ts.SyntaxKind } = {
+  [ts.SyntaxKind.PlusEqualsToken]: ts.SyntaxKind.PlusToken,
+  [ts.SyntaxKind.MinusEqualsToken]: ts.SyntaxKind.MinusToken,
+  [ts.SyntaxKind.AsteriskEqualsToken]: ts.SyntaxKind.AsteriskToken,
+  [ts.SyntaxKind.SlashEqualsToken]: ts.SyntaxKind.SlashToken,
+  [ts.SyntaxKind.PercentEqualsToken]: ts.SyntaxKind.PercentToken,
+}
+// 自运算符
+const SelfCalc = {
+  [ts.SyntaxKind.PlusPlusToken]: ts.SyntaxKind.PlusToken,
+  [ts.SyntaxKind.MinusMinusToken]: ts.SyntaxKind.MinusToken,
+}
+// 获取算数运算符对应的函数名称
+function getCalcFunc(kind: ts.SyntaxKind) {
+  switch (kind) {
+    case ts.SyntaxKind.PlusToken:
+      return 'add';
+    case ts.SyntaxKind.MinusToken:
+      return 'subtract';
+    case ts.SyntaxKind.AsteriskToken:
+      return 'multiply';
+    case ts.SyntaxKind.SlashToken:
+      return 'divide';
+    case ts.SyntaxKind.PercentToken:
+      return 'modulo';
+  }
+  return '';
+}
+
+// 识别ts的表达式，将其转化为OWCode的表达式
+export function parseExpression(expression: ts.Expression, definedContants: DefinedContants = {}, globalVariables: string[] = []): OWExpression {
+  if (ts.isCallExpression(expression)) {
+    return getCallExpression(expression, definedContants, globalVariables);
+  }
+  if (ts.isIdentifier(expression)) {
+    // 普通字符，检查已定义的常量
+    const name = expression.text;
+    // 替换成常量的解析结果
+    if (typeof(definedContants[name]) !== 'undefined') {
+      return parseExpression(definedContants[name], definedContants, globalVariables);
+    }
+    // 或者，也可能是全局变量
+    if (globalVariables.includes(name)) {
+      const exp: CallExpression = {
+        kind: ExpressionKind.CALL,
+        text: 'GET_GLOBAL',
+        arguments: [{
+          kind: ExpressionKind.RAW,
+          text: name
+        }]
+      };
+      return exp;
+    }
+    console.log(definedContants, globalVariables);
+    throw new Error(`常量 ${name} 未定义`);
+  }
+  if (ts.isPropertyAccessExpression(expression) && ts.isIdentifier(expression.expression)) {
+    // 检查是否访问的内置对象
+    const name = expression.expression.text;
+    if (ConstantNamespaces.includes(name)) {
+      return {
+        kind: ExpressionKind.CONSTANT,
+        text: name.toUpperCase() + '_' + expression.name.text.replace(/([A-Z])/g, '_$1').toUpperCase()
+      };
+    }
+  }
+  if (ts.isNumericLiteral(expression)) {
+    // 纯数字
+    return {
+      kind: ExpressionKind.NUMBER,
+      text: expression.text
+    };
+  }
+  // 运算，转化为相应函数
+  if (ts.isBinaryExpression(expression)) {
+    // 普通运算
+    if (SimpleCalc.includes(expression.operatorToken.kind)) {
+      const exp: CallExpression = {
+        kind: ExpressionKind.CALL,
+        text: getCalcFunc(expression.operatorToken.kind).toUpperCase(),
+        arguments: [
+          parseExpression(expression.left, definedContants, globalVariables),
+          parseExpression(expression.right, definedContants, globalVariables)
+        ]
+      };
+      return exp;
+    }
+    // TODO: 运算后赋值
+    // if (typeof(CalcAndSet[expression.operatorToken.kind]) !== 'undefined') {
+    //   const exp: CallExpression = {
+    //     kind: ExpressionKind.CALL,
+    //     text: getCalcFunc(expression.operatorToken.kind).toUpperCase(),
+    //     arguments: [
+    //       parseExpression(expression.left, definedContants, globalVariables),
+    //       parseExpression(expression.right, definedContants, globalVariables)
+    //     ]
+    //   };
+    //   return exp;
+    // }
+  }
+  if (expression.kind === ts.SyntaxKind.FalseKeyword) {
+    // false
+    return {
+      kind: ExpressionKind.BOOLEAN,
+      text: 'FALSE'
+    };
+  }
+  if (expression.kind === ts.SyntaxKind.TrueKeyword) {
+    // true
+    return {
+      kind: ExpressionKind.BOOLEAN,
+      text: 'TRUE'
+    };
+  }
+  console.error(expression);
+  throw new Error('无法识别表达式');
+}
+
+export function parseEvent(exps: ts.NodeArray<ts.Expression>, defines?: DefinedContants): OWEvent {
+  const exp = exps[0];
+  if (ts.isPropertyAccessExpression(exp)) {
+    const left = getFinalText(exp.expression, defines);
+    if (left !== 'Events') {
+      throw new Error('runAt只接受Events.*');
+    }
+    const right = getFinalText(exp.name, defines);
+    // @ts-ignore
+    if (typeof(Events[right]) === 'undefined') {
+      throw new Error(`不存在 ${right} 事件`);
+    }
+    // @ts-ignore
+    const eventName = Events[right];
+    // 全局事件
+    if (GlobalEvents.includes(eventName)) {
+      const event: OWEvent = {
+        kind: eventName
+      }
+      return event;
+    }
+    // 子程序
+    if (SubEvents.includes(eventName)) {
+      // TODO: 子程序名称
+      return createSubEvent("");
+    }
+    // 玩家事件
+    const team = getFinalText(exps[1], defines);
+    const hero = getFinalText(exps[2], defines);
+    let teamName = Team.ALL;
+    let heroName = Heros.ALL;
+    if (team.substr(0, 5) === 'Team.') {
+      // @ts-ignore
+      teamName = Team[team.substr(5)];
+    }
+    if (hero.substr(0, 6) === 'Heros.') {
+      // @ts-ignore
+      heroName = Heros[hero.substr(5)];
+    }
+    const event: PlayerEvent = {
+      kind: eventName,
+      team: teamName,
+      hero: heroName
+    };
+    return event;
+  }
+  throw new Error('事件无效');
+}
+
+export function createSubEvent(name: string): SubEvent {
+  return {
+    kind: Events.SUB,
+    sub: name
+  };
+}

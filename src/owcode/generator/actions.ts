@@ -1,7 +1,8 @@
 import { ExpressionKind, isCallExpression, OWExpression } from "../ast/expression";
 import i18n from "./i18n";
 
-export function expressionToCode(exp: OWExpression): string {
+type varMap = { [x: string]: string };
+export function expressionToCode(global: varMap, player: varMap, exp: OWExpression): string {
   switch (exp.kind) {
     case ExpressionKind.BOOLEAN:
       return i18n(`BOOL_${exp.text}`);
@@ -17,7 +18,7 @@ export function expressionToCode(exp: OWExpression): string {
       let fillZero = 4 - str.substr(str.indexOf('.')).length;
       if (fillZero < 0) {
         // 只取前三位小数
-        str = str.substr(0, str.indexOf('.') + 3);
+        str = str.substr(0, str.indexOf('.') + 4);
       } else {
         // 补足小数点后三位
         while (fillZero--) {
@@ -32,7 +33,8 @@ export function expressionToCode(exp: OWExpression): string {
   }
   if (isCallExpression(exp)) {
     const name = i18n(`FUNC_${exp.text}`);
-    const args: string = exp.arguments.map(expressionToCode).join(', ');
+    // TODO: 如果是访问变量，那么做一个对应关系
+    const args: string = exp.arguments.map(expressionToCode.bind(null, global, player)).join(', ');
     return `${name}(${args})`;
   }
   throw new Error('未知表达式');

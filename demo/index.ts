@@ -6,7 +6,8 @@ import to from '../src/owcode/generator';
 
 const ast = parse(readFileSync(resolve(__dirname, 'a.ts'), { encoding: 'UTF8' }));
 const result = to(ast);
-writeFileSync(resolve(__dirname, 'result.txt'), result, { encoding: 'UTF8' });
+// writeFileSync(resolve(__dirname, 'result.txt'), result, { encoding: 'UTF8' });
+console.log(result);
 
 // console.log(to({
 //   variable: {

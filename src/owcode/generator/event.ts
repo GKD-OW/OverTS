@@ -1,7 +1,7 @@
-import { isGlobalEvent, OWEvent, isPlayerEvent, isSubEvent } from "../ast/event";
-import i18n from "./i18n";
+import { isPlayerEvent, isSubEvent, OWEvent } from "../ast/event";
 import { Team } from "../type/variable";
 import { getHero } from "./hero";
+import i18n from "./i18n";
 
 function getTeam(team: Team) {
   switch (team) {
@@ -16,10 +16,10 @@ function getTeam(team: Team) {
 
 export function getEventText(event: OWEvent): string[] {
   if (isPlayerEvent(event)) {
-    return [i18n(`EVENT_${event.name}`), getTeam(event.team), getHero(event.hero)];
+    return [i18n(`EVENT_${event.kind}`), getTeam(event.team), getHero(event.hero)];
   }
   if (isSubEvent(event)) {
-    return [i18n(`EVENT_${event.name}`), event.sub];
+    return [i18n(`EVENT_${event.kind}`), event.sub];
   }
-  return [i18n(`EVENT_${event.name}`)];
+  return [i18n(`EVENT_${event.kind}`)];
 }

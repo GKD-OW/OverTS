@@ -2,10 +2,12 @@ import { Condition } from "../ast/conditions";
 import { expressionToCode } from "./actions";
 import { matchSymbolToString } from "./matchSymbolToString";
 
-export function conditionToCode(cond: Condition): string {
+type varMap = { [x: string]: string };
+
+export function conditionToCode(global: varMap, player: varMap, cond: Condition): string {
   return [
-    expressionToCode(cond.left),
+    expressionToCode(global, player, cond.left),
     matchSymbolToString(cond.symbol),
-    expressionToCode(cond.right)
+    expressionToCode(global, player, cond.right)
   ].join(' ');
 }
