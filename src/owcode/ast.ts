@@ -14,5 +14,6 @@ export interface Ast {
     global: string[]; // 全局变量
     player: string[]; // 玩家变量
   }
+  sub: { [x: string]: Rule };
   rules: Rule[];
 }

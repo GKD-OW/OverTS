@@ -14,10 +14,10 @@ export default class Result {
 
   push(str?: string, doWithRetract = 0) {
     if (str && str.length > 0) {
-      this.result.push(this.getRetract());
-      this.result.push(str);
+      this.result.push(this.getRetract() + str);
+    } else {
+      this.result.push("");
     }
-    this.result.push("");
     if (doWithRetract) {
       this.retract += doWithRetract;
     }

@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Ast } from "../ast";
+import { Ast, Rule } from "../ast";
 import { expressionToCode } from "./actions";
 import { conditionToCode } from "./conditions";
 import { getEventText } from "./event";
@@ -45,8 +45,9 @@ export default function(ast: Ast, options?: GeneratorOption) {
     result.rightBrace();
     result.push();
   }
-  // 规则区域
-  ast.rules.forEach(rule => {
+
+
+  const addRule = (rule: Rule) => {
     const name = options?.uglify ? uuid() : rule.name;
     result.push(`${i18n('G_RULE')}("${name}")`);
     result.leftBrace();
@@ -56,19 +57,38 @@ export default function(ast: Ast, options?: GeneratorOption) {
     getEventText(rule.event).forEach(text => result.push(text + ';'));
     result.rightBrace();
     // 条件
-    result.push(i18n('G_RULE_COND'));
-    result.leftBrace();
-    rule.conditions.map(conditionToCode.bind(null, uglifyGlobal, uglifyPlayer)).forEach(text => result.push(text + ';'));
-    result.rightBrace();
+    if (rule.conditions.length > 0) {
+      result.push(i18n('G_RULE_COND'));
+      result.leftBrace();
+      rule.conditions.map(conditionToCode.bind(null, uglifyGlobal, uglifyPlayer)).forEach(text => result.push(text + ';'));
+      result.rightBrace();
+    }
     // 规则
-    result.push(i18n('G_RULE_ACT'));
-    result.leftBrace();
-    rule.actions.map(expressionToCode.bind(null, uglifyGlobal, uglifyPlayer)).forEach(text => result.push(text + ';'));
-    result.rightBrace();
+    if (rule.actions.length > 0) {
+      result.push(i18n('G_RULE_ACT'));
+      result.leftBrace();
+      rule.actions.map(expressionToCode.bind(null, uglifyGlobal, uglifyPlayer)).forEach(text => result.push(text + ';'));
+      result.rightBrace();
+    }
     // 完成规则
     result.rightBrace();
     result.push();
-  });
+  }
+
+  // 子程序
+  if (Object.keys(ast.sub).length > 0) {
+    result.push(i18n('G_SUB'));
+    result.leftBrace();
+    Object.keys(ast.sub).forEach((name, index) => {
+      result.push(`${index}: ${name}`);
+    });
+    result.rightBrace();
+    Object.values(ast.sub).forEach(it => {
+      addRule(it);
+    });
+  }
+  // 规则区域
+  ast.rules.forEach(rule => addRule(rule));
 
   return result.get();
 }

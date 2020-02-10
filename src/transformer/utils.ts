@@ -1,5 +1,7 @@
 import * as ts from "typescript";
-import { CallExpression, ExpressionKind, OWExpression } from "../owcode/ast/expression";
+import { v4 as uuidv4 } from 'uuid';
+import Transformer from ".";
+import { OWExpression } from "../owcode/ast/expression";
 import { parseExpression } from "./expression";
 import { DefinedContants } from "./var";
 
@@ -24,12 +26,12 @@ function deepParse(exp: ts.Expression, defines?: DefinedContants): ts.Expression
   return exp;
 }
 
-interface getVariableResult {
+export interface getVariableResult {
   defines: DefinedContants;
   variables: string[];
   variableValues: { [x: string]: OWExpression };
 }
-export function getVariable(statements: ts.Statement[] | ts.NodeArray<ts.Statement>, defines?: DefinedContants) {
+export function getVariable(this: Transformer, statements: ts.Statement[] | ts.NodeArray<ts.Statement>, defines?: DefinedContants) {
   const result: getVariableResult = {
     defines: {},
     variables: [],
@@ -50,7 +52,7 @@ export function getVariable(statements: ts.Statement[] | ts.NodeArray<ts.Stateme
             // 添加到变量声明
             result.variables.push(declaration.name.text);
             if (declaration.initializer) {
-              result.variableValues[declaration.name.text] = parseExpression(declaration.initializer);
+              result.variableValues[declaration.name.text] = parseExpression.call(this, declaration.initializer);
             }
           }
         }
@@ -60,37 +62,6 @@ export function getVariable(statements: ts.Statement[] | ts.NodeArray<ts.Stateme
   return result;
 }
 
-
-export function getFinalText(exp: ts.Expression, defines?: DefinedContants): string {
-  if (ts.isIdentifier(exp)) {
-    if (defines && typeof(defines[exp.text]) !== 'undefined') {
-      return getFinalText(defines[exp.text], defines);
-    } else {
-      return exp.text;
-    }
-  }
-  if (ts.isStringLiteral(exp)) {
-    return exp.text;
-  }
-  if (ts.isPropertyAccessExpression(exp)) {
-    const leftName = getFinalText(exp.expression, defines);
-    const rightName = getFinalText(exp.name, defines);
-    return `${leftName}.${rightName}`;
-  }
-  return "";
-}
-
-export function createInitializer(vars: { [x: string]: OWExpression }) {
-  const result: CallExpression[] = [];
-  Object.keys(vars).forEach(name => {
-    result.push({
-      kind: ExpressionKind.CALL,
-      text: 'SET_GLOBAL',
-      arguments: [{
-        kind: ExpressionKind.RAW,
-        text: name
-      }, vars[name]]
-    });
-  });
-  return result;
+export function uuid() {
+  return uuidv4().replace(/\-/g, '');
 }

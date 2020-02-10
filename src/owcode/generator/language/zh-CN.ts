@@ -1,5 +1,6 @@
 const zhCN: {[x: string]: string } = {
   G_VAR: '变量',
+  G_SUB: '子程序',
   G_VAR_GLOBAL: '全局',
   G_VAR_PLAYER: '玩家',
   G_RULE: '规则',
@@ -15,6 +16,7 @@ const zhCN: {[x: string]: string } = {
   HERO_MERCY: '天使',
   EVENT_GLOBAL_ONGOING: '持续 - 全局', // 持续 - 全局
   EVENT_PLAYER_ONGOING: '持续 - 每名玩家', // 持续 - 每名玩家
+  EVENT_SUB: '子程序', // 子程序
   FUNC_WAIT: '等待',
   FUNC_ABORT: '中止',
   FUNC_TELEPORT: '传送',
@@ -22,7 +24,8 @@ const zhCN: {[x: string]: string } = {
   FUNC_GET_GLOBAL: '全局变量',
   FUNC_ADD: '加',
   FUNC_MATCH: '比较',
-  CONST_GAME_IS_WAITING_PLAYERS: '正在等待玩家'
+  CONST_GAME_IS_WAITING_PLAYERS: '正在等待玩家',
+  FUNC_CALL_SUB: '调用子程序'
 }
 
 export default zhCN;
