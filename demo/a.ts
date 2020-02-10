@@ -1,4 +1,6 @@
-import { condition, Events, Game, runAt, wait, Team, Heros } from '../src/owcode/type';
+import { Team, Heros } from '../src/owcode/type';
+// import '../src/owcode/type/constants';
+// import '../src/owcode/type/functions';
 
 const a = 1;
 let b = 2;

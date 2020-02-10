@@ -1,5 +1,5 @@
 export default class Result {
-  private result: string = '';
+  private result: string[] = [];
   private retract = 0;
 
   private getRetract() {
@@ -9,15 +9,15 @@ export default class Result {
   }
 
   get() {
-    return this.result;
+    return this.result.join("\n");
   }
 
   push(str?: string, doWithRetract = 0) {
     if (str && str.length > 0) {
-      this.result += this.getRetract();
-      this.result += str;
+      this.result.push(this.getRetract());
+      this.result.push(str);
     }
-    this.result += "\n";
+    this.result.push("");
     if (doWithRetract) {
       this.retract += doWithRetract;
     }
