@@ -6,22 +6,5 @@ import to from '../src/owcode/generator';
 
 const transformer = new Transformer(readFileSync(resolve(__dirname, 'a.ts'), { encoding: 'UTF8' }));
 const result = to(transformer.getResult());
-writeFileSync(resolve(__dirname, 'result.txt'), result, { encoding: 'UTF8' });
-// console.log(result);
-
-// console.log(to({
-//   variable: {
-//     global: ['AAA', 'BBB'],
-//     player: ['CCC', 'DDD']
-//   },
-//   rules: [
-//     {
-//       name: '规则1',
-//       event: {
-//         name: Events.GLOBAL_ONGOING
-//       },
-//       conditions: [],
-//       actions: []
-//     }
-//   ]
-// }));
+// writeFileSync(resolve(__dirname, 'result.txt'), result, { encoding: 'UTF8' });
+console.log(result);

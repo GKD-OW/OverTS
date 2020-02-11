@@ -6,6 +6,7 @@
   "license": "AGPL",
   "scripts": {
     "start": "ts-node ./demo/index.ts",
+    "debug": "node -r ts-node/register --inspect ./demo/index.ts",
     "build": ""
   },
   "dependencies": {

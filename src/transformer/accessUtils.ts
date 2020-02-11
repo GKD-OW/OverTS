@@ -33,7 +33,7 @@ export function isCanToString(obj: any): obj is CanToString {
  * @param exp 
  * @param defines 
  */
-export function getFinalAccess(exp: ts.Expression, defines?: DefinedContants): ts.Expression | CanToString {
+export function getFinalAccess(exp: ts.Node, defines?: DefinedContants): ts.Expression | CanToString {
   if (ts.isIdentifier(exp)) {
     if (defines && typeof(defines[exp.text]) !== 'undefined') {
       return getFinalAccess(defines[exp.text], defines);

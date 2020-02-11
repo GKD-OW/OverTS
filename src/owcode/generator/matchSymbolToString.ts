@@ -1,4 +1,4 @@
-import { MatchSymbol } from "../type";
+import { MatchSymbol } from "../type/match";
 
 export function matchSymbolToString(symbol: MatchSymbol): string {
   switch (symbol) {

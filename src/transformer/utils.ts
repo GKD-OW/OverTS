@@ -1,11 +1,11 @@
 import * as ts from "typescript";
 import { v4 as uuidv4 } from 'uuid';
 import Transformer from ".";
-import { OWExpression } from "../owcode/ast/expression";
+import { OWExpression, CallExpression, ExpressionKind } from "../owcode/ast/expression";
 import { parseExpression } from "./expression";
 import { DefinedContants } from "./var";
 
-function deepParse(exp: ts.Expression, defines?: DefinedContants): ts.Expression {
+function deepParse(exp: ts.Node, defines?: DefinedContants): ts.Node {
   if (!defines) {
     return exp;
   }
@@ -14,13 +14,13 @@ function deepParse(exp: ts.Expression, defines?: DefinedContants): ts.Expression
   }
   if (ts.isCallExpression(exp)) {
     const res = { ...exp };
-    res.arguments = ts.createNodeArray(res.arguments.map(it => deepParse(it, defines)));
+    res.arguments = ts.createNodeArray(res.arguments.map(it => deepParse(it, defines)) as ts.Expression[]);
     return res;
   }
   if (ts.isBinaryExpression(exp)) {
     const res = { ...exp };
-    res.left = deepParse(res.left, defines);
-    res.right = deepParse(res.left, defines);
+    res.left = deepParse(res.left, defines) as ts.Expression;
+    res.right = deepParse(res.left, defines) as ts.Expression;
     return res;
   }
   return exp;
@@ -57,9 +57,38 @@ export function getVariable(this: Transformer, statements: ts.Statement[] | ts.N
           }
         }
       });
+      return;
+    }
+    // 另外，函数定义也作为const，提取出来
+    if (ts.isFunctionDeclaration(statement)) {
+      let name = "";
+      if (statement.name && ts.isIdentifier(statement.name)) {
+        name = statement.name.text;
+      }
+      // 忽略未命名的函数
+      if (!name) {
+        return;
+      }
+      // 忽略空函数
+      if (!statement.body) {
+        return;
+      }
+      // 剩下的才是有效函数
+      result.defines[name] = statement;
     }
   });
   return result;
+}
+
+export function createSubCall(name: string): CallExpression {
+  return {
+    kind: ExpressionKind.CALL,
+    text: 'CALL_SUB',
+    arguments: [{
+      kind: ExpressionKind.RAW,
+      text: name
+    }]
+  };
 }
 
 export function uuid() {

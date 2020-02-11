@@ -1,12 +1,13 @@
 import * as ts from 'typescript';
-import '../owcode/type/global';
 import { Ast, Rule } from '../owcode/ast';
 import { Condition } from '../owcode/ast/conditions';
 import { OWEvent, SubEvent } from '../owcode/ast/event';
 import { CallExpression, ExpressionKind } from '../owcode/ast/expression';
-import { MatchSymbol } from '../owcode/type';
+import '../owcode/type/global';
+import { MatchSymbol } from '../owcode/type/match';
+import { getFinalAccess, isCanToString, PropertyAccess } from './accessUtils';
 import { parseEvent, parseExpression } from './expression';
-import { getVariable, getVariableResult, uuid } from './utils';
+import { createSubCall, getVariable, getVariableResult, uuid } from './utils';
 import { DefinedContants } from './var';
 
 
@@ -188,31 +189,75 @@ export default class Transformer {
    * @param body 
    * @param defines 
    */
-  private parseRuleBody(body: ts.Block) {
+  private parseRuleBody(body: ts.Block, parentDefines?: DefinedContants) {
     // 首先取出宏定义（可能有）
     const vars = getVariable.call(this, body.statements);
-    const defines = vars.defines;
+    const defines = this.getDefines(vars.defines, parentDefines);
     // 然后开始逐句解析
-    const bodys: CallExpression[] = [];
-    body.statements.forEach(scopeStatement => {
+    let bodys: CallExpression[] = [];
+    body.statements.forEach(state => {
+      debugger;
       // 函数调用或者函数赋值都在这里面
-      if (ts.isExpressionStatement(scopeStatement)) {
+      if (ts.isExpressionStatement(state)) {
         // 赋值语句，转换为读写全局变量
-        if (ts.isBinaryExpression(scopeStatement.expression) && ts.isIdentifier(scopeStatement.expression.left) && scopeStatement.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
+        if (ts.isBinaryExpression(state.expression) && ts.isIdentifier(state.expression.left) && state.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
           bodys.push({
             kind: ExpressionKind.CALL,
             text: 'SET_GLOBAL',
             arguments: [{
               kind: ExpressionKind.RAW,
-              text: scopeStatement.expression.left.text
-            }, this.parseExpression(scopeStatement.expression.right, defines)]
+              text: state.expression.left.text
+            }, this.parseExpression(state.expression.right, defines, false)]
           });
+          return;
         }
         // 函数调用语句
-        if (ts.isCallExpression(scopeStatement.expression)) {
+        if (ts.isCallExpression(state.expression)) {
+          // 获取最终访问的是谁
+          const finalExp = getFinalAccess(state.expression.expression, defines);
           // 如果遇到this调用，则进行子程序解析
-          // if ()
-          bodys.push(this.parseExpression(scopeStatement.expression, defines) as CallExpression);
+          if (isCanToString(finalExp)) {
+            if (finalExp instanceof PropertyAccess) {
+              if (finalExp.left.toString() === 'this') {
+                console.log("this call");
+                return;
+              }
+            }
+          } else if (ts.isArrowFunction(finalExp)) {
+            // 箭头函数调用
+            const body = (finalExp as ts.ArrowFunction).body;
+            if (body) {
+              if (ts.isBlock(body)) {
+                // 有很多条语句的body
+                bodys = bodys.concat(this.parseRuleBody(body, defines));
+              } else {
+                // 单条语句
+                bodys.push(this.parseExpression(body, defines, false) as CallExpression);
+              }
+            }
+            return;
+          } else if (ts.isFunctionExpression(finalExp) || ts.isFunctionDeclaration(finalExp)) {
+            // 普通函数调用也作为子程序进行解析
+            const func = finalExp as ts.FunctionExpression;
+            // 作为子程序进行
+            if (func.body) {
+              const name = `sub_${func.pos}_${func.end}`;
+              this.parseSub(name, func.body);
+              bodys.push(createSubCall(name));
+            }
+            return;
+          } else if (ts.isFunctionDeclaration(finalExp)) {
+            // 普通函数调用也作为子程序进行解析
+            const func = finalExp as ts.FunctionDeclaration;
+            // 作为子程序进行
+            if (func.body) {
+              const name = `sub_${func.pos}_${func.end}`;
+              this.parseSub(name, func.body);
+              bodys.push(createSubCall(name));
+            }
+            return;
+          }
+          bodys.push(this.parseExpression(state.expression, defines, false) as CallExpression);
         }
       }
     });
@@ -224,6 +269,9 @@ export default class Transformer {
    * @param name 
    */
   public parseSub(name: string, body: ts.Block) {
+    if (typeof(this.ast.sub[name]) !== 'undefined') {
+      return;
+    }
     const event: SubEvent = {
       kind: Events.SUB,
       sub: name
@@ -238,11 +286,14 @@ export default class Transformer {
     this.ast.sub[name] = rule;
   }
 
-  private parseExpression(exp: ts.Expression, defines: DefinedContants = {}) {
-    const newDefines = {
-      ...this.vars.defines,
+  private getDefines(defines: DefinedContants = {}, parentDefines?: DefinedContants) {
+    return {
+      ...(parentDefines || this.vars.defines),
       ...defines
     };
-    return parseExpression.call(this, exp, newDefines, this.vars.variables);
+  }
+
+  private parseExpression(exp: ts.Expression, defines: DefinedContants = {}, merge = true) {
+    return parseExpression.call(this, exp, merge ? this.getDefines(defines) : defines, this.vars.variables);
   }
 }

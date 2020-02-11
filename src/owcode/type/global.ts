@@ -52,6 +52,17 @@ declare global {
 }
 
 declare global {
+  namespace Game {
+    const isWaitingPlayers: boolean;
+    const isInSetup: boolean;
+  }
+  namespace Constants {
+    const True: boolean;
+    const False: boolean;
+  }
+}
+
+declare global {
   function wait(time: number): void;
   function abort(): void;
   // 变量读写

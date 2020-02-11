@@ -1,11 +1,11 @@
 import * as ts from 'typescript';
-import '../owcode/type/global';
 import Transformer from '.';
 import { ConstantNamespaces } from '../owcode/ast/constants';
 import { GlobalEvents, OWEvent, PlayerEvent, SubEvent, SubEvents } from '../owcode/ast/event';
 import { CallExpression, ExpressionKind, OWExpression } from '../owcode/ast/expression';
+import '../owcode/type/global';
 import { getFinalAccess, isCanToString, PropertyAccess } from './accessUtils';
-import { uuid } from './utils';
+import { createSubCall, uuid } from './utils';
 import { DefinedContants } from './var';
 
 // 普通算数运算符
@@ -68,20 +68,13 @@ function getCallExpression(this: Transformer, expression: ts.CallExpression, def
     };
     return result;
   } else {
-    // 子程序
+    // 进到了这里的话，都算作子程序
     if (ts.isArrowFunction(finalExp) || ts.isFunctionDeclaration(finalExp)) {
       const body = (finalExp as ts.FunctionDeclaration).body;
       if (body) {
         const subName = "sub_" + uuid();
         this.parseSub(subName, body);
-        return {
-          kind: ExpressionKind.CALL,
-          text: 'CALL_SUB',
-          arguments: [{
-            kind: ExpressionKind.RAW,
-            text: subName
-          }]
-        };
+        return createSubCall(subName);
       }
     }
   }
