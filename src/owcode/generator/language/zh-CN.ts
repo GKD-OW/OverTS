@@ -23,9 +23,11 @@ const zhCN: {[x: string]: string } = {
   FUNC_SET_GLOBAL: '设置全局变量',
   FUNC_GET_GLOBAL: '全局变量',
   FUNC_ADD: '加',
-  FUNC_MATCH: '比较',
+  FUNC_COMPARE: '比较',
   CONST_GAME_IS_WAITING_PLAYERS: '正在等待玩家',
-  FUNC_CALL_SUB: '调用子程序'
+  FUNC_CALL_SUB: '调用子程序',
+  FUNC_AND: '与',
+  FUNC_OR: '或',
 }
 
 export default zhCN;

@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "jsx": "react",

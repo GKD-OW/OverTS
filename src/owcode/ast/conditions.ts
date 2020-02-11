@@ -1,8 +1,8 @@
-import { MatchSymbol } from "../type/match";
+import { CompareSymbol } from "../type/compare";
 import { OWExpression } from "./expression";
 
 export interface Condition {
   left: OWExpression;
-  symbol: MatchSymbol;
+  symbol: CompareSymbol;
   right: OWExpression;
 }

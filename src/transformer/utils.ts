@@ -1,7 +1,8 @@
 import * as ts from "typescript";
 import { v4 as uuidv4 } from 'uuid';
 import Transformer from ".";
-import { OWExpression, CallExpression, ExpressionKind } from "../owcode/ast/expression";
+import { CallExpression, ExpressionKind, OWExpression } from "../owcode/ast/expression";
+import { CompareSymbol } from "../owcode/type/compare";
 import { parseExpression } from "./expression";
 import { DefinedContants } from "./var";
 
@@ -81,14 +82,29 @@ export function getVariable(this: Transformer, statements: ts.Statement[] | ts.N
 }
 
 export function createSubCall(name: string): CallExpression {
+  return createCall('CALL_SUB', {
+    kind: ExpressionKind.RAW,
+    text: name
+  });
+}
+
+export function createCall(name: string, ...args: OWExpression[]): CallExpression {
   return {
     kind: ExpressionKind.CALL,
-    text: 'CALL_SUB',
-    arguments: [{
-      kind: ExpressionKind.RAW,
-      text: name
-    }]
+    text: name,
+    arguments: args
   };
+}
+
+export function createCondition(left: OWExpression, right: OWExpression = {
+  kind: ExpressionKind.BOOLEAN,
+  text: 'TRUE'
+}, symbol: CompareSymbol = CompareSymbol.EQUALS) {
+  return {
+    left,
+    symbol,
+    right,
+  }
 }
 
 export function uuid() {

@@ -2,22 +2,25 @@ import * as ts from 'typescript';
 import Transformer from '.';
 import { ConstantNamespaces } from '../owcode/ast/constants';
 import { GlobalEvents, OWEvent, PlayerEvent, SubEvent, SubEvents } from '../owcode/ast/event';
-import { CallExpression, ExpressionKind, OWExpression } from '../owcode/ast/expression';
+import { CallExpression, CompareExpression, ExpressionKind, OWExpression } from '../owcode/ast/expression';
+import { CompareSymbol, tsMatchToSymbol } from '../owcode/type/compare';
 import '../owcode/type/global';
 import { getFinalAccess, isCanToString, PropertyAccess } from './accessUtils';
-import { createSubCall, uuid } from './utils';
+import { createCall, createSubCall, uuid } from './utils';
 import { DefinedContants } from './var';
 
 // 普通算数运算符
-const SimpleCalc = [
-  ts.SyntaxKind.PlusToken,
-  ts.SyntaxKind.MinusToken,
-  ts.SyntaxKind.AsteriskToken,
-  ts.SyntaxKind.SlashToken,
-  ts.SyntaxKind.PercentToken,
-];
+const simpleCalc: { [x: number]: string } = {
+  [ts.SyntaxKind.PlusToken]: 'add',
+  [ts.SyntaxKind.MinusToken]: 'subtract',
+  [ts.SyntaxKind.AsteriskToken]: 'multiply',
+  [ts.SyntaxKind.SlashToken]: 'divide',
+  [ts.SyntaxKind.PercentToken]: 'modulo',
+  [ts.SyntaxKind.AmpersandAmpersandToken]: 'and',
+  [ts.SyntaxKind.BarBarToken]: 'or',
+};
 // 运算后赋值的运算符
-const CalcAndSet: { [x: number]: ts.SyntaxKind } = {
+const calcAndSet: { [x: number]: ts.SyntaxKind } = {
   [ts.SyntaxKind.PlusEqualsToken]: ts.SyntaxKind.PlusToken,
   [ts.SyntaxKind.MinusEqualsToken]: ts.SyntaxKind.MinusToken,
   [ts.SyntaxKind.AsteriskEqualsToken]: ts.SyntaxKind.AsteriskToken,
@@ -25,25 +28,9 @@ const CalcAndSet: { [x: number]: ts.SyntaxKind } = {
   [ts.SyntaxKind.PercentEqualsToken]: ts.SyntaxKind.PercentToken,
 }
 // 自运算符
-const SelfCalc = {
+const selfCalc = {
   [ts.SyntaxKind.PlusPlusToken]: ts.SyntaxKind.PlusToken,
   [ts.SyntaxKind.MinusMinusToken]: ts.SyntaxKind.MinusToken,
-}
-// 获取算数运算符对应的函数名称
-function getCalcFunc(kind: ts.SyntaxKind) {
-  switch (kind) {
-    case ts.SyntaxKind.PlusToken:
-      return 'add';
-    case ts.SyntaxKind.MinusToken:
-      return 'subtract';
-    case ts.SyntaxKind.AsteriskToken:
-      return 'multiply';
-    case ts.SyntaxKind.SlashToken:
-      return 'divide';
-    case ts.SyntaxKind.PercentToken:
-      return 'modulo';
-  }
-  return '';
 }
 
 /**
@@ -61,12 +48,7 @@ function getCallExpression(this: Transformer, expression: ts.CallExpression, def
       throw new Error('无法识别调用');
     }
     // 内置函数调用
-    const result: CallExpression = {
-      kind: ExpressionKind.CALL,
-      text: callName.replace(/([A-Z])/g, '_$1').toUpperCase(),
-      arguments: expression.arguments.map(arg => parseExpression.call(this, arg, defines, globalVariables))
-    };
-    return result;
+    return createCall(callName.replace(/([A-Z])/g, '_$1').toUpperCase(), ...expression.arguments.map(arg => parseExpression.call(this, arg, defines, globalVariables)));
   } else {
     // 进到了这里的话，都算作子程序
     if (ts.isArrowFunction(finalExp) || ts.isFunctionDeclaration(finalExp)) {
@@ -101,15 +83,10 @@ export function parseExpression(this: Transformer, expression: ts.Expression, de
       }
       // 或者，也可能是全局变量
       if (globalVariables.includes(strName)) {
-        const exp: CallExpression = {
-          kind: ExpressionKind.CALL,
-          text: 'GET_GLOBAL',
-          arguments: [{
-            kind: ExpressionKind.RAW,
-            text: strName
-          }]
-        };
-        return exp;
+        return createCall('GET_GLOBAL', {
+          kind: ExpressionKind.RAW,
+          text: strName
+        });
       }
       throw new Error(`常量 ${strName} 未定义`);
     } else {
@@ -133,19 +110,30 @@ export function parseExpression(this: Transformer, expression: ts.Expression, de
       text: expression.text
     };
   }
+  // !x 取反运算
+  if (ts.isPrefixUnaryExpression(expression)) {
+    return createCall('NOT', parseExpression.call(this, expression.operand, defines, globalVariables));
+  }
   // 运算，转化为相应函数
   if (ts.isBinaryExpression(expression)) {
-    // 普通运算
-    if (SimpleCalc.includes(expression.operatorToken.kind)) {
-      const exp: CallExpression = {
-        kind: ExpressionKind.CALL,
-        text: getCalcFunc(expression.operatorToken.kind).toUpperCase(),
-        arguments: [
-          parseExpression.call(this, expression.left, defines, globalVariables),
-          parseExpression.call(this, expression.right, defines, globalVariables)
-        ]
-      };
-      return exp;
+    // 普通运算 和 简单逻辑运算（与、或）
+    const kind: ts.SyntaxKind = expression.operatorToken.kind;
+    if (typeof(simpleCalc[kind]) !== 'undefined') {
+      return createCall(
+        simpleCalc[kind].toUpperCase(),
+        parseExpression.call(this, expression.left, defines, globalVariables),
+        parseExpression.call(this, expression.right, defines, globalVariables)
+      );
+    }
+    // 其他逻辑运算（大于、小于等）
+    const logicSymbol = tsMatchToSymbol(expression.operatorToken.kind);
+    if (typeof(logicSymbol) !== 'undefined') {
+      return createCall(
+        'COMPARE',
+        parseExpression.call(this, expression.left, defines, globalVariables),
+        createCompareExpression(logicSymbol),
+        parseExpression.call(this, expression.right, defines, globalVariables)
+      );
     }
     // TODO: 运算后赋值
     // if (typeof(CalcAndSet[expression.operatorToken.kind]) !== 'undefined') {
@@ -231,5 +219,13 @@ export function createSubEvent(name: string): SubEvent {
   return {
     kind: Events.SUB,
     sub: name
+  };
+}
+
+export function createCompareExpression(compare: CompareSymbol = CompareSymbol.EQUALS): CompareExpression {
+  return {
+    kind: ExpressionKind.COMPARE_SYMBOL,
+    text: "",
+    compare
   };
 }

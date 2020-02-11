@@ -3,11 +3,11 @@ import { Ast, Rule } from '../owcode/ast';
 import { Condition } from '../owcode/ast/conditions';
 import { OWEvent, SubEvent } from '../owcode/ast/event';
 import { CallExpression, ExpressionKind } from '../owcode/ast/expression';
+import { tsMatchToSymbol } from '../owcode/type/compare';
 import '../owcode/type/global';
-import { MatchSymbol } from '../owcode/type/match';
 import { getFinalAccess, isCanToString, PropertyAccess } from './accessUtils';
 import { parseEvent, parseExpression } from './expression';
-import { createSubCall, getVariable, getVariableResult, uuid, getClassName, getMethod } from './utils';
+import { createCall, createCondition, createSubCall, getClassName, getMethod, getVariable, getVariableResult, uuid } from './utils';
 import { DefinedContants } from './var';
 
 
@@ -54,14 +54,10 @@ export default class Transformer {
     if (Object.keys(globalInitializer).length > 0) {
       const actions: CallExpression[] = [];
       Object.keys(globalInitializer).forEach(name => {
-        actions.push({
-          kind: ExpressionKind.CALL,
-          text: 'SET_GLOBAL',
-          arguments: [{
-            kind: ExpressionKind.RAW,
-            text: name
-          }, globalInitializer[name]]
-        });
+        actions.push(createCall('SET_GLOBAL', {
+          kind: ExpressionKind.RAW,
+          text: name
+        }, globalInitializer[name]));
       });
       this.ast.rules.push({
         name: "init",
@@ -167,23 +163,17 @@ export default class Transformer {
           if (decorator.expression.expression.text === 'condition') {
             // 条件
             decorator.expression.arguments.forEach(condition => {
-              // 比较
               if (ts.isBinaryExpression(condition)) {
-                conditions.push({
-                  left: this.parseExpression(condition.left),
-                  right: this.parseExpression(condition.right),
-                  symbol: MatchSymbol.EQUALS
-                });
+                const symbol = tsMatchToSymbol(condition.operatorToken.kind);
+                // 比较
+                if (typeof(symbol) !== 'undefined') {
+                  conditions.push(createCondition(this.parseExpression(condition.left), this.parseExpression(condition.right), symbol));
+                  return;
+                }
+                // 其他就不管了，扔到else的逻辑里面去
               } else {
                 // 其他情况下，将左侧解析为OW表达式，右侧保持true
-                conditions.push({
-                  left: this.parseExpression(condition),
-                  symbol: MatchSymbol.EQUALS,
-                  right: {
-                    kind: ExpressionKind.BOOLEAN,
-                    text: 'TRUE'
-                  },
-                });
+                conditions.push(createCondition(this.parseExpression(condition)));
               }
             });
           }
@@ -213,23 +203,17 @@ export default class Transformer {
     body.statements.forEach(state => {
       // return特殊处理
       if (ts.isReturnStatement(state)) {
-        bodys.push({
-          kind: ExpressionKind.CALL,
-          text: 'ABORT',
-        });
+        bodys.push(createCall('ABORT'));
+        return;
       }
       // 函数调用或者函数赋值都在这里面
       if (ts.isExpressionStatement(state)) {
         // 赋值语句，转换为读写全局变量
         if (ts.isBinaryExpression(state.expression) && ts.isIdentifier(state.expression.left) && state.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
-          bodys.push({
-            kind: ExpressionKind.CALL,
-            text: 'SET_GLOBAL',
-            arguments: [{
-              kind: ExpressionKind.RAW,
-              text: state.expression.left.text
-            }, this.parseExpression(state.expression.right, defines, false)]
-          });
+          bodys.push(createCall('SET_GLOBAL', {
+            kind: ExpressionKind.RAW,
+            text: state.expression.left.text
+          }, this.parseExpression(state.expression.right, defines, false)));
           return;
         }
         // 函数调用语句

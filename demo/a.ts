@@ -1,25 +1,13 @@
 import '../src/owcode/type/global';
 
+let a = true;
+let b = false;
+let c = false;
 
 export class myClass {
-  test2() {
-    wait(1);
-  }
-
   @runAt(Events.GLOBAL_ONGOING)
-  @condition(Game.isWaitingPlayers)
+  @condition(Game.isWaitingPlayers, a)
   test() {
-    // e();
-    this.test2();
-    return;
-    wait(2);
-  }
-}
-
-class myClass2 {
-  @runAt(Events.GLOBAL_ONGOING)
-  @condition(Game.isWaitingPlayers)
-  test() {
-    wait(1);
+    c = a && b;
   }
 }

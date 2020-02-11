@@ -1,4 +1,5 @@
-import { ExpressionKind, isCallExpression, OWExpression } from "../ast/expression";
+import { CompareExpression, ExpressionKind, isCallExpression, OWExpression } from "../ast/expression";
+import { compareSymbolToString } from "./compareSymbolToString";
 import i18n from "./i18n";
 
 type varMap = { [x: string]: string };
@@ -8,8 +9,8 @@ export function expressionToCode(global: varMap, player: varMap, exp: OWExpressi
       return i18n(`BOOL_${exp.text}`);
     case ExpressionKind.CONSTANT:
       return i18n(`CONST_${exp.text}`);
-    case ExpressionKind.MATCH_SYMBOL:
-      return exp.text;
+    case ExpressionKind.COMPARE_SYMBOL:
+      return compareSymbolToString((exp as CompareExpression).compare);
     case ExpressionKind.NUMBER:
       let str = exp.text;
       if (!str.includes('.')) {

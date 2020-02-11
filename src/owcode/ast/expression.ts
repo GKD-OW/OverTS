@@ -1,7 +1,9 @@
+import { CompareSymbol } from "../type/compare";
+
 export enum ExpressionKind {
   CALL,
   CONSTANT,
-  MATCH_SYMBOL,
+  COMPARE_SYMBOL,
   NUMBER,
   BOOLEAN,
   STRING,
@@ -20,4 +22,13 @@ export interface CallExpression extends OWExpression {
 
 export function isCallExpression(obj: any): obj is CallExpression {
   return obj && obj.kind === ExpressionKind.CALL;
+}
+
+export interface CompareExpression extends OWExpression {
+  kind: ExpressionKind.COMPARE_SYMBOL,
+  compare: CompareSymbol;
+}
+
+export function isMatchExpression(obj: any): obj is CompareExpression {
+  return obj && obj.kind === ExpressionKind.COMPARE_SYMBOL;
 }

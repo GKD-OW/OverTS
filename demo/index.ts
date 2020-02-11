@@ -6,5 +6,5 @@ import to from '../src/owcode/generator';
 
 const transformer = new Transformer(readFileSync(resolve(__dirname, 'a.ts'), { encoding: 'UTF8' }));
 const result = to(transformer.getResult());
-// writeFileSync(resolve(__dirname, 'result.txt'), result, { encoding: 'UTF8' });
-console.log(result);
+writeFileSync(resolve(__dirname, 'result.txt'), result, { encoding: 'UTF8' });
+// console.log(result);
