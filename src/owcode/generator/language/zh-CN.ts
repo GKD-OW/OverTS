@@ -19,10 +19,12 @@ const zhCN: {[x: string]: string } = {
   EVENT_SUB: '子程序', // 子程序
   CONST_GAME_IS_WAITING_PLAYERS: '正在等待玩家',
   CONST_EMPTY_ARRAY: '空数组',
+  CONST_ADD: '加',
   FUNC_WAIT: '等待',
   FUNC_ABORT: '中止',
   FUNC_TELEPORT: '传送',
   FUNC_SET_GLOBAL: '设置全局变量',
+  FUNC_MODIFY_GLOBAL: '修改全局变量',
   FUNC_GET_GLOBAL: '全局变量',
   FUNC_ADD: '加',
   FUNC_COMPARE: '比较',
@@ -30,6 +32,7 @@ const zhCN: {[x: string]: string } = {
   FUNC_AND: '与',
   FUNC_OR: '或',
   FUNC_SET_GLOBAL_AT: '在索引处设置全局变量',
+  FUNC_MODIFY_GLOBAL_AT: '在索引处修改全局变量',
   FUNC_VALUE_IN_ARRAY: '数组中的值'
 }
 

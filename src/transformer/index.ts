@@ -10,7 +10,6 @@ import { parseEvent, parseExpression } from './expression';
 import { createCall, createCondition, createRaw, createSubCall, getClassName, getMethod, getVariable, getVariableResult, uuid } from './utils';
 import { DefinedContants } from './var';
 
-
 export default class Transformer {
   private ast: Ast;
   private file: ts.SourceFile;
@@ -302,6 +301,10 @@ export default class Transformer {
   }
 
   private parseExpression(exp: ts.Expression, defines: DefinedContants = {}, merge = true) {
-    return parseExpression.call(this, exp, merge ? this.getDefines(defines) : defines, this.vars.variables);
+    return parseExpression({
+      transformer: this,
+      defines: merge ? this.getDefines(defines) : defines,
+      vars: this.vars.variables
+    }, exp);
   }
 }

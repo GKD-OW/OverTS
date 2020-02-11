@@ -1,10 +1,16 @@
 import * as ts from "typescript";
 import { v4 as uuidv4 } from 'uuid';
 import Transformer from ".";
-import { CallExpression, ExpressionKind, OWExpression } from "../owcode/ast/expression";
+import { SubEvent } from "../owcode/ast/event";
+import { CallExpression, CompareExpression, ExpressionKind, OWExpression } from "../owcode/ast/expression";
 import { CompareSymbol } from "../owcode/type/compare";
+import { getFinalAccess, isCanToString, TextAccess } from "./accessUtils";
 import { parseExpression } from "./expression";
-import { DefinedContants } from "./var";
+import { DefinedContants, ParseContext } from "./var";
+
+export function uuid() {
+  return uuidv4().replace(/\-/g, '');
+}
 
 function deepParse(exp: ts.Node, defines?: DefinedContants): ts.Node {
   if (!defines) {
@@ -32,6 +38,12 @@ export interface getVariableResult {
   variables: string[];
   variableValues: { [x: string]: OWExpression };
 }
+/**
+ * 从一连串的表达式中提取变量声明
+ * @param this 
+ * @param statements 
+ * @param defines 
+ */
 export function getVariable(this: Transformer, statements: ts.Statement[] | ts.NodeArray<ts.Statement>, defines?: DefinedContants) {
   const result: getVariableResult = {
     defines: {},
@@ -53,7 +65,11 @@ export function getVariable(this: Transformer, statements: ts.Statement[] | ts.N
             // 添加到变量声明
             result.variables.push(declaration.name.text);
             if (declaration.initializer) {
-              result.variableValues[declaration.name.text] = parseExpression.call(this, declaration.initializer, result.defines);
+              result.variableValues[declaration.name.text] = parseExpression({
+                transformer: this,
+                defines: result.defines,
+                vars: []
+              }, declaration.initializer);
             }
           }
         }
@@ -81,10 +97,19 @@ export function getVariable(this: Transformer, statements: ts.Statement[] | ts.N
   return result;
 }
 
+/**
+ * 创建子程序调用表达式
+ * @param name 
+ */
 export function createSubCall(name: string): CallExpression {
   return createCall('CALL_SUB', createRaw(name));
 }
 
+/**
+ * 创建函数调用表达式
+ * @param name 
+ * @param args 
+ */
 export function createCall(name: string, ...args: OWExpression[]): CallExpression {
   return {
     kind: ExpressionKind.CALL,
@@ -93,6 +118,12 @@ export function createCall(name: string, ...args: OWExpression[]): CallExpressio
   };
 }
 
+/**
+ * 创建条件表达式
+ * @param left 
+ * @param right 
+ * @param symbol 
+ */
 export function createCondition(left: OWExpression, right: OWExpression = {
   kind: ExpressionKind.BOOLEAN,
   text: 'TRUE'
@@ -104,10 +135,33 @@ export function createCondition(left: OWExpression, right: OWExpression = {
   }
 }
 
-export function uuid() {
-  return uuidv4().replace(/\-/g, '');
+/**
+ * 创建子程序事件
+ * @param name 
+ */
+export function createSubEvent(name: string): SubEvent {
+  return {
+    kind: Events.SUB,
+    sub: name
+  };
 }
 
+/**
+ * 创建比较表达式
+ * @param compare 
+ */
+export function createCompareExpression(compare: CompareSymbol = CompareSymbol.EQUALS): CompareExpression {
+  return {
+    kind: ExpressionKind.COMPARE_SYMBOL,
+    text: "",
+    compare
+  };
+}
+
+/**
+ * 获取TS的类名称
+ * @param clazz 
+ */
 export function getClassName(clazz: ts.ClassDeclaration) {
   if (clazz.name && ts.isIdentifier(clazz.name)) {
     return clazz.name.text;
@@ -115,6 +169,11 @@ export function getClassName(clazz: ts.ClassDeclaration) {
   return '';
 }
 
+/**
+ * 从类中获取特定名称的方法定义
+ * @param clazz 
+ * @param name 
+ */
 export function getMethod(clazz: ts.ClassDeclaration, name: string) {
   for (const member of clazz.members) {
     if (ts.isMethodDeclaration(member) && member.name && ts.isIdentifier(member.name) && member.name.text === name) {
@@ -123,6 +182,10 @@ export function getMethod(clazz: ts.ClassDeclaration, name: string) {
   }
 }
 
+/**
+ * 将number类型的表达式转化为raw类型的表达式
+ * @param exp 
+ */
 export function numberToRaw(exp: OWExpression): OWExpression {
   if (exp.kind !== ExpressionKind.NUMBER) {
     return exp;
@@ -130,9 +193,46 @@ export function numberToRaw(exp: OWExpression): OWExpression {
   return createRaw(parseInt(exp.text).toString());
 }
 
+/**
+ * 创建raw类型的表达式
+ * @param text 
+ */
 export function createRaw(text: string) {
   return {
     kind: ExpressionKind.RAW,
     text
   }
+}
+
+/**
+ * 从TS的数组访问表达式中，获取访问详情
+ * @param context 
+ * @param exp 
+ */
+export function getArrayAccess(context: ParseContext, exp: ts.ElementAccessExpression) {
+  const left = getFinalAccess(exp.expression, context.defines);
+  const index = getFinalAccess(exp.argumentExpression, context.defines);
+  if (!(left instanceof TextAccess)) {
+    throw new Error('仅支持一维数组');
+  }
+  const name = left.toString();
+  if (!context.vars.includes(name)) {
+    throw new Error(`找不到全局变量 ${name}`);
+  }
+  let indexExp: OWExpression | undefined = undefined;
+  // 全局变量里面读取
+  if (isCanToString(index)) {
+    if (context.vars.includes(index.toString())) {
+      indexExp = createCall('GET_GLOBAL', createRaw(index.toString()));
+    }
+  } else {
+    indexExp = parseExpression(context, index);
+  }
+  if (!indexExp) {
+    throw new Error('无法识别数组访问');
+  }
+  return {
+    name: createRaw(name),
+    index: numberToRaw(indexExp)
+  };
 }
