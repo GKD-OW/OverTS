@@ -1,6 +1,4 @@
-import { Team, Heros } from '../src/owcode/type';
-// import '../src/owcode/type/constants';
-// import '../src/owcode/type/functions';
+import '../src/owcode/type/global';
 
 const a = 1;
 let b = 2;

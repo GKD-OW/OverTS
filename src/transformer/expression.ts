@@ -1,9 +1,9 @@
 import * as ts from 'typescript';
+import '../owcode/type/global';
 import Transformer from '.';
 import { ConstantNamespaces } from '../owcode/ast/constants';
 import { GlobalEvents, OWEvent, PlayerEvent, SubEvent, SubEvents } from '../owcode/ast/event';
 import { CallExpression, ExpressionKind, OWExpression } from '../owcode/ast/expression';
-import { Events, Heros, Team } from '../owcode/type';
 import { getFinalAccess, isCanToString, PropertyAccess } from './accessUtils';
 import { uuid } from './utils';
 import { DefinedContants } from './var';

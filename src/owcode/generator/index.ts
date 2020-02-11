@@ -83,10 +83,12 @@ export default function(ast: Ast, options?: GeneratorOption) {
       result.push(`${index}: ${name}`);
     });
     result.rightBrace();
+    result.push();
     Object.values(ast.sub).forEach(it => {
       addRule(it);
     });
   }
+
   // 规则区域
   ast.rules.forEach(rule => addRule(rule));
 

@@ -1,4 +1,4 @@
-import { Heros } from "../type/hero";
+import '../type/global';
 import i18n from "./i18n";
 
 const mapHeroToName: { [x: number]: string } = {

@@ -1,6 +1,4 @@
-import { Events } from "../type/event";
-import { Heros } from "../type/hero";
-import { Team } from "../type/variable";
+import '../type/global';
 
 export const GlobalEvents = [Events.GLOBAL_ONGOING];
 export const SubEvents = [Events.SUB];

@@ -1,5 +1,27 @@
-import { Player, Team } from "./variable";
-import { Heros } from "./hero";
+import * as globalthis from 'globalthis';
+const globals: any = globalthis();
+
+type Player = {};
+
+globals.Events = {
+  GLOBAL_ONGOING: 'GLOBAL_ONGOING', // 持续 - 全局
+  PLAYER_ONGOING: 'PLAYER_ONGOING', // 持续 - 每名玩家
+  PLAYER_ELIM: 'PLAYER_ELIM', // 玩家参与消灭
+  PLAYER_FINAL_BLOW: 'PLAYER_FINAL_BLOW', // 玩家造成最后一击
+  PLAYER_DEALT_DAMAGE: 'PLAYER_DEALT_DAMAGE', // 玩家造成伤害
+  SUB: 'SUB' // 子程序
+}
+
+globals.Team = {
+  ALL: 0,
+  A: 1,
+  B: 2
+}
+
+globals.Heros = {
+  ALL: 0,
+  MERCY: 1
+}
 
 declare global {
   function runAt(event: string): any;
@@ -13,6 +35,19 @@ declare global {
     PLAYER_FINAL_BLOW = 'PLAYER_FINAL_BLOW', // 玩家造成最后一击
     PLAYER_DEALT_DAMAGE = 'PLAYER_DEALT_DAMAGE', // 玩家造成伤害
     SUB = 'SUB' // 子程序
+  }
+
+  enum Team {
+    ALL,
+    A,
+    B
+  }
+}
+
+declare global {
+  enum Heros {
+    ALL = 0,
+    MERCY = 1
   }
 }
 

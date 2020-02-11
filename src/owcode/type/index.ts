@@ -1,9 +1,6 @@
 import './constants';
-import './functions';
+import './global';
 
+export * from './global';
 export * from './constants';
-export * from './event';
-export * from './functions';
-export * from './hero';
 export * from './match';
-export * from './variable';

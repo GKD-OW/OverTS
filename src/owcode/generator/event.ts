@@ -1,5 +1,5 @@
+import '../type/global';
 import { isPlayerEvent, isSubEvent, OWEvent } from "../ast/event";
-import { Team } from "../type/variable";
 import { getHero } from "./hero";
 import i18n from "./i18n";
 

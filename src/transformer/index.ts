@@ -1,10 +1,10 @@
 import * as ts from 'typescript';
+import '../owcode/type/global';
 import { Ast, Rule } from '../owcode/ast';
 import { Condition } from '../owcode/ast/conditions';
 import { OWEvent, SubEvent } from '../owcode/ast/event';
 import { CallExpression, ExpressionKind } from '../owcode/ast/expression';
 import { MatchSymbol } from '../owcode/type';
-import { Events } from '../owcode/type/event';
 import { parseEvent, parseExpression } from './expression';
 import { getVariable, getVariableResult, uuid } from './utils';
 import { DefinedContants } from './var';
