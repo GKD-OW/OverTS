@@ -44,8 +44,11 @@ export function getFinalAccess(exp: ts.Node, defines?: DefinedContants): ts.Expr
   if (ts.isStringLiteral(exp)) {
     return new TextAccess(exp.text);
   }
-  if (ts.isPropertyAccessExpression(exp)) {
-    return new PropertyAccess(getFinalAccess(exp.expression, defines), getFinalAccess(exp.name, defines));
+  if (ts.isPropertyAccessExpression(exp) && ts.isIdentifier(exp.name)) {
+    return new PropertyAccess(getFinalAccess(exp.expression, defines), new TextAccess(exp.name.text));
+  }
+  if (ts.isElementAccessExpression(exp)) {
+    return new PropertyAccess(getFinalAccess(exp.expression, defines), getFinalAccess(exp.argumentExpression, defines));
   }
   return exp;
 }

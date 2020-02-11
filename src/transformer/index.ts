@@ -7,7 +7,7 @@ import '../owcode/type/global';
 import { MatchSymbol } from '../owcode/type/match';
 import { getFinalAccess, isCanToString, PropertyAccess } from './accessUtils';
 import { parseEvent, parseExpression } from './expression';
-import { createSubCall, getVariable, getVariableResult, uuid } from './utils';
+import { createSubCall, getVariable, getVariableResult, uuid, getClassName, getMethod } from './utils';
 import { DefinedContants } from './var';
 
 
@@ -78,20 +78,22 @@ export default class Transformer {
     this.file.statements.forEach(statement => {
       // 遍历所有的类，将其中的函数作为规则
       if (ts.isClassDeclaration(statement)) {
-        let className = "class_" + uuid();
-        if (statement.name && ts.isIdentifier(statement.name)) {
-          className = statement.name.text;
-        }
         statement.members.forEach(member => {
           if (ts.isMethodDeclaration(member)) {
-            this.visitMethod(className, member);
+            this.visitMethod(statement, member);
           }
         });
       }
     });
   }
 
-  private visitMethod(className: string, method: ts.MethodDeclaration) {
+  private visitMethod(clazz: ts.ClassDeclaration, method: ts.MethodDeclaration) {
+    let className = "class_" + uuid();
+    if (clazz.name && ts.isIdentifier(clazz.name)) {
+      className = clazz.name.text;
+    } else {
+      clazz.name = ts.createIdentifier(className);
+    }
     // 非public的方法，都视为禁用的规则，不理会
     let avaliable = true;
     if (method.modifiers) {
@@ -125,14 +127,14 @@ export default class Transformer {
     // 这是一条要运行的规则，遍历注解，提取出事件和条件
     const meta = this.getRuleMeta(method.decorators);
     if (!meta) {
-      // 名称由自己名称和类名称共同组成
-      this.parseSub(`${className}_${rule.name}`, method.body);
+      // 没有事件的一律忽略
+      return;
     } else {
       rule.event = meta.event;
       rule.conditions = meta.conditions;
     }
     // 开始遍历主体
-    rule.actions = this.parseRuleBody(method.body);
+    rule.actions = this.parseRuleBody(method.body, clazz);
     this.ast.rules.push(rule);
   }
 
@@ -189,14 +191,13 @@ export default class Transformer {
    * @param body 
    * @param defines 
    */
-  private parseRuleBody(body: ts.Block, parentDefines?: DefinedContants) {
+  private parseRuleBody(body: ts.Block, clazz?: ts.ClassDeclaration, parentDefines?: DefinedContants) {
     // 首先取出宏定义（可能有）
     const vars = getVariable.call(this, body.statements);
     const defines = this.getDefines(vars.defines, parentDefines);
     // 然后开始逐句解析
     let bodys: CallExpression[] = [];
     body.statements.forEach(state => {
-      debugger;
       // 函数调用或者函数赋值都在这里面
       if (ts.isExpressionStatement(state)) {
         // 赋值语句，转换为读写全局变量
@@ -217,9 +218,23 @@ export default class Transformer {
           const finalExp = getFinalAccess(state.expression.expression, defines);
           // 如果遇到this调用，则进行子程序解析
           if (isCanToString(finalExp)) {
-            if (finalExp instanceof PropertyAccess) {
-              if (finalExp.left.toString() === 'this') {
-                console.log("this call");
+            if (finalExp instanceof PropertyAccess && !isCanToString(finalExp.left)) {
+              const leftExp = finalExp.left as ts.Expression;
+              if (leftExp.kind === ts.SyntaxKind.ThisKeyword) {
+                if (!clazz) {
+                  throw new Error("Can not access 'this'");
+                }
+                const subMethodName = finalExp.right.toString();
+                const subName = getClassName(clazz) + '_' + subMethodName;
+                const subMethod = getMethod(clazz, subMethodName);
+                if (!subMethod) {
+                  throw new Error(`类 ${getClassName(clazz)} 上不存在方法 ${subName}`);
+                }
+                if (!subMethod.body) {
+                  throw new Error(`方法 ${subName} 不能为空`);
+                }
+                this.parseSub(subName, subMethod.body);
+                bodys.push(createSubCall(subName));
                 return;
               }
             }
@@ -229,7 +244,7 @@ export default class Transformer {
             if (body) {
               if (ts.isBlock(body)) {
                 // 有很多条语句的body
-                bodys = bodys.concat(this.parseRuleBody(body, defines));
+                bodys = bodys.concat(this.parseRuleBody(body, clazz, defines));
               } else {
                 // 单条语句
                 bodys.push(this.parseExpression(body, defines, false) as CallExpression);
@@ -268,7 +283,7 @@ export default class Transformer {
    * 解析子程序，并加入到子程序列表里面
    * @param name 
    */
-  public parseSub(name: string, body: ts.Block) {
+  public parseSub(name: string, body: ts.Block, clazz?: ts.ClassDeclaration) {
     if (typeof(this.ast.sub[name]) !== 'undefined') {
       return;
     }
@@ -280,7 +295,7 @@ export default class Transformer {
       name,
       event,
       conditions: [],
-      actions: this.parseRuleBody(body)
+      actions: this.parseRuleBody(body, clazz)
     };
     // 解析body
     this.ast.sub[name] = rule;

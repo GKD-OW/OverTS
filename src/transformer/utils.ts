@@ -94,3 +94,18 @@ export function createSubCall(name: string): CallExpression {
 export function uuid() {
   return uuidv4().replace(/\-/g, '');
 }
+
+export function getClassName(clazz: ts.ClassDeclaration) {
+  if (clazz.name && ts.isIdentifier(clazz.name)) {
+    return clazz.name.text;
+  }
+  return '';
+}
+
+export function getMethod(clazz: ts.ClassDeclaration, name: string) {
+  for (const member of clazz.members) {
+    if (ts.isMethodDeclaration(member) && member.name && ts.isIdentifier(member.name) && member.name.text === name) {
+      return member;
+    }
+  }
+}
