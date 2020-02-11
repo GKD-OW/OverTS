@@ -15,7 +15,7 @@ export interface OWExpression {
 
 export interface CallExpression extends OWExpression {
   kind: ExpressionKind.CALL,
-  arguments: OWExpression[];
+  arguments?: OWExpression[];
 }
 
 export function isCallExpression(obj: any): obj is CallExpression {

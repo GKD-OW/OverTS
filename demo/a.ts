@@ -11,6 +11,8 @@ export class myClass {
   test() {
     // e();
     this.test2();
+    return;
+    wait(2);
   }
 }
 

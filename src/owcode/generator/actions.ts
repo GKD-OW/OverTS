@@ -34,7 +34,7 @@ export function expressionToCode(global: varMap, player: varMap, exp: OWExpressi
   if (isCallExpression(exp)) {
     const name = i18n(`FUNC_${exp.text}`);
     // TODO: 如果是访问变量，那么做一个对应关系
-    const args: string = exp.arguments.map(expressionToCode.bind(null, global, player)).join(', ');
+    const args: string = exp.arguments ? exp.arguments.map(expressionToCode.bind(null, global, player)).join(', ') : '';
     return `${name}(${args})`;
   }
   throw new Error('未知表达式');

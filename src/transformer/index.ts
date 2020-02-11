@@ -211,6 +211,13 @@ export default class Transformer {
     // 然后开始逐句解析
     let bodys: CallExpression[] = [];
     body.statements.forEach(state => {
+      // return特殊处理
+      if (ts.isReturnStatement(state)) {
+        bodys.push({
+          kind: ExpressionKind.CALL,
+          text: 'ABORT',
+        });
+      }
       // 函数调用或者函数赋值都在这里面
       if (ts.isExpressionStatement(state)) {
         // 赋值语句，转换为读写全局变量
