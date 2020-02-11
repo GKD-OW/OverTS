@@ -78,6 +78,19 @@ export default class Transformer {
     this.file.statements.forEach(statement => {
       // 遍历所有的类，将其中的函数作为规则
       if (ts.isClassDeclaration(statement)) {
+        // 只访问带有export标志的类
+        if (!statement.modifiers) {
+          return;
+        }
+        let isExported = false;
+        statement.modifiers.forEach(modifier => {
+          if (modifier.kind === ts.SyntaxKind.ExportKeyword) {
+            isExported = true;
+          }
+        });
+        if (!isExported) {
+          return;
+        }
         statement.members.forEach(member => {
           if (ts.isMethodDeclaration(member)) {
             this.visitMethod(statement, member);

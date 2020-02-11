@@ -13,3 +13,11 @@ export class myClass {
     this.test2();
   }
 }
+
+class myClass2 {
+  @runAt(Events.GLOBAL_ONGOING)
+  @condition(Game.isWaitingPlayers)
+  test() {
+    wait(1);
+  }
+}
