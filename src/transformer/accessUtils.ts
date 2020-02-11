@@ -47,7 +47,8 @@ export function getFinalAccess(exp: ts.Node, defines?: DefinedContants): ts.Expr
   if (ts.isPropertyAccessExpression(exp) && ts.isIdentifier(exp.name)) {
     return new PropertyAccess(getFinalAccess(exp.expression, defines), new TextAccess(exp.name.text));
   }
-  if (ts.isElementAccessExpression(exp)) {
+  // 数组形式的对象访问，但不处理下标是数字的情况
+  if (ts.isElementAccessExpression(exp) && !ts.isNumericLiteral(exp.argumentExpression)) {
     return new PropertyAccess(getFinalAccess(exp.expression, defines), getFinalAccess(exp.argumentExpression, defines));
   }
   return exp;

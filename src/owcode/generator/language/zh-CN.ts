@@ -17,6 +17,8 @@ const zhCN: {[x: string]: string } = {
   EVENT_GLOBAL_ONGOING: '持续 - 全局', // 持续 - 全局
   EVENT_PLAYER_ONGOING: '持续 - 每名玩家', // 持续 - 每名玩家
   EVENT_SUB: '子程序', // 子程序
+  CONST_GAME_IS_WAITING_PLAYERS: '正在等待玩家',
+  CONST_EMPTY_ARRAY: '空数组',
   FUNC_WAIT: '等待',
   FUNC_ABORT: '中止',
   FUNC_TELEPORT: '传送',
@@ -24,10 +26,11 @@ const zhCN: {[x: string]: string } = {
   FUNC_GET_GLOBAL: '全局变量',
   FUNC_ADD: '加',
   FUNC_COMPARE: '比较',
-  CONST_GAME_IS_WAITING_PLAYERS: '正在等待玩家',
   FUNC_CALL_SUB: '调用子程序',
   FUNC_AND: '与',
   FUNC_OR: '或',
+  FUNC_SET_GLOBAL_AT: '在索引处设置全局变量',
+  FUNC_VALUE_IN_ARRAY: '数组中的值'
 }
 
 export default zhCN;

@@ -5,8 +5,8 @@ import { GlobalEvents, OWEvent, PlayerEvent, SubEvent, SubEvents } from '../owco
 import { CallExpression, CompareExpression, ExpressionKind, OWExpression } from '../owcode/ast/expression';
 import { CompareSymbol, tsMatchToSymbol } from '../owcode/type/compare';
 import '../owcode/type/global';
-import { getFinalAccess, isCanToString, PropertyAccess } from './accessUtils';
-import { createCall, createSubCall, uuid } from './utils';
+import { getFinalAccess, isCanToString, PropertyAccess, TextAccess } from './accessUtils';
+import { createCall, createSubCall, uuid, numberToRaw, createRaw } from './utils';
 import { DefinedContants } from './var';
 
 // 普通算数运算符
@@ -83,10 +83,7 @@ export function parseExpression(this: Transformer, expression: ts.Expression, de
       }
       // 或者，也可能是全局变量
       if (globalVariables.includes(strName)) {
-        return createCall('GET_GLOBAL', {
-          kind: ExpressionKind.RAW,
-          text: strName
-        });
+        return createCall('GET_GLOBAL', createRaw(strName));
       }
       throw new Error(`常量 ${strName} 未定义`);
     } else {
@@ -103,21 +100,90 @@ export function parseExpression(this: Transformer, expression: ts.Expression, de
       };
     }
   }
+  // 访问数组
+  if (ts.isElementAccessExpression(expression)) {
+    const left = getFinalAccess(expression.expression, defines);
+    if (!(left instanceof TextAccess)) {
+      throw new Error('仅支持一维数组');
+    }
+    const name = left.toString();
+    // 必须是全局变量
+    if (!globalVariables.includes(name)) {
+      throw new Error(`找不到全局变量 ${name}`);
+    }
+    const index = getFinalAccess(expression.argumentExpression, defines);
+    let indexExp: OWExpression | undefined = undefined;
+    // 全局变量里面读取
+    if (isCanToString(index)) {
+      if (globalVariables.includes(index.toString())) {
+        indexExp = createCall('GET_GLOBAL', createRaw(index.toString()));
+      }
+    } else {
+      indexExp = parseExpression.call(this, index, defines, globalVariables);
+    }
+    if (!indexExp) {
+      throw new Error('无法识别数组访问');
+    }
+    indexExp = numberToRaw(indexExp);
+    return createCall('VALUE_IN_ARRAY', createCall('GET_GLOBAL', createRaw(name)), indexExp);
+  }
+  // 纯数字
   if (ts.isNumericLiteral(expression)) {
-    // 纯数字
     return {
       kind: ExpressionKind.NUMBER,
       text: expression.text
     };
   }
-  // !x 取反运算
   if (ts.isPrefixUnaryExpression(expression)) {
-    return createCall('NOT', parseExpression.call(this, expression.operand, defines, globalVariables));
+    // !x 取反运算
+    if(expression.operator === ts.SyntaxKind.ExclamationToken) {
+      return createCall('NOT', parseExpression.call(this, expression.operand, defines, globalVariables));
+    }
+    // 自增、自减运算
+    if (expression.operator === ts.SyntaxKind.MinusMinusToken) {
+      // 可能有两种情况，一种是修改，一种是在索引处修改
+      if (ts.isElementAccessExpression(expression.operand)) {
+        const finalAccess = getFinalAccess(expression.operand.expression);
+        const index = getFinalAccess(expression.operand.argumentExpression);
+        if (!isCanToString(finalAccess)) {
+          throw new Error('');
+        }
+        return createCall('MODIFY_GLOBAL_AT')
+      }
+      return createCall('')
+    }
   }
   // 运算，转化为相应函数
   if (ts.isBinaryExpression(expression)) {
-    // 普通运算 和 简单逻辑运算（与、或）
     const kind: ts.SyntaxKind = expression.operatorToken.kind;
+    // 赋值运算
+    if (kind === ts.SyntaxKind.EqualsToken) {
+      // 数组赋值和其他情况分开处理
+      if (ts.isElementAccessExpression(expression.left)) {
+        let index = numberToRaw(parseExpression.call(this, expression.left.argumentExpression, defines, globalVariables));
+        const varName = getFinalAccess(expression.left.expression, defines);
+        if (!isCanToString(varName)) {
+          throw new Error('读写数组时，必须明确指定全局变量名称');
+        }
+        const varNameStr = varName.toString();
+        if (!globalVariables.includes(varNameStr)) {
+          throw new Error(`找不到全局变量 ${varNameStr}`);
+        }
+        return createCall(
+          'SET_GLOBAL_AT',
+          createRaw(varNameStr),
+          index,
+          parseExpression.call(this, expression.right, defines, globalVariables)
+        );
+      } else {
+        return createCall(
+          'SET_GLOBAL',
+          parseExpression.call(this, expression.left, defines, globalVariables),
+          parseExpression.call(this, expression.right, defines, globalVariables)
+        );
+      }
+    }
+    // 普通运算 和 简单逻辑运算（与、或）
     if (typeof(simpleCalc[kind]) !== 'undefined') {
       return createCall(
         simpleCalc[kind].toUpperCase(),
@@ -160,6 +226,16 @@ export function parseExpression(this: Transformer, expression: ts.Expression, de
     return {
       kind: ExpressionKind.BOOLEAN,
       text: 'TRUE'
+    };
+  }
+  // 不支持有元素的数组
+  if (ts.isArrayLiteralExpression(expression)) {
+    if (expression.elements.length > 0) {
+      throw new Error('数组赋值仅支持空数组');
+    }
+    return {
+      kind: ExpressionKind.CONSTANT,
+      text: 'EMPTY_ARRAY'
     };
   }
   console.error(expression);

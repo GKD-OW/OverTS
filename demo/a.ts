@@ -1,13 +1,14 @@
 import '../src/owcode/type/global';
 
-let a = true;
-let b = false;
-let c = false;
+let a = [];
+let b = [];
 
 export class myClass {
   @runAt(Events.GLOBAL_ONGOING)
-  @condition(Game.isWaitingPlayers, a)
+  @condition(Game.isWaitingPlayers)
   test() {
-    c = a && b;
+    a[2] = 3;
+    b[1] = 2;
+    wait(a[b[1]]);
   }
 }

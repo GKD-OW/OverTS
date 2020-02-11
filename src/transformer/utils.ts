@@ -53,7 +53,7 @@ export function getVariable(this: Transformer, statements: ts.Statement[] | ts.N
             // 添加到变量声明
             result.variables.push(declaration.name.text);
             if (declaration.initializer) {
-              result.variableValues[declaration.name.text] = parseExpression.call(this, declaration.initializer);
+              result.variableValues[declaration.name.text] = parseExpression.call(this, declaration.initializer, result.defines);
             }
           }
         }
@@ -82,10 +82,7 @@ export function getVariable(this: Transformer, statements: ts.Statement[] | ts.N
 }
 
 export function createSubCall(name: string): CallExpression {
-  return createCall('CALL_SUB', {
-    kind: ExpressionKind.RAW,
-    text: name
-  });
+  return createCall('CALL_SUB', createRaw(name));
 }
 
 export function createCall(name: string, ...args: OWExpression[]): CallExpression {
@@ -123,5 +120,19 @@ export function getMethod(clazz: ts.ClassDeclaration, name: string) {
     if (ts.isMethodDeclaration(member) && member.name && ts.isIdentifier(member.name) && member.name.text === name) {
       return member;
     }
+  }
+}
+
+export function numberToRaw(exp: OWExpression): OWExpression {
+  if (exp.kind !== ExpressionKind.NUMBER) {
+    return exp;
+  }
+  return createRaw(parseInt(exp.text).toString());
+}
+
+export function createRaw(text: string) {
+  return {
+    kind: ExpressionKind.RAW,
+    text
   }
 }

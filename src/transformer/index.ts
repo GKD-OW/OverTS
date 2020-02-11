@@ -2,12 +2,12 @@ import * as ts from 'typescript';
 import { Ast, Rule } from '../owcode/ast';
 import { Condition } from '../owcode/ast/conditions';
 import { OWEvent, SubEvent } from '../owcode/ast/event';
-import { CallExpression, ExpressionKind } from '../owcode/ast/expression';
+import { CallExpression } from '../owcode/ast/expression';
 import { tsMatchToSymbol } from '../owcode/type/compare';
 import '../owcode/type/global';
 import { getFinalAccess, isCanToString, PropertyAccess } from './accessUtils';
 import { parseEvent, parseExpression } from './expression';
-import { createCall, createCondition, createSubCall, getClassName, getMethod, getVariable, getVariableResult, uuid } from './utils';
+import { createCall, createCondition, createRaw, createSubCall, getClassName, getMethod, getVariable, getVariableResult, uuid } from './utils';
 import { DefinedContants } from './var';
 
 
@@ -54,10 +54,7 @@ export default class Transformer {
     if (Object.keys(globalInitializer).length > 0) {
       const actions: CallExpression[] = [];
       Object.keys(globalInitializer).forEach(name => {
-        actions.push(createCall('SET_GLOBAL', {
-          kind: ExpressionKind.RAW,
-          text: name
-        }, globalInitializer[name]));
+        actions.push(createCall('SET_GLOBAL', createRaw(name), globalInitializer[name]));
       });
       this.ast.rules.push({
         name: "init",
@@ -208,14 +205,6 @@ export default class Transformer {
       }
       // 函数调用或者函数赋值都在这里面
       if (ts.isExpressionStatement(state)) {
-        // 赋值语句，转换为读写全局变量
-        if (ts.isBinaryExpression(state.expression) && ts.isIdentifier(state.expression.left) && state.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
-          bodys.push(createCall('SET_GLOBAL', {
-            kind: ExpressionKind.RAW,
-            text: state.expression.left.text
-          }, this.parseExpression(state.expression.right, defines, false)));
-          return;
-        }
         // 函数调用语句
         if (ts.isCallExpression(state.expression)) {
           // 获取最终访问的是谁
@@ -255,7 +244,7 @@ export default class Transformer {
               }
             }
             return;
-          } else if (ts.isFunctionExpression(finalExp) || ts.isFunctionDeclaration(finalExp)) {
+          } else if (ts.isFunctionExpression(finalExp)) {
             // 普通函数调用也作为子程序进行解析
             const func = finalExp as ts.FunctionExpression;
             // 作为子程序进行
@@ -276,8 +265,8 @@ export default class Transformer {
             }
             return;
           }
-          bodys.push(this.parseExpression(state.expression, defines, false) as CallExpression);
         }
+        bodys.push(this.parseExpression(state.expression, defines, false) as CallExpression);
       }
     });
     return bodys;
