@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
 
-type AvaliableType = ts.UnionTypeNode | ts.KeywordTypeNode | ts.TypeReferenceNode;
+type AvaliableType = ts.UnionTypeNode | ts.KeywordTypeNode | ts.TypeReferenceNode | ts.ArrayTypeNode;
 
 export default class TSWriter {
   private file: ts.SourceFile;

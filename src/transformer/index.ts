@@ -53,7 +53,7 @@ export default class Transformer {
     if (Object.keys(globalInitializer).length > 0) {
       const actions: CallExpression[] = [];
       Object.keys(globalInitializer).forEach(name => {
-        actions.push(createCall('SET_GLOBAL', createRaw(name), globalInitializer[name]));
+        actions.push(createCall('SET_GLOBAL_VAR', createRaw(name), globalInitializer[name]));
       });
       this.ast.rules.push({
         name: "init",

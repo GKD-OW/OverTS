@@ -223,7 +223,7 @@ export function getArrayAccess(context: ParseContext, exp: ts.ElementAccessExpre
   // 全局变量里面读取
   if (isCanToString(index)) {
     if (context.vars.includes(index.toString())) {
-      indexExp = createCall('GET_GLOBAL', createRaw(index.toString()));
+      indexExp = createCall('GLOBAL_VAR', createRaw(index.toString()));
     }
   } else {
     indexExp = parseExpression(context, index);

@@ -5,12 +5,12 @@ import i18n from "./i18n";
 
 function getTeam(team: Team) {
   switch (team) {
-    case Team.A:
-      return i18n('TEAM_A');
-    case Team.B:
-      return i18n('TEAM_B');
+    case Team.ONE:
+      return i18n('CONST_TEAM_ONE');
+    case Team.TWO:
+      return i18n('CONST_TEAM_TWO');
     default:
-      return i18n('TEAM_ALL');
+      return i18n('CONST_TEAM_ALL');
   }
 }
 

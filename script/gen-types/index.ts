@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as ts from 'typescript';
 import TSWriter from './TSWriter';
 
-type AvaliableType = ts.UnionTypeNode | ts.KeywordTypeNode | ts.TypeReferenceNode;
+type AvaliableType = ts.UnionTypeNode | ts.KeywordTypeNode | ts.TypeReferenceNode | ts.ArrayTypeNode;
 
 interface FunctionResult {
   name: string;
@@ -15,24 +15,38 @@ interface FunctionResult {
   }[];
 }
 
+const funcAlias: { [x: string]: string } = {
+  'any': 'oneOf',
+  'all': 'allOf',
+  'map': 'mapOf'
+}
 const enumAlias: { [x: string]: string } = {
   Map: 'Maps',
   Position: 'Pos'
 }
+const enumType: { [x: string]: string } = {
+  Pos: 'VECTOR'
+}
 const knownType: { [x: string]: AvaliableType } = {
   PLAYER: ts.createTypeReferenceNode('Player', undefined),
+  VECTOR: ts.createTypeReferenceNode('Vector', undefined),
+  'STRING CONSTANT': ts.createTypeReferenceNode('Strings', undefined),
   ANY: ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+  VOID: ts.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
   VARIABLE: ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
   BOOLEAN: ts.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
-  NUMBER: ts.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)
+  NUMBER: ts.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
+  STRING: ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
 }
 
 // 补充国际化文本
 const locales: any = require('./locales.json');
+const returnType: { [x: string]: string } = require('./returnType.json');
 const sourceDir = resolve(__dirname, 'data');
 const resultDir = resolve(__dirname, 'result');
 const result = {
   functions: [] as FunctionResult[],
+  strings: [] as string[],
   constants: [] as string[],
   events: [] as string[]
 }
@@ -148,13 +162,7 @@ function upperFirse(str: string) {
 function formatTo(from: string, toFormat: string) {
   // 检测当前的格式，统一转换为以空格分隔的小写命名
   let formatted = removeSpecial(from);
-  if (formatted.includes('.')) {
-    formatted = formatted.replace(/\./g, ' ');
-  }
-  // A_XXX_B形式
-  if (formatted.includes('_')) {
-    formatted = from.toLowerCase().replace(/_/g, ' ');
-  }
+  formatted = formatted.replace(/([\._\-])/g, ' ');
   // 本身就是全大写的，转化为小写
   if (/^([A-Z ]+)$/.test(formatted)) {
     formatted = formatted.toLowerCase();
@@ -207,6 +215,9 @@ function addFunc(func: FunctionResult, allLangs: any) {
   newName = formatTo(newName, 'toFormat');
   if (newName === '') {
     return;
+  }
+  if (typeof(funcAlias[newName]) !== 'undefined') {
+    newName = funcAlias[newName];
   }
   result.functions.push({ ...func, name: newName });
   // 写入语言
@@ -285,6 +296,20 @@ function readEvents() {
 readEvents();
 
 
+// 内置字符串
+function readStrings() {
+  const strings = read('stringKw')[0];
+  strings.forEach((it: any) => {
+    const name = formatTo(it.opy, 'TO_FORMAT');
+    if (name === '') {
+      return;
+    }
+    result.strings.push(name);
+    writeLang(`CONST_STR_${name}`, it);
+  });
+}
+readStrings();
+
 // 提取出warning
 if (Object.keys(langWarnings).length > 0) {
   const locales: any = {};
@@ -303,7 +328,7 @@ function write() {
     return node;
   })));
 
-  // 写入常量声明
+  // 写常量
   const constDeclare: { [x: string]: ts.Statement } = {};
   const enums: { [x: string]: { [x: string]: ts.Expression } } = {};
   result.constants.map(it => {
@@ -317,11 +342,23 @@ function write() {
       if (typeof(enums[left][right]) !== 'undefined') {
         return;
       }
-      enums[left][right] = ts.createStringLiteral(right);
+      // 看一下有没有特别指定的类型
+      if (typeof(enumType[left]) !== 'undefined') {
+        enums[left][right] = ts.createStringLiteral(`_GKD_${enumType[left]}_`);
+      } else {
+        enums[left][right] = ts.createStringLiteral(right);
+      }
     } else {
       constDeclare[it] = writer.createConst(it, ts.SyntaxKind.AnyKeyword);
     }
   });
+  // 写事件
+  enums['Events'] = {};
+  result.events.forEach(it => enums['Events'][it] = ts.createStringLiteral(it));
+  // 写字符串
+  enums['Strings'] = {};
+  result.strings.forEach(it => enums['Strings'][it] = ts.createStringLiteral(it));
+  // 写入声明
   writer.pushDeclare([
     ...Object.values(constDeclare),
     ...Object.keys(enums).map(it => writer.createEnum(it, enums[it]))
@@ -333,36 +370,72 @@ function write() {
   const enumAliasNames = Object.keys(enumAlias);
   const enumNamesUpper = enumNames.map(it => it.toUpperCase());
   const enumAliasNamesUpper = enumAliasNames.map(it => it.toUpperCase());
-  const detectType = (text: string) => {
+  const detectType = (text: string): AvaliableType => {
+    // 如果有好几种类型
+    if (text.includes('|')) {
+      return ts.createUnionTypeNode(text.split('|').map(it => detectType(it.trim())));
+    }
+    // 可能是数组类型
+    if (/\[\]$/.test(text)) {
+      return ts.createArrayTypeNode(detectType(text.substr(0, text.length - 2)));
+    }
+    // 末尾有个?
+    if (/\?$/.test(text)) {
+      return ts.createUnionTypeNode([
+        detectType(text.substr(0, text.length - 1)),
+        ts.createKeywordTypeNode(ts.SyntaxKind.NullKeyword)
+      ]);
+    }
     // 从已知类型中检测
     if (typeof(knownType[text]) !== 'undefined') {
       return knownType[text];
     }
     // 从之前的enum中检测
     let typeText = text;
+    let hasGot = false;
     if (enumAliasNamesUpper.includes(typeText)) {
+      hasGot = true;
       typeText = enumAlias[enumAliasNames[enumAliasNamesUpper.indexOf(typeText)]];
     }
     if (enumNames.includes(typeText)) {
-      return ts.createTypeReferenceNode(typeText, undefined);
+      hasGot = true;
     }
     const isEnum = enumNamesUpper.indexOf(typeText);
     if (isEnum !== -1) {
+      hasGot = true;
+      typeText = enumNames[isEnum];
+    }
+    if (typeof(enumType[typeText]) !== 'undefined') {
+      return detectType(enumType[typeText]);
+    }
+    if (hasGot) {
       return ts.createTypeReferenceNode(enumNames[isEnum], undefined);
     }
 
     !unknownTypes.includes(text) && unknownTypes.push(text);
-    return ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword);
+    return knownType['ANY'];
   }
+  const unknownReturn: string[] = [];
   writer.pushDeclare(result.functions.map(it => {
+    let itReturn: AvaliableType = knownType['ANY'];
+    if (typeof(returnType[it.name]) === 'undefined') {
+      unknownReturn.push(it.name);
+    } else {
+      itReturn = detectType(returnType[it.name]);
+    }
     return writer.createFunction(it.name, it.args.map(arg => {
       return {
         name: arg.name,
         desc: arg.desc,
         type: detectType(arg.type)
       }
-    }), ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword), it.desc);
+    }), itReturn, it.desc);
   }));
+
+  // 生成返回定义
+  const returns: any = {};
+  unknownReturn.forEach(it => returns[it] = "");
+  fs.writeFileSync(resolve(__dirname, 'returnType_2.json'), JSON.stringify(returns, null, '  '), { encoding: 'UTF8' });
 
   console.log(unknownTypes);
 

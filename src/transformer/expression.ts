@@ -80,7 +80,7 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
       }
       // 或者，也可能是全局变量
       if (context.vars.includes(strName)) {
-        return createCall('GET_GLOBAL', createRaw(strName));
+        return createCall('GLOBAL_VAR', createRaw(strName));
       }
       throw new Error(`常量 ${strName} 未定义`);
     } else {
@@ -100,7 +100,7 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
   // 访问数组
   if (ts.isElementAccessExpression(expression)) {
     const arrayAccess = getArrayAccess(context, expression);
-    return createCall('VALUE_IN_ARRAY', createCall('GET_GLOBAL', arrayAccess.name), arrayAccess.index);
+    return createCall('VALUE_IN_ARRAY', createCall('GLOBAL_VAR', arrayAccess.name), arrayAccess.index);
   }
   // 纯数字
   if (ts.isNumericLiteral(expression)) {
@@ -133,7 +133,7 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
       // 可能有两种情况，一种是修改，一种是在索引处修改
       if (ts.isElementAccessExpression(expression.operand)) {
         const arrayAccess = getArrayAccess(context, expression.operand);
-        return createCall('MODIFY_GLOBAL_AT', arrayAccess.name, arrayAccess.index, symbolExp, num);
+        return createCall('MODIFY_GLOBAL_VAR_AT_INDEX', arrayAccess.name, arrayAccess.index, symbolExp, num);
       }
       const nameExp = getFinalAccess(expression.operand);
       if (!isCanToString(nameExp)) {
@@ -143,7 +143,7 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
       if (!context.vars.includes(name)) {
         throw new Error(`找不到全局变量 ${name}`);
       }
-      return createCall('MODIFY_GLOBAL', createRaw(name), symbolExp, num);
+      return createCall('MODIFY_GLOBAL_VAR', createRaw(name), symbolExp, num);
     }
   }
   // 运算，转化为相应函数
@@ -155,14 +155,14 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
       if (ts.isElementAccessExpression(expression.left)) {
         const arrayAccess = getArrayAccess(context, expression.left);
         return createCall(
-          'SET_GLOBAL_AT',
+          'SET_GLOBAL_VAR_AT_INDEX',
           arrayAccess.name,
           arrayAccess.index,
           parseExpression(context, expression.right)
         );
       } else {
         return createCall(
-          'SET_GLOBAL',
+          'SET_GLOBAL_VAR',
           parseExpression(context, expression.left),
           parseExpression(context, expression.right)
         );
@@ -213,7 +213,7 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
       if (!context.vars.includes(name)) {
         throw new Error(`找不到全局变量 ${name}`);
       }
-      return createCall('MODIFY_GLOBAL', createRaw(name), symbolExp, num);
+      return createCall('MODIFY_GLOBAL_VAR', createRaw(name), symbolExp, num);
     }
   }
   if (expression.kind === ts.SyntaxKind.FalseKeyword) {
@@ -279,14 +279,14 @@ export function parseEvent(exps: ts.NodeArray<ts.Expression>, defines?: DefinedC
     const team = getFinalAccess(exps[1], defines);
     const hero = getFinalAccess(exps[2], defines);
     let teamName = Team.ALL;
-    let heroName = Heros.ALL;
+    let heroName = GET_ALL_HEROES;
     if (team instanceof PropertyAccess && team.left === 'Team') {
       // @ts-ignore
       teamName = Team[team.left];
     }
     if (hero instanceof PropertyAccess && hero.left === 'Heros') {
       // @ts-ignore
-      heroName = Heros[hero.left];
+      heroName = Hero[hero.left];
     }
     const event: PlayerEvent = {
       kind: eventName,
