@@ -24,10 +24,10 @@ export default function(ast: Ast, options?: GeneratorOption) {
   const uglifyPlayer: { [x: string]: string } = {};
   // 变量区域
   if (ast.variable.global.length > 0 || ast.variable.player.length > 0) {
-    result.push(i18n('G_VAR'));
+    result.push(i18n('G_VARIABLES'));
     result.leftBrace();
     if (ast.variable.global.length > 0) {
-      result.push(i18n('G_VAR_GLOBAL') + ':', 1);
+      result.push(i18n('G_GLOBAL') + ':', 1);
       ast.variable.global.forEach((name, index) => {
         uglifyGlobal[name] = options?.uglify ? uuid() : name;
         result.push(`${index}: ${uglifyGlobal[name]}`);
@@ -35,7 +35,7 @@ export default function(ast: Ast, options?: GeneratorOption) {
       result.push('', -1);
     }
     if (ast.variable.player.length > 0) {
-      result.push(i18n('G_VAR_PLAYER') + ':', 1);
+      result.push(i18n('G_PLAYER') + ':', 1);
       ast.variable.global.forEach((name, index) => {
         uglifyPlayer[name] = options?.uglify ? uuid() : name;
         result.push(`${index}: ${uglifyPlayer[name]}`);
@@ -52,20 +52,20 @@ export default function(ast: Ast, options?: GeneratorOption) {
     result.push(`${i18n('G_RULE')}("${name}")`);
     result.leftBrace();
     // 事件
-    result.push(i18n('G_RULE_EVENT'));
+    result.push(i18n('G_EVENT'));
     result.leftBrace();
     getEventText(rule.event).forEach(text => result.push(text + ';'));
     result.rightBrace();
     // 条件
     if (rule.conditions.length > 0) {
-      result.push(i18n('G_RULE_COND'));
+      result.push(i18n('G_CONDITIONS'));
       result.leftBrace();
       rule.conditions.map(conditionToCode.bind(null, uglifyGlobal, uglifyPlayer)).forEach(text => result.push(text + ';'));
       result.rightBrace();
     }
     // 规则
     if (rule.actions.length > 0) {
-      result.push(i18n('G_RULE_ACT'));
+      result.push(i18n('G_ACTIONS'));
       result.leftBrace();
       rule.actions.map(expressionToCode.bind(null, uglifyGlobal, uglifyPlayer)).forEach(text => result.push(text + ';'));
       result.rightBrace();

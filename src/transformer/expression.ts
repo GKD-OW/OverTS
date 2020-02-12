@@ -1,5 +1,5 @@
 import * as ts from 'typescript';
-import { ConstantNamespaces } from '../owcode/ast/constants';
+import Constants from './constants';
 import { GlobalEvents, OWEvent, PlayerEvent, SubEvents } from '../owcode/ast/event';
 import { CallExpression, ExpressionKind, OWExpression } from '../owcode/ast/expression';
 import { tsMatchToSymbol } from '../owcode/type/compare';
@@ -90,10 +90,10 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
   if (ts.isPropertyAccessExpression(expression) && ts.isIdentifier(expression.expression)) {
     // 检查是否访问的内置对象
     const name = expression.expression.text;
-    if (ConstantNamespaces.includes(name)) {
+    if (Constants.includes(name)) {
       return {
         kind: ExpressionKind.CONSTANT,
-        text: name.toUpperCase() + '_' + expression.name.text.replace(/([A-Z])/g, '_$1').toUpperCase()
+        text: name.toUpperCase() + '_' + expression.name.text.toUpperCase()
       };
     }
   }
@@ -124,7 +124,7 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
       }
       const symbolExp = {
         kind: ExpressionKind.CONSTANT,
-        text: symbol
+        text: `OPERATION_${symbol}`
       };
       const num = {
         kind: ExpressionKind.NUMBER,
@@ -194,7 +194,7 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
       }
       const symbolExp = {
         kind: ExpressionKind.CONSTANT,
-        text: symbol
+        text: `OPERATION_${symbol}`
       };
       const num = ts.isNumericLiteral(expression.right) ? {
         kind: ExpressionKind.NUMBER,
@@ -203,7 +203,7 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
       // 可能有两种情况，一种是修改，一种是在索引处修改
       if (ts.isElementAccessExpression(expression.left)) {
         const arrayAccess = getArrayAccess(context, expression.left);
-        return createCall('MODIFY_GLOBAL_AT', arrayAccess.name, arrayAccess.index, symbolExp, num);
+        return createCall('MODIFY_GLOBAL_VAR_AT_INDEX', arrayAccess.name, arrayAccess.index, symbolExp, num);
       }
       const nameExp = getFinalAccess(expression.left);
       if (!isCanToString(nameExp)) {
@@ -237,7 +237,7 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
     }
     return {
       kind: ExpressionKind.CONSTANT,
-      text: 'EMPTY_ARRAY'
+      text: 'GAME_EMPTY_ARRAY'
     };
   }
   console.error(expression);
@@ -279,7 +279,7 @@ export function parseEvent(exps: ts.NodeArray<ts.Expression>, defines?: DefinedC
     const team = getFinalAccess(exps[1], defines);
     const hero = getFinalAccess(exps[2], defines);
     let teamName = Team.ALL;
-    let heroName = GET_ALL_HEROES;
+    let heroName = Game.GET_ALL_HEROES;
     if (team instanceof PropertyAccess && team.left === 'Team') {
       // @ts-ignore
       teamName = Team[team.left];

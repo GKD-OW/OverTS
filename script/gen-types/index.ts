@@ -275,7 +275,10 @@ function readValues() {
         args: getArgs(it.args)
       }, it);
     } else {
-      const name = formatTo(it.opy, 'TO_FORMAT');
+      let name = formatTo(it.opy, 'TO_FORMAT');
+      if (!name.includes('.')) {
+        name = 'Game.' + name;
+      }
       result.constants.push(name);
       const langKey = ('CONST_' + formatTo(name, 'TO_FORMAT')).replace(/([_]+)/g, '_');
       writeLang(langKey, it);
@@ -310,6 +313,18 @@ function readStrings() {
 }
 readStrings();
 
+
+// 全局关键字
+function readGlobalKeyword() {
+  const keywords = read('keywords')[0];
+  keywords.forEach((it: any) => {
+    const name = 'G_' + formatTo(it['en-US'], 'TO_FORMAT');
+    writeLang(name, it);
+  });
+}
+readGlobalKeyword();
+
+
 // 提取出warning
 if (Object.keys(langWarnings).length > 0) {
   const locales: any = {};
@@ -329,27 +344,27 @@ function write() {
   })));
 
   // 写常量
-  const constDeclare: { [x: string]: ts.Statement } = {};
+  const otherNs = writer.createModule('Game', [], ts.NodeFlags.Namespace, false);
   const enums: { [x: string]: { [x: string]: ts.Expression } } = {};
   result.constants.map(it => {
-    if (it.includes('.')) {
-      const index = it.indexOf('.');
-      const left = it.substr(0, index);
-      const right = it.substr(index + 1);
-      if (typeof(enums[left]) === 'undefined') {
-        enums[left] = {};
+    const index = it.indexOf('.');
+    const parentName = it.substr(0, index);
+    const selfName = it.substr(index + 1);
+    if (parentName === 'Game') {
+      writer.insertToModule(otherNs, writer.createConst(selfName, ts.SyntaxKind.AnyKeyword));
+    } else {
+      if (typeof(enums[parentName]) === 'undefined') {
+        enums[parentName] = {};
       }
-      if (typeof(enums[left][right]) !== 'undefined') {
+      if (typeof(enums[parentName][selfName]) !== 'undefined') {
         return;
       }
       // 看一下有没有特别指定的类型
-      if (typeof(enumType[left]) !== 'undefined') {
-        enums[left][right] = ts.createStringLiteral(`_GKD_${enumType[left]}_`);
+      if (typeof(enumType[parentName]) !== 'undefined') {
+        enums[parentName][selfName] = ts.createStringLiteral(`_GKD_${enumType[parentName]}_`);
       } else {
-        enums[left][right] = ts.createStringLiteral(right);
+        enums[parentName][selfName] = ts.createStringLiteral(selfName);
       }
-    } else {
-      constDeclare[it] = writer.createConst(it, ts.SyntaxKind.AnyKeyword);
     }
   });
   // 写事件
@@ -360,7 +375,7 @@ function write() {
   result.strings.forEach(it => enums['Strings'][it] = ts.createStringLiteral(it));
   // 写入声明
   writer.pushDeclare([
-    ...Object.values(constDeclare),
+    otherNs,
     ...Object.keys(enums).map(it => writer.createEnum(it, enums[it]))
   ]);
 
@@ -437,7 +452,8 @@ function write() {
   unknownReturn.forEach(it => returns[it] = "");
   fs.writeFileSync(resolve(__dirname, 'returnType_2.json'), JSON.stringify(returns, null, '  '), { encoding: 'UTF8' });
 
-  console.log(unknownTypes);
+  // console.log(unknownTypes);
+  console.log(enumNames);
 
   // 生成 ts 文件
   fs.writeFileSync(resolve(resultDir, 'global.ts'), writer.getText(), {

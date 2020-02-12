@@ -11,18 +11,6 @@
     "ja-JP": "",
     "zh-CN": "启用查看器记录"
   },
-  "FUNC_FOR_GLOBAL_VAR": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "FUNC_FOR_PLAYER_VAR": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "FUNC_START_RULE": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
   "FUNC_STOP_ALL_HEALING_MODIFICATIONS": {
     "ja-JP": "",
     "zh-CN": "停止所有治疗调整"
@@ -32,74 +20,7 @@
     "ja-JP": "",
     "zh-CN": "停止治疗调整"
   },
-  "CONST_BUTTON_MELEE": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "CONST_BUTTON_RELOAD": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "CONST_HERO_DVA": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "CONST_ICON_CROSS": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "CONST_HUDREEVAL_SORT_ORDER_AND_STRING": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "CONST_HUDREEVAL_VISIBILITY_SORT_ORDER_AND_STRING": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "CONST_HEALINGREEVAL_NONE": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "CONST_HEALINGREEVAL_RECEIVERS_AND_HEALERS": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "CONST_HEALINGREEVAL_RECEIVERS_HEALERS_AND_HEALPERCENT": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "CONST_MAP_WORKSHOP_CHAMBER": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "CONST_MAP_WORKSHOP_EXPANSE": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "CONST_MAP_WORKSHOP_ISLAND": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "CONST_ASYNCBEHAVIOR_RESTART": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "CONST_ASYNCBEHAVIOR_NOOP": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "CONST_EVENT_WAS_HEALTH_PACK": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "CONST_FALSE": {
-    "ja-JP": ""
-  },
-  "CONST_GET_LAST_HEALING_MODIFICATION": {
-    "ja-JP": "",
-    "zh-CN": ""
-  },
-  "CONST_TRUE": {
-    "ja-JP": ""
+  "G_SUBROUTINES": {
+    "zh-CN": "子程序"
   }
 }
