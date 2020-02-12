@@ -58,7 +58,7 @@ export default class Transformer {
       this.ast.rules.push({
         name: "init",
         event: {
-          kind: Events.GLOBAL_ONGOING
+          kind: Events.GLOBAL
         },
         conditions: [],
         actions
@@ -116,7 +116,7 @@ export default class Transformer {
     const rule: Rule = {
       name: "rule",
       event: {
-        kind: Events.GLOBAL_ONGOING
+        kind: Events.GLOBAL
       },
       conditions: [],
       actions: []
@@ -280,7 +280,7 @@ export default class Transformer {
       return;
     }
     const event: SubEvent = {
-      kind: Events.SUB,
+      kind: Events.SUBROUTINE,
       sub: name
     };
     const rule: Rule = {

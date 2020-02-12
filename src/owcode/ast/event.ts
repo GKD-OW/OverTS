@@ -1,7 +1,7 @@
 import '../type/global';
 
-export const GlobalEvents = [Events.GLOBAL_ONGOING];
-export const SubEvents = [Events.SUB];
+export const GlobalEvents = [Events.GLOBAL];
+export const SubEvents = [Events.SUBROUTINE];
 
 export interface OWEvent {
   kind: string;

@@ -6,7 +6,6 @@ type varMap = { [x: string]: string };
 export function expressionToCode(global: varMap, player: varMap, exp: OWExpression): string {
   switch (exp.kind) {
     case ExpressionKind.BOOLEAN:
-      return i18n(`BOOL_${exp.text}`);
     case ExpressionKind.CONSTANT:
       return i18n(`CONST_${exp.text}`);
     case ExpressionKind.COMPARE_SYMBOL:

@@ -5,7 +5,7 @@ let b = [];
 let c = 0;
 
 export class myClass {
-  @runAt(Events.GLOBAL_ONGOING)
+  @runAt(Events.GLOBAL)
   @condition(Game.isWaitingPlayers)
   test() {
     a[2] = 3;

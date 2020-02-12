@@ -1,0 +1,6 @@
+*
+!.gitignore
+!index.ts
+!locales.json
+!TSWriter.ts
+!global.template.ts

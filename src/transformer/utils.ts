@@ -102,7 +102,7 @@ export function getVariable(this: Transformer, statements: ts.Statement[] | ts.N
  * @param name 
  */
 export function createSubCall(name: string): CallExpression {
-  return createCall('CALL_SUB', createRaw(name));
+  return createCall('CALL_SUBROUTINE', createRaw(name));
 }
 
 /**
@@ -141,7 +141,7 @@ export function createCondition(left: OWExpression, right: OWExpression = {
  */
 export function createSubEvent(name: string): SubEvent {
   return {
-    kind: Events.SUB,
+    kind: Events.SUBROUTINE,
     sub: name
   };
 }
