@@ -1155,7 +1155,7 @@ declare global {
      * @param player The player or players whose button is being reenabled.
      * @param button The logical button that is being reenabled.
      */
-    function allowButton(player: Player, button: Button): void;
+    function allowButton(player: Player | Player[], button: Button): void;
     /**
      * applyImpulse
      * Applies an instantaneous change in velocity to the movement of one or more players.
@@ -1165,14 +1165,14 @@ declare global {
      * @param relative Specifies whether direction is relative to world coordinates or the local coordinates of the player or players.
      * @param motion Specifies whether existing velocity that is counter to direction should first be cancelled out before applying the impulse.
      */
-    function applyImpulse(player: Player, direction: Vector, speed: number, relative: Relativity, motion: Impulse): void;
+    function applyImpulse(player: Player | Player[], direction: Vector, speed: number, relative: Relativity, motion: Impulse): void;
     /**
      * bigMessage
      * Displays a large message above the reticle that is visible to specific players.
      * @param visibleTo One or more players who will see the message.
      * @param header The message to be displayed.
      */
-    function bigMessage(visibleTo: Player, header: Strings): void;
+    function bigMessage(visibleTo: Player | Player[], header: Strings): void;
     /**
      * callSubroutine
      * Pauses execution of the current rule and begins executing a subroutine rule (which is a rule with a subroutine event type). When the subroutine rule finishes, the original rule resumes execution. The subroutine will have access to the same contextual values (such as Event Player) as the original rule.
@@ -1206,7 +1206,7 @@ declare global {
      * @param rate The amount of change that will happen to the variable's value each second.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. This action will keep asking for and using new values from reevaluated inputs.
      */
-    function chasePlayerVariableAtRate(player: Player, variable: string, destination: any, rate: number, reevaluation: ChaseReeval): void;
+    function chasePlayerVariableAtRate(player: Player | Player[], variable: string, destination: any, rate: number, reevaluation: ChaseReeval): void;
     /**
      * chasePlayerVariableOverTime
      * Gradually modifies the value of a player variable over time. (A player variable is a variable that belongs to a specific player.)
@@ -1216,21 +1216,21 @@ declare global {
      * @param duration The amount of time, in seconds, over which the variable's value will approach the destination.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. This action will keep asking for and using new values from reevaluated inputs.
      */
-    function chasePlayerVariableOverTime(player: Player, variable: string, destination: any, duration: number, reevaluation: ChaseReeval): void;
+    function chasePlayerVariableOverTime(player: Player | Player[], variable: string, destination: any, duration: number, reevaluation: ChaseReeval): void;
     /**
      * clearStatusEffect
      * Clears a status that was applied from a set status action from one or more players.
      * @param player The player or players from whom the status will be removed.
      * @param status The status to be removed from the player or players.
      */
-    function clearStatusEffect(player: Player, status: Status): void;
+    function clearStatusEffect(player: Player | Player[], status: Status): void;
     /**
      * communicate
      * Causes one or more players to use an emote, voice line, or other equipped communication.
      * @param player The player or players to perform the communication.
      * @param type The type of communication.
      */
-    function communicate(player: Player, type: Communicate): void;
+    function communicate(player: Player | Player[], type: Communicate): void;
     /**
      * createBeam
      * Creates an in-world beam effect entity. This effect entity will persist until destroyed. To obtain a reference to this entity, use the last created entity value. This action will fail if too many entities have been created.
@@ -1241,7 +1241,7 @@ declare global {
      * @param color The color of the beam to be created. If a particular team is chosen, the effect will either be red or blue, depending on whether the team is hostile to the viewer. Does not apply to sound effects. Only the "good" and "bad" beam effects can have color applied.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. The effect will keep asking for and using new values from reevaluated inputs.
      */
-    function createBeam(visibleTo: Player, type: Beam, startPosition: Pos, endPosition: Pos, color: Color, reevaluation: EffectReeval): void;
+    function createBeam(visibleTo: Player | Player[], type: Beam, startPosition: Pos, endPosition: Pos, color: Color, reevaluation: EffectReeval): void;
     /**
      * createDummy
      * Adds a new bot to the specified slot on the specified team so long as the slot is available. This bot will only move, fire, or use abilities if executing workshop actions.
@@ -1262,7 +1262,7 @@ declare global {
      * @param radius The radius of this effect.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated.
      */
-    function createEffect(visibleTo: Player, type: Effect, color: Color, position: Pos, radius: number, reevaluation: EffectReeval): void;
+    function createEffect(visibleTo: Player | Player[], type: Effect, color: Color, position: Pos, radius: number, reevaluation: EffectReeval): void;
     /**
      * hudText
      * Creates hud text visible to specific players at a specific location on the screen. This text will persist until destroyed. To obtain a reference to this text, use the last text id value. This action will fail if too many text elements have been created.
@@ -1278,7 +1278,7 @@ declare global {
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated.
      * @param spectators Whether spectators can see the text or not.
      */
-    function hudText(visibleTo: Player, header: Strings | null, subheader: Strings | null, text: Strings | null, location: Pos, sortOrder: number, headerColor: Color, subheaderColor: Color, textColor: Color, reevaluation: HudReeval, spectators: SpecVisibility): void;
+    function hudText(visibleTo: Player | Player[], header: Strings | null, subheader: Strings | null, text: Strings | null, location: Pos, sortOrder: number, headerColor: Color, subheaderColor: Color, textColor: Color, reevaluation: HudReeval, spectators: SpecVisibility): void;
     /**
      * createIcon
      * Creates an in-world icon entity. This icon entity will persist until destroyed. To obtain a reference to this entity, use the last created entity value. This action will fail if too many entities have been created.
@@ -1289,7 +1289,7 @@ declare global {
      * @param iconColor The color of the icon to be created. If a particular team is chosen, the effect will either be red or blue, depending on whether the team is hostile to the viewer.
      * @param showWhenOffscreen Should this icon appear even when it is behind you?
      */
-    function createIcon(visibleTo: Player, position: Pos, icon: Icon, reevaluation: IconReeval, iconColor: Color, showWhenOffscreen: boolean): void;
+    function createIcon(visibleTo: Player | Player[], position: Pos, icon: Icon, reevaluation: IconReeval, iconColor: Color, showWhenOffscreen: boolean): void;
     /**
      * createInWorldText
      * Creates in-world text visible to specific players at a specific position in the world. This text will persist until destroyed. To obtain a reference to this text, use the last text id value. This action will fail if too many text elements have been created.
@@ -1302,7 +1302,7 @@ declare global {
      * @param textColor Specifies the color of the in-world text to use.
      * @param spectators Whether spectators can see the text or not.
      */
-    function createInWorldText(visibleTo: Player, header: Strings, position: Pos, scale: number, clipping: Clip, reevaluation: WorldTextReeval, textColor: Color, spectators: SpecVisibility): void;
+    function createInWorldText(visibleTo: Player | Player[], header: Strings, position: Pos, scale: number, clipping: Clip, reevaluation: WorldTextReeval, textColor: Color, spectators: SpecVisibility): void;
     /**
      * damage
      * Applies instantaneous damage to one or more players, possibly killing the players.
@@ -1310,7 +1310,7 @@ declare global {
      * @param damager The player who will receive credit for the damage. A damager of null indicates no player will receive credit.
      * @param amount The amount of damage to apply. This amount may be modified by buffs, debuffs, or armor.
      */
-    function damage(player: Player, damager: Player, amount: number): void;
+    function damage(player: Player | Player[], damager: Player | Player[], amount: number): void;
     /**
      * declareDraw
      * Instantly ends the match in a draw. This action has no effect in free-for-all modes.
@@ -1321,7 +1321,7 @@ declare global {
      * Instantly ends the match with the specific player as the winner. This action only has an effect in free-for-all modes.
      * @param player The winning player.
      */
-    function declarePlayerVictory(player: Player): void;
+    function declarePlayerVictory(player: Player | Player[]): void;
     /**
      * declareRoundVictory
      * Declare a team as the current round winner. This only works in the control and elimination game modes
@@ -1371,7 +1371,7 @@ declare global {
      * Destroys an effect entity that was created by create effect.
      * @param entity Specifies which effect entity to destroy. This entity may be last created entity or a variable into which last created entity was earlier stored.
      */
-    function destroyEffect(entity: Player): void;
+    function destroyEffect(entity: Player | Player[]): void;
     /**
      * destroyHudText
      * Destroys hud text that was created by create hud text.
@@ -1383,7 +1383,7 @@ declare global {
      * Destroys an icon entity that was created by create icon.
      * @param entity Specifies which icon entity to destroy. This entity may be last created entity or a variable into which last created entity was earlier stored.
      */
-    function destroyIcon(entity: Player): void;
+    function destroyIcon(entity: Player | Player[]): void;
     /**
      * destroyInWorldText
      * Destroys in-world text that was created by create in-world text.
@@ -1410,7 +1410,7 @@ declare global {
      * Disables automatic respawning for one or more players, only allowing respawning by scripting commands.
      * @param players The player or players whose respawning is affected.
      */
-    function disableRespawn(players: Player): void;
+    function disableRespawn(players: Player | Player[]): void;
     /**
      * disableScoring
      * Disables changes to player and team scores from the game mode itself, only allowing scores to be changed by scripting commands.
@@ -1421,13 +1421,13 @@ declare global {
      * Undoes the effect of the enable death spectate all players action for or more players.
      * @param player The player or players whose default death spectate behavior is restored.
      */
-    function disableDeathSpectateAllPlayers(player: Player): void;
+    function disableDeathSpectateAllPlayers(player: Player | Player[]): void;
     /**
      * disableDeathSpectateTargetHud
      * Undoes the effect of the enable death spectate target hud action for or more players.
      * @param player The player or players who will revert to seeing their own hud while death spectating.
      */
-    function disableDeathSpectateTargetHud(player: Player): void;
+    function disableDeathSpectateTargetHud(player: Player | Player[]): void;
     /**
      * disableInspector
      * Causes the workshop inspector to stop recording new entries. This has the benefit of reducing your script's server load, particularly when modifying arrays.
@@ -1439,7 +1439,7 @@ declare global {
      * @param player The player or players whose button is being disabled.
      * @param button The logical button that is being disabled.
      */
-    function disallowButton(player: Player, button: Button): void;
+    function disallowButton(player: Player | Player[], button: Button): void;
     /**
      * enableAnnouncer
      * Undoes the effect of the disable built-in game mode announcer action.
@@ -1460,7 +1460,7 @@ declare global {
      * Undoes the effect of the disable built-in game mode respawning action for one or more players.
      * @param players The player or players whose respawning is affected.
      */
-    function enableRespawn(players: Player): void;
+    function enableRespawn(players: Player | Player[]): void;
     /**
      * enableScoring
      * Undoes the effect of the disable built-in game mode scoring action.
@@ -1471,13 +1471,13 @@ declare global {
      * Allows one or more players to spectate all players when dead, as opposed to only allies.
      * @param player The player or players who will be allowed to spectate all players.
      */
-    function enableDeathSpectateAllPlayers(player: Player): void;
+    function enableDeathSpectateAllPlayers(player: Player | Player[]): void;
     /**
      * enableDeathSpectateTargetHud
      * Causes one or more players to see their spectate target's hud instead of their own while death spectating.
      * @param player The player or players who will begin seeing their spectate targets hud while death spectating.
      */
-    function enableDeathSpectateTargetHud(player: Player): void;
+    function enableDeathSpectateTargetHud(player: Player | Player[]): void;
     /**
      * enableInspector
      * Causes the workshop inspector to resume recording new entries (in case it had been disabled earlier). Enabling recording at specific times may make it easier to debug problematic areas in your logic.
@@ -1501,7 +1501,7 @@ declare global {
      * @param rangeStop If the control variable reaches or passes this value, then the loop will exit, and execution jumps to the next action after the end action. Whether this value is considered passed or not is based on whether the step value is negative or positive. If the control variable has already reached or passed this value when the loop begins, then the loop exits.
      * @param step This value is added to the control variable when the end action is reached. If this modification causes the control variable to reach or pass the range stop value, then the loop exits, and execution jumps to the next action after the end action. Otherwise, the loop continues, and execution jumps to the next action after the for action.
      */
-    function forPlayerVar(controlPlayer: Player, controlVariable: string, rangeStart: number, rangeStop: number, step: number): void;
+    function forPlayerVar(controlPlayer: Player | Player[], controlVariable: string, rangeStart: number, rangeStop: number, step: number): void;
     /**
      * goToAssembleHeroes
      * Returns the match to the assemble heroes phase of the game mode. Only works if the game is in progress.
@@ -1514,14 +1514,14 @@ declare global {
      * @param healer The player who will receive credit for the healing. A healer of null indicates no player will receive credit.
      * @param amount The amount of healing to apply. This amount may be modified by buff or debuffs. Healing is capped by each player's max health.
      */
-    function heal(player: Player, healer: Player, amount: number): void;
+    function heal(player: Player | Player[], healer: Player | Player[], amount: number): void;
     /**
      * kill
      * Instantly kills one or more players.
      * @param player The player or players who will be killed.
      * @param killer The player who will receive credit for the kill. A killer of null indicates no player will receive credit.
      */
-    function kill(player: Player, killer: Player): void;
+    function kill(player: Player | Player[], killer: Player | Player[]): void;
     /**
      * loop
      * Restarts the action list from the beginning. To prevent an infinite loop, a wait action must execute between the start of the action list and this action.
@@ -1566,7 +1566,7 @@ declare global {
      * @param player The player or players whose score will change.
      * @param score The amount the score will increase or decrease. If positive, the score will increase. If negative, the score will decrease.
      */
-    function addToScore(player: Player, score: number): void;
+    function addToScore(player: Player | Player[], score: number): void;
     /**
      * modifyPlayerVar
      * Modifies the value of a player variable, which is a variable that belongs to a specific player.
@@ -1575,7 +1575,7 @@ declare global {
      * @param operation The way in which the variable's value will be changed. Options include standard arithmetic operations as well as array operations for appending and removing values.
      * @param value The value used for the modification. For arithmetic operations, this is the second of the two operands, with the other being the variable's existing value. For array operations, this is the value to append or remove.
      */
-    function modifyPlayerVar(player: Player, variable: string, operation: Operation, value: any): void;
+    function modifyPlayerVar(player: Player | Player[], variable: string, operation: Operation, value: any): void;
     /**
      * modifyPlayerVarAtIndex
      * Modifies the value of a player variable at an index, which is a variable that belongs to a specific player.
@@ -1585,7 +1585,7 @@ declare global {
      * @param operation The way in which the variable's value will be changed. Options include standard arithmetic operations as well as array operations for appending and removing values.
      * @param value The value used for the modification. For arithmetic operations, this is the second of the two operands, with the other being the variable's existing value. For array operations, this is the value to append or remove.
      */
-    function modifyPlayerVarAtIndex(player: Player, variable: string, index: number, operation: Operation, value: any): void;
+    function modifyPlayerVarAtIndex(player: Player | Player[], variable: string, index: number, operation: Operation, value: any): void;
     /**
      * addToTeamScore
      * Modifies the score of one or both teams. This action has no effect in free-for-all modes or modes without a team score.
@@ -1607,74 +1607,74 @@ declare global {
      * @param position The effect's position. If this value is a player, then the effect will play at the player's position. Otherwise, the value is interpreted as a position in the world.
      * @param radius The effect's radius in meters.
      */
-    function playEffect(visibleTo: Player, type: DynamicEffect, color: Color, position: Pos, radius: number): void;
+    function playEffect(visibleTo: Player | Player[], type: DynamicEffect, color: Color, position: Pos, radius: number): void;
     /**
      * preloadHero
      * Preemptively loads the specified hero or heroes into memory using the skins of the specified player or players, available memory permitting. Useful whenever rapid hero changing is possible and the next hero is known.
      * @param player The player or players who will begin preloading a hero or heroes. Only one preload hero action will be active at a time for a given player.
      * @param hero The hero or heroes to begin preloading for the specified player or players. When multiple heroes are specified in an array, the heroes towards the beginning of the array are prioritized.
      */
-    function preloadHero(player: Player, hero: Hero): void;
+    function preloadHero(player: Player | Player[], hero: Hero): void;
     /**
      * forceButtonPress
      * Forces one or more players to press a button virtually for a single frame.
      * @param player The player or players for whom the virtual button input will be forced.
      * @param button The button to be pressed.
      */
-    function forceButtonPress(player: Player, button: Button): void;
+    function forceButtonPress(player: Player | Player[], button: Button): void;
     /**
      * resetHeroAvailability
      * Restores the list of heroes available to one or more players to the list specified by the game settings. If a player's current hero becomes unavailable, the player is forced to choose a different hero and respawn at an appropriate spawn location.
      * @param player The player or players whose hero list is being reset.
      */
-    function resetHeroAvailability(player: Player): void;
+    function resetHeroAvailability(player: Player | Player[]): void;
     /**
      * respawn
      * Respawns one or more players at an appropriate spawn location with full health, even if they were already alive.
      * @param player The player or players to respawn.
      */
-    function respawn(player: Player): void;
+    function respawn(player: Player | Player[]): void;
     /**
      * resurrect
      * Instantly resurrects one or more players at the location they died with no transition.
      * @param player The player or players who will be resurrected.
      */
-    function resurrect(player: Player): void;
+    function resurrect(player: Player | Player[]): void;
     /**
      * setAbilityOneEnabled
      * Enables or disables ability 1 for one or more players.
      * @param player The player or players whose access to ability 1 is affected.
      * @param enabled Specifies whether the player or players are able to use ability 1. Expects a boolean value such as true, false, or compare.
      */
-    function setAbilityOneEnabled(player: Player, enabled: boolean): void;
+    function setAbilityOneEnabled(player: Player | Player[], enabled: boolean): void;
     /**
      * setAbilityTwoEnabled
      * Enables or disables ability 2 for one or more players.
      * @param player The player or players whose access to ability 2 is affected.
      * @param enabled Specifies whether the player or players are able to use ability 2. Expects a boolean value such as true, false, or compare.
      */
-    function setAbilityTwoEnabled(player: Player, enabled: boolean): void;
+    function setAbilityTwoEnabled(player: Player | Player[], enabled: boolean): void;
     /**
      * setAimSpeed
      * Sets the aim speed of one or more players to a percentage of their normal aim speed.
      * @param player The player or players whose aim speed will be set.
      * @param turnSpeedPercent The percentage of normal aim speed to which the player or players will set their aim speed.
      */
-    function setAimSpeed(player: Player, turnSpeedPercent: number): void;
+    function setAimSpeed(player: Player | Player[], turnSpeedPercent: number): void;
     /**
      * setDamageDealt
      * Sets the damage dealt of one or more players to a percentage of their raw damage dealt.
      * @param player The player or players whose damage dealt will be set.
      * @param damageDealtPercent The percentage of raw damage dealt to which the player or players will set their damage dealt.
      */
-    function setDamageDealt(player: Player, damageDealtPercent: number): void;
+    function setDamageDealt(player: Player | Player[], damageDealtPercent: number): void;
     /**
      * setDamageReceived
      * Sets the damage received of one or more players to a percentage of their raw damage received.
      * @param player The player or players whose damage received will be set.
      * @param damageReceivedPercent The percentage of raw damage received to which the player or players will set their damage received.
      */
-    function setDamageReceived(player: Player, damageReceivedPercent: number): void;
+    function setDamageReceived(player: Player | Player[], damageReceivedPercent: number): void;
     /**
      * setFacing
      * Sets the facing of one or more players to the specified direction.
@@ -1682,7 +1682,7 @@ declare global {
      * @param direction The unit direction in which the player or players will face. This value is normalized internally.
      * @param relative Specifies whether direction is relative to world coordinates or the local coordinates of the player or players.
      */
-    function setFacing(player: Player, direction: Vector, relative: Relativity): void;
+    function setFacing(player: Player | Player[], direction: Vector, relative: Relativity): void;
     /**
      * setGlobalVar
      * Stores a value into a global variable, which is a variable that belongs to the game itself.
@@ -1704,28 +1704,28 @@ declare global {
      * @param player The player or players whose movement gravity will be set.
      * @param gravityPercent The percentage of regular movement gravity to which the player or players will set their personal movement gravity.
      */
-    function setGravity(player: Player, gravityPercent: number): void;
+    function setGravity(player: Player | Player[], gravityPercent: number): void;
     /**
      * setHealingDealt
      * Sets the healing dealt of one or more players to a percentage of their raw healing dealt.
      * @param player The player or players whose healing dealt will be set.
      * @param healingDealtPercent
      */
-    function setHealingDealt(player: Player, healingDealtPercent: number): void;
+    function setHealingDealt(player: Player | Player[], healingDealtPercent: number): void;
     /**
      * setHealingReceived
      * Sets the healing received of one or more players to a percentage of their raw healing received.
      * @param player The player or players whose healing received will be set.
      * @param healingReceivedPercent The percentage of raw healing received to which the player or players will set their healing received.
      */
-    function setHealingReceived(player: Player, healingReceivedPercent: number): void;
+    function setHealingReceived(player: Player | Player[], healingReceivedPercent: number): void;
     /**
      * setInvisibility
      * Causes one or more players to become invisible to either all other players or just enemies.
      * @param player The player or players who will become invisible.
      * @param invisibleTo Specifies for whom the player or players will be invisible.
      */
-    function setInvisibility(player: Player, invisibleTo: Invis): void;
+    function setInvisibility(player: Player | Player[], invisibleTo: Invis): void;
     /**
      * setMatchTime
      * Sets the current match time (which is visible at the top of the screen). This can be used to shorten or extend the duration of a match or to change the duration of assemble heroes or setup.
@@ -1738,14 +1738,14 @@ declare global {
      * @param player The player or players whose max health will be set.
      * @param healthPercent The percentage of raw max health to which the player or players will set their max health.
      */
-    function setMaxHealth(player: Player, healthPercent: number): void;
+    function setMaxHealth(player: Player | Player[], healthPercent: number): void;
     /**
      * setMoveSpeed
      * Sets the move speed of one or more players to a percentage of their raw move speed.
      * @param player The player or players whose move speed will be set.
      * @param moveSpeedPercent The percentage of raw move speed to which the player or players will set their move speed.
      */
-    function setMoveSpeed(player: Player, moveSpeedPercent: number): void;
+    function setMoveSpeed(player: Player | Player[], moveSpeedPercent: number): void;
     /**
      * setObjectiveDescription
      * Sets the text at the top center of the screen that normally describes the objective to a message visible to specific players.
@@ -1753,21 +1753,21 @@ declare global {
      * @param header The message to be displayed.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. The message will keep asking for and using new values from reevaluated inputs.
      */
-    function setObjectiveDescription(visibleTo: Player, header: Strings, reevaluation: HudReeval): void;
+    function setObjectiveDescription(visibleTo: Player | Player[], header: Strings, reevaluation: HudReeval): void;
     /**
      * setAllowedHeroes
      * Sets the list of heroes available to one or more players. If a player's current hero becomes unavailable, the player is forced to choose a different hero and respawn at an appropriate spawn location.
      * @param player The player or players whose hero list is being set.
      * @param hero The hero or heroes that will be available. If no heroes are provided, the action has no effect.
      */
-    function setAllowedHeroes(player: Player, hero: Hero): void;
+    function setAllowedHeroes(player: Player | Player[], hero: Hero): void;
     /**
      * setScore
      * Sets the score (kill count) of one or more players. This action only has an effect in free-for-all modes.
      * @param player The player or players whose score will be set.
      * @param score The score that will be set.
      */
-    function setScore(player: Player, score: number): void;
+    function setScore(player: Player | Player[], score: number): void;
     /**
      * setPlayerVar
      * Stores a value into a player variable, which is a variable that belongs to a specific player.
@@ -1775,7 +1775,7 @@ declare global {
      * @param variable Specifies which of the player's variables to store the value into.
      * @param value The value that will be stored.
      */
-    function setPlayerVar(player: Player, variable: string, value: any): void;
+    function setPlayerVar(player: Player | Player[], variable: string, value: any): void;
     /**
      * setPlayerVarAtIndex
      * Finds or creates an array on a player variable, which is a variable that belongs to a specific player, then stores a value in the array at the specified index.
@@ -1784,42 +1784,42 @@ declare global {
      * @param index The index of the array to modify. If the index is beyond the end of the array, the array is extended with new elements given a value of zero.
      * @param value The value that will be stored into the array.
      */
-    function setPlayerVarAtIndex(player: Player, variable: string, index: number, value: any): void;
+    function setPlayerVarAtIndex(player: Player | Player[], variable: string, index: number, value: any): void;
     /**
      * setPrimaryFireEnabled
      * Enables or disables primary fire for one or more players.
      * @param player The player or players whose access to primary fire is affected.
      * @param enabled Specifies whether the player or players are able to use primary fire. Expects a boolean value such as true, false, or compare.
      */
-    function setPrimaryFireEnabled(player: Player, enabled: boolean): void;
+    function setPrimaryFireEnabled(player: Player | Player[], enabled: boolean): void;
     /**
      * setProjectileGravity
      * Sets the projectile gravity for one or more players to a percentage of regular projectile gravity.
      * @param player The player or players whose projectile gravity will be set.
      * @param projectileGravityPercent The percentage of regular projectile gravity to which the player or players will set their personal projectile gravity.
      */
-    function setProjectileGravity(player: Player, projectileGravityPercent: number): void;
+    function setProjectileGravity(player: Player | Player[], projectileGravityPercent: number): void;
     /**
      * setProjectileSpeed
      * Iets the projectile speed for one or more players to a percentage of projectile speed.
      * @param player The player or players whose projectile speed will be set.
      * @param projectileSpeedPercent The percentage of regular projectile speed to which the player or players will set their personal projectile speed.
      */
-    function setProjectileSpeed(player: Player, projectileSpeedPercent: number): void;
+    function setProjectileSpeed(player: Player | Player[], projectileSpeedPercent: number): void;
     /**
      * setRespawnTime
      * Sets the duration between death and respawn for one or more players. For players that are already dead when this action is executed, the change takes effect on their next death.
      * @param player The player or players whose respawn max time is being defined.
      * @param time The duration between death and respawn in seconds.
      */
-    function setRespawnTime(player: Player, time: number): void;
+    function setRespawnTime(player: Player | Player[], time: number): void;
     /**
      * setSecondaryFireEnabled
      * Enables or disables secondary fire for one or more players.
      * @param player The player or players whose access to secondary fire is affected.
      * @param enabled Specifies whether the player or players are able to use secondary fire. Expects a boolean value such as true, false, or compare.
      */
-    function setSecondaryFireEnabled(player: Player, enabled: boolean): void;
+    function setSecondaryFireEnabled(player: Player | Player[], enabled: boolean): void;
     /**
      * setSlowMotion
      * Sets the simulation rate for the entire game, including all players, projectiles, effects, and game mode logic.
@@ -1834,7 +1834,7 @@ declare global {
      * @param status The status to be applied to the player or players. These behave similarly to statuses applied from hero abilities.
      * @param duration The duration of the status in seconds. To have a status that lasts until a clear status action is executed, provide an arbitrarily long duration such as 9999.
      */
-    function setStatusEffect(player: Player, assister: Player, status: Status, duration: number): void;
+    function setStatusEffect(player: Player | Player[], assister: Player | Player[] | null, status: Status, duration: number): void;
     /**
      * setTeamScore
      * Sets the score for one or both teams. This action has no effect in free-for-all modes or modes without a team score.
@@ -1848,14 +1848,14 @@ declare global {
      * @param player The player or players whose access to their ultimate ability is affected.
      * @param enabled Specifies whether the player or players are able to use their ultimate ability. Expects a boolean value such as true, false, or compare.
      */
-    function setUltEnabled(player: Player, enabled: boolean): void;
+    function setUltEnabled(player: Player | Player[], enabled: boolean): void;
     /**
      * setUltCharge
      * Sets the ultimate charge for one or more players as a percentage of maximum charge.
      * @param player The player or players whose ultimate charge will be set.
      * @param chargePercent The percentage of maximum charge.
      */
-    function setUltCharge(player: Player, chargePercent: number): void;
+    function setUltCharge(player: Player | Player[], chargePercent: number): void;
     /**
      * skip
      * Skips execution of a certain number of actions in the action list.
@@ -1875,7 +1875,7 @@ declare global {
      * @param visibleTo One or more players who will see the message.
      * @param header The message to be displayed.
      */
-    function smallMessage(visibleTo: Player, header: Strings): void;
+    function smallMessage(visibleTo: Player | Player[], header: Strings): void;
     /**
      * startAcceleration
      * Starts accelerating one or more players in a specified direction.
@@ -1886,7 +1886,7 @@ declare global {
      * @param relative Specifies whether direction is relative to world coordinates or the local coordinates of the player or players.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. This action will keep asking for and using new values from reevaluated inputs.
      */
-    function startAcceleration(player: Player, direction: Vector, rate: number, maxSpeed: number, relative: Relativity, reevaluation: AccelReeval): void;
+    function startAcceleration(player: Player | Player[], direction: Vector, rate: number, maxSpeed: number, relative: Relativity, reevaluation: AccelReeval): void;
     /**
      * setCamera
      * Places your camera at a location, facing a direction.
@@ -1895,7 +1895,7 @@ declare global {
      * @param lookAtPosition Where the camera looks at. Reevaluates continuously.
      * @param blendSpeed How fast to blend the camera speed as positions change. 0 means do not blend at all, and just change positions instantly.
      */
-    function setCamera(player: Player, eyePosition: Pos, lookAtPosition: Pos, blendSpeed: number): void;
+    function setCamera(player: Player | Player[], eyePosition: Pos, lookAtPosition: Pos, blendSpeed: number): void;
     /**
      * startDamageModification
      * Starts modifying how much damage one or more receivers will receive from one or more damagers. A reference to this damage modification can be obtained from the last damage modification id value. This action will fail if too many damage modifications have been started.
@@ -1904,16 +1904,16 @@ declare global {
      * @param damagePercent The percentage of damage that will apply to receivers when attacked by damagers.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. This action will keep asking for and using new values from reevaluated inputs.
      */
-    function startDamageModification(receivers: Player, damagers: Player, damagePercent: number, reevaluation: DamageReeval): void;
+    function startDamageModification(receivers: Player | Player[], damagers: Player | Player[], damagePercent: number, reevaluation: DamageReeval): void;
     /**
-     * startDoT
+     * startDamageOverTime
      * Starts an instance of damage over time. This dot will persist for the specified duration or until stopped by script. To obtain a reference to this dot, use the last damage over time id value.
      * @param player One or more players who will receive the damage over time.
      * @param damager The player who will receive credit for the damage. A damager of null indicates no player will receive credit.
      * @param duration The duration of the damage over time in seconds. To have a dot that lasts until stopped by script, provide an arbitrarily long duration such as 9999.
      * @param damagePerSecond The damage per second for the damage over time.
      */
-    function startDoT(player: Player, damager: Player, duration: number, damagePerSecond: number): void;
+    function startDamageOverTime(player: Player | Player[], damager: Player | Player[], duration: number, damagePerSecond: number): any;
     /**
      * startFacing
      * Starts turning one or more players to face the specified direction.
@@ -1923,14 +1923,14 @@ declare global {
      * @param relative Specifies whether direction is relative to world coordinates or the local coordinates of the player or players.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. This action will keep asking for and using new values from reevaluated inputs.
      */
-    function startFacing(player: Player, direction: Vector, turnRate: number, relative: Relativity, reevaluation: FacingReeval): void;
+    function startFacing(player: Player | Player[], direction: Vector, turnRate: number, relative: Relativity, reevaluation: FacingReeval): void;
     /**
      * startForcingHero
      * Starts forcing one or more players to be a specific hero and, if necessary, respawns them immediately in their current location. This will be the only hero available to the player or players until the stop forcing player to be hero action is executed.
      * @param player The player or players who will be forced to be a specific hero.
      * @param hero The hero that the player or players will be forced to be.
      */
-    function startForcingHero(player: Player, hero: Hero): void;
+    function startForcingHero(player: Player | Player[], hero: Hero): void;
     /**
      * startForcingSpawn
      * Forces a team to spawn in a particular spawn room, regardless of the spawn room normally used by the game mode. This action only has an effect in assault, hybrid, and payload maps.
@@ -1949,16 +1949,16 @@ declare global {
      * @param minSideways Sets the minimum run sideways amount. 0 allows the player or players to stop while 1 forces full sideways movement.
      * @param maxSideways Sets the maximum run sideways amount. 0 prevents the player or players from moving SIDEWAYS while 1 allows full sideways movement.
      */
-    function startForcingThrottle(player: Player, minForward: number, maxForward: number, minBackward: number, maxBackward: number, minSideways: number, maxSideways: number): void;
+    function startForcingThrottle(player: Player | Player[], minForward: number, maxForward: number, minBackward: number, maxBackward: number, minSideways: number, maxSideways: number): void;
     /**
-     * startHoT
+     * startHealOverTime
      * Starts an instance of heal over time. This hot will persist for the specified duration or until stopped by script. To obtain a reference to this hot, use the last heal over time id value.
      * @param player One or more players who will receive the heal over time.
      * @param healer The player who will receive credit for the healing. A healer of null indicates no player will receive credit.
      * @param duration The duration of the heal over time in seconds. To have a hot that lasts until stopped by script, provide an arbitrarily long duration such as 9999.
      * @param healingPerSecond The healing per second for the heal over time.
      */
-    function startHoT(player: Player, healer: Player, duration: number, healingPerSecond: number): void;
+    function startHealOverTime(player: Player | Player[], healer: Player | Player[], duration: number, healingPerSecond: number): any;
     /**
      * startHealingModification
      * Starts modifying how much healing one or more receivers will receive from one or more healers. A reference to this healing modification can be obtained from the last healing modification id value. This action will fail if too many healing modifications have been started.
@@ -1967,14 +1967,14 @@ declare global {
      * @param healingPercent The percentage of healing that will apply to receivers when healed by healers.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. This action will keep asking for and using new values from reevaluated inputs.
      */
-    function startHealingModification(receivers: Player, healers: Player, healingPercent: number, reevaluation: HealingReeval): void;
+    function startHealingModification(receivers: Player | Player[], healers: Player | Player[], healingPercent: number, reevaluation: HealingReeval): void;
     /**
      * startForcingButton
      * Forces one or more players to hold a button virtually until stopped by the stop holding button action.
      * @param player The player or players who are holding a button virtually.
      * @param button The logical button that is being held virtually.
      */
-    function startForcingButton(player: Player, button: Button): void;
+    function startForcingButton(player: Player | Player[], button: Button): void;
     /**
      * startRule
      * Begins simultaneous execution of a subroutine rule (which is a rule with a Subroutine event type). Execution of the original rule continues uninterrupted. The subroutine will have access to the same contextual values (such as Event Player) as the original rule.
@@ -1992,7 +1992,7 @@ declare global {
      * @param behavior Specifies whether preexisting throttle is replaced or added to.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. This aciton will keep asking for and using new values from reevaluated inputs.
      */
-    function startThrottleInDirection(player: Player, direction: Vector, magnitude: number, relative: Relativity, behavior: Throttle, reevaluation: ThrottleReeval): void;
+    function startThrottleInDirection(player: Player | Player[], direction: Vector, magnitude: number, relative: Relativity, behavior: Throttle, reevaluation: ThrottleReeval): void;
     /**
      * startTransformingThrottle
      * Starts transforming (scaling and rotating) the throttle (directional input control) of a player or players. Cancels any existing start transforming throttle behavior.
@@ -2001,13 +2001,13 @@ declare global {
      * @param yAxisScalar The player or players will have their throttle Y axis (front to back) multiplied by this value before the throttle is rotated to its new relative direction. This value is evaluated continuously (meaning it updates every frame).
      * @param relativeDirection After the axis scalars are applied, the player or players will have their throttle transformed so that it is relative to this unit direction vector. For example, to make the throttle camera relative, provide the direction that the camera is facing. This value is evaluated continuously (meaning it updates every frame) and normalized internally.
      */
-    function startTransformingThrottle(player: Player, xAxisScalar: number, yAxisScalar: number, relativeDirection: Vector): void;
+    function startTransformingThrottle(player: Player | Player[], xAxisScalar: number, yAxisScalar: number, relativeDirection: Vector): void;
     /**
      * stopAcceleration
      * Stops the acceleration started by the start accelerating action for one or more players.
      * @param player The player or players who will stop accelerating.
      */
-    function stopAcceleration(player: Player): void;
+    function stopAcceleration(player: Player | Player[]): void;
     /**
      * stopAllDamageModifications
      * Stops all damage modifications that were started using the start damage modification action.
@@ -2019,23 +2019,23 @@ declare global {
      */
     function stopAllHealingModifications(): void;
     /**
-     * stopAllDoT
+     * stopAllDamageOverTime
      * Stops all damage over time started by start damage over time for one or more players.
      * @param player The player or players whose scripted damage over time will stop.
      */
-    function stopAllDoT(player: Player): void;
+    function stopAllDamageOverTime(player: Player | Player[]): any;
     /**
-     * stopAllHoT
+     * stopAllHealOverTime
      * Stops all heal over time started by start heal over time for one or more players.
      * @param player The player or players whose scripted heal over time will stop.
      */
-    function stopAllHoT(player: Player): void;
+    function stopAllHealOverTime(player: Player | Player[]): any;
     /**
      * stopCamera
      * None
      * @param player The player or players whose cameras will be put back to the default view.
      */
-    function stopCamera(player: Player): void;
+    function stopCamera(player: Player | Player[]): void;
     /**
      * stopChasingGlobalVariable
      * Stops an in-progress chase of a global variable, leaving it at its current value.
@@ -2048,7 +2048,7 @@ declare global {
      * @param player The player whose variable will stop changing. If multiple players are provided, each of their variables will stop changing.
      * @param variable Specifies which of the player's variables to stop modifying.
      */
-    function stopChasingPlayerVariable(player: Player, variable: string): void;
+    function stopChasingPlayerVariable(player: Player | Player[], variable: string): void;
     /**
      * stopDamageModification
      * Stops a damage modification that was started by the start damage modification action.
@@ -2056,23 +2056,23 @@ declare global {
      */
     function stopDamageModification(damageModification: number): void;
     /**
-     * stopDoT
+     * stopDamageOverTime
      * Stops an instance of damage over time started by the start damage over time action.
      * @param damageOverTimeId Specifies which damage over time instance to stop. This id may be last damage over time id or a variable into which last damage over time id was earlier stored.
      */
-    function stopDoT(damageOverTimeId: number): void;
+    function stopDamageOverTime(damageOverTimeId: number): any;
     /**
      * stopFacing
      * Stops the turning started by the start facing action for one or more players.
      * @param player The player or players who will stop turning.
      */
-    function stopFacing(player: Player): void;
+    function stopFacing(player: Player | Player[]): void;
     /**
      * stopForcingCurrentHero
      * Stops forcing one or more players to be a specific hero. This will not respawn the player or players, but it will restore their hero availability the next time they go to select a hero.
      * @param player The player or players who will no longer be forced to be a specific hero.
      */
-    function stopForcingCurrentHero(player: Player): void;
+    function stopForcingCurrentHero(player: Player | Player[]): void;
     /**
      * stopForcingSpawn
      * Undoes the effect of the start forcing spawn room action for the specified team.
@@ -2084,13 +2084,13 @@ declare global {
      * Undoes the effect of the start forcing throttle action for one or more players.
      * @param player The player or players whose movement input will be restored.
      */
-    function stopForcingThrottle(player: Player): void;
+    function stopForcingThrottle(player: Player | Player[]): void;
     /**
-     * stopHoT
+     * stopHealOverTime
      * Stops an instance of heal over time started by the start heal over time action.
      * @param healOverTimeId Specifies which heal over time instance to stop. This id may be last heal over time id or a variable into which last heal over time id was earlier stored.
      */
-    function stopHoT(healOverTimeId: number): void;
+    function stopHealOverTime(healOverTimeId: number): any;
     /**
      * stopHealingModification
      * Stops a healing modification that was started by the start healing modification action.
@@ -2103,26 +2103,26 @@ declare global {
      * @param player The player or players who are no longer holding a button virtually.
      * @param button The logical button that is no longer being held virtually.
      */
-    function stopForcingButton(player: Player, button: Button): void;
+    function stopForcingButton(player: Player | Player[], button: Button): void;
     /**
      * stopThrottleInDirection
      * Cancels the behavior caused by start throttle in direction.
      * @param player The player or players whose default throttle control will be restored.
      */
-    function stopThrottleInDirection(player: Player): void;
+    function stopThrottleInDirection(player: Player | Player[]): void;
     /**
      * stopTransformingThrottle
      * Stops the throttle transform started by start transforming throttle for one or more players.
      * @param player The player or players whose throttle will stop being transformed.
      */
-    function stopTransformingThrottle(player: Player): void;
+    function stopTransformingThrottle(player: Player | Player[]): void;
     /**
      * teleport
      * Teleports one or more players to the specified position.
      * @param player The player or players to teleport.
      * @param position The position to which the player or players will teleport. If a player is provided, the position of the player is used.
      */
-    function teleport(player: Player, position: Pos): void;
+    function teleport(player: Player | Player[], position: Pos): void;
     /**
      * unpauseMatchTime
      * Unpauses the match time.
@@ -2183,13 +2183,13 @@ declare global {
      * The array of heroes from which the specified player is currently allowed to select.
      * @param player The player whose allowed heroes to acquire.
      */
-    function getAllowedHeroes(player: Player): Hero[];
+    function getAllowedHeroes(player: Player | Player[]): Hero[];
     /**
      * getAltitude
      * The player's current height in meters above a surface. Results in 0 whenever the player is on a surface.
      * @param player The player whose altitude to acquire.
      */
-    function getAltitude(player: Player): number;
+    function getAltitude(player: Player | Player[]): number;
     /**
      * and
      * Whether both of the two inputs are true (or equivalent to true).
@@ -2366,19 +2366,19 @@ declare global {
      * Whether the specified player, icon entity, or effect entity still exists. Useful for determining if a player has left the match or an entity has been destroyed.
      * @param entity The player, icon entity, or effect entity whose existence to check.
      */
-    function entityExists(entity: Player): boolean;
+    function entityExists(entity: Player | Player[]): boolean;
     /**
      * getEyePosition
      * The position of a player's first person view (used for aiming)
      * @param player The position of a player's first person view (used for aiming)
      */
-    function getEyePosition(player: Player): Vector;
+    function getEyePosition(player: Player | Player[]): Vector;
     /**
      * getFacingDirection
      * The unit-length directional vector of a player's current facing relative to the world. This value includes both horizontal and vertical facing.
      * @param player The player whose facing direction to acquire.
      */
-    function getFacingDirection(player: Player): Vector;
+    function getFacingDirection(player: Player | Player[]): Vector;
     /**
      * getFarthestPlayer
      * The player farthest from a position, optionally restricted by team.
@@ -2416,26 +2416,26 @@ declare global {
      * Whether an entity has spawned in the world. Results in false for players who have not chosen a hero yet.
      * @param entity The player, icon entity, or effect entity whose presence in world to check.
      */
-    function hasSpawned(entity: Player): boolean;
+    function hasSpawned(entity: Player | Player[]): boolean;
     /**
      * hasStatusEffect
      * Whether the specified player has the specified status, either from the set status action or from a non-scripted game mechanic.
      * @param player The player whose status to check.
      * @param status The status to check for.
      */
-    function hasStatusEffect(player: Player, status: Status): boolean;
+    function hasStatusEffect(player: Player | Player[], status: Status): boolean;
     /**
      * getHealth
      * The current health of a player, including armor and shields.
      * @param player The player whose health to acquire.
      */
-    function getHealth(player: Player): number;
+    function getHealth(player: Player | Player[]): number;
     /**
      * getNormalizedHealth
      * The current health of a player, including armor and shields, normalized between 0 and 1. (for example, 0 is no health, 0.5 is half health, 1 is full health, etc.)
      * @param player The player whose normalized health to acquire.
      */
-    function getNormalizedHealth(player: Player): number;
+    function getNormalizedHealth(player: Player | Player[]): number;
     /**
      * hero
      * A hero constant.
@@ -2453,7 +2453,7 @@ declare global {
      * The current hero of a player.
      * @param player The player whose hero to acquire.
      */
-    function getCurrentHero(player: Player): Hero;
+    function getCurrentHero(player: Player | Player[]): Hero;
     /**
      * horizontalAngleFromDirection
      * The horizontal angle in degrees corresponding to the specified direction vector.
@@ -2466,7 +2466,7 @@ declare global {
      * @param player The player from whose current facing the angle begins.
      * @param position The position in the world where the angle ends.
      */
-    function horizontalAngleTowards(player: Player, position: Pos): number;
+    function horizontalAngleTowards(player: Player | Player[], position: Pos): number;
     /**
      * gamemode
      * A game mode constant.
@@ -2478,13 +2478,13 @@ declare global {
      * The horizontal angle in degrees of a player's current facing relative to the world. This value increases as the player rotates to the left (wrapping around at +/- 180).
      * @param player The player whose horizontal facing angle to acquire.
      */
-    function getHorizontalFacingAngle(player: Player): number;
+    function getHorizontalFacingAngle(player: Player | Player[]): number;
     /**
      * getHorizontalSpeed
      * The current horizontal speed of a player in meters per second. This measurement excludes all vertical motion.
      * @param player The player whose horizontal speed to acquire.
      */
-    function getHorizontalSpeed(player: Player): number;
+    function getHorizontalSpeed(player: Player | Player[]): number;
     /**
      * iconString
      * Allows you to use an icon inside of a string.
@@ -2503,69 +2503,69 @@ declare global {
      * Whether a player is alive.
      * @param player The player whose life to check.
      */
-    function isAlive(player: Player): boolean;
+    function isAlive(player: Player | Player[]): boolean;
     /**
      * isHoldingButton
      * Whether a player is holding a specific button.
      * @param player The player whose button to check.
      * @param button The button to check.
      */
-    function isHoldingButton(player: Player, button: Button): boolean;
+    function isHoldingButton(player: Player | Player[], button: Button): boolean;
     /**
      * isCommunicating
      * Whether a player is using a specific communication type (such as emoting, using a voice line, etc.).
      * @param player The player whose communication status to check.
      * @param type The type of communication to consider. The duration of emotes is exact, the duration of voice lines is assumed to be 4 seconds, and all other durations are assumed to be 2 seconds.
      */
-    function isCommunicating(player: Player, type: Communicate): boolean;
+    function isCommunicating(player: Player | Player[], type: Communicate): boolean;
     /**
      * isCommunicatingAnything
      * Whether a player is using any communication type (such as emoting, using a voice line, etc.).
      * @param player The player whose communication status to check.
      */
-    function isCommunicatingAnything(player: Player): boolean;
+    function isCommunicatingAnything(player: Player | Player[]): boolean;
     /**
      * isCommunicatingEmote
      * Whether a player is using an emote.
      * @param player The player whose emoting status to check.
      */
-    function isCommunicatingEmote(player: Player): boolean;
+    function isCommunicatingEmote(player: Player | Player[]): boolean;
     /**
      * isCommunicatingVoiceline
      * Whether a player is using a voice line. (The duration of voice lines is assumed to be 4 seconds.)
      * @param player The player whose voice line status to check.
      */
-    function isCommunicatingVoiceline(player: Player): boolean;
+    function isCommunicatingVoiceline(player: Player | Player[]): boolean;
     /**
      * isCrouching
      * Whether a player is crouching.
      * @param player The player whose crouching status to check.
      */
-    function isCrouching(player: Player): boolean;
+    function isCrouching(player: Player | Player[]): boolean;
     /**
      * isDead
      * Whether a player is dead.
      * @param player The player whose death to check.
      */
-    function isDead(player: Player): boolean;
+    function isDead(player: Player | Player[]): boolean;
     /**
      * isDummy
      * Whether a player is a dummy bot.
      * @param player Player to consider.
      */
-    function isDummy(player: Player): boolean;
+    function isDummy(player: Player | Player[]): boolean;
     /**
      * isFiringPrimaryFire
      * Whether the specified player's primary weapon attack is being used.
      * @param player The player whose primary weapon attack usage to check.
      */
-    function isFiringPrimaryFire(player: Player): boolean;
+    function isFiringPrimaryFire(player: Player | Player[]): boolean;
     /**
      * isFiringSecondaryFire
      * Whether the specified player's secondary weapon attack is being used.
      * @param player The player whose secondary weapon attack usage to check.
      */
-    function isFiringSecondaryFire(player: Player): boolean;
+    function isFiringSecondaryFire(player: Player | Player[]): boolean;
     /**
      * isFlagAtBase
      * Whether a specific team's flag is at its base in capture the flag.
@@ -2590,7 +2590,7 @@ declare global {
      * Whether a player is airborne.
      * @param player The player whose airborne status to check.
      */
-    function isInAir(player: Player): boolean;
+    function isInAir(player: Player | Player[]): boolean;
     /**
      * isInLineOfSight
      * Whether two positions have line of sight with each other.
@@ -2604,7 +2604,7 @@ declare global {
      * Whether a specific player is in the spawn room (and is thus being healed and able to change heroes).
      * @param player The player whose spawn room status to check.
      */
-    function isInSpawnRoom(player: Player): boolean;
+    function isInSpawnRoom(player: Player | Player[]): boolean;
     /**
      * isInViewAngle
      * Whether a location is within view of a player.
@@ -2612,13 +2612,13 @@ declare global {
      * @param location The location to test if it's within view.
      * @param viewAngle The view angle to compare against in degrees.
      */
-    function isInViewAngle(player: Player, location: Pos, viewAngle: number): boolean;
+    function isInViewAngle(player: Player | Player[], location: Pos, viewAngle: number): boolean;
     /**
      * isMoving
      * Whether a player is moving (defined as having a nonzero current speed).
      * @param player The player whose moving status to check.
      */
-    function isMoving(player: Player): boolean;
+    function isMoving(player: Player | Player[]): boolean;
     /**
      * isObjectiveComplete
      * Whether the specified objective has been completed. Results in false if the game mode is not assault, escort, or assault/escort.
@@ -2630,31 +2630,31 @@ declare global {
      * Whether a player is on the ground (or other walkable surface).
      * @param player The player whose ground status to check.
      */
-    function isOnGround(player: Player): boolean;
+    function isOnGround(player: Player | Player[]): boolean;
     /**
      * isOnObjective
      * Whether a specific player is currently occupying a payload or capture point.
      * @param player The player whose objective status to check.
      */
-    function isOnObjective(player: Player): boolean;
+    function isOnObjective(player: Player | Player[]): boolean;
     /**
      * isOnWall
      * Whether a player is on a wall (climbing or riding).
      * @param player The player whose wall status to check.
      */
-    function isOnWall(player: Player): boolean;
+    function isOnWall(player: Player | Player[]): boolean;
     /**
      * isOnFire
      * Whether a specific player's portrait is on fire.
      * @param player The player whose portrait to check.
      */
-    function isOnFire(player: Player): boolean;
+    function isOnFire(player: Player | Player[]): boolean;
     /**
      * isStanding
      * Whether a player is standing (defined as both not moving and not in the air).
      * @param player The player whose standing status to check.
      */
-    function isStanding(player: Player): boolean;
+    function isStanding(player: Player | Player[]): boolean;
     /**
      * isTeamOnDefense
      * Whether the specified team is currently on defense. Results in false if the game mode is not assault, escort, or assault/escort.
@@ -2686,19 +2686,19 @@ declare global {
      * Whether the specified player is using ability 1.
      * @param player The player whose ability 1 usage to check.
      */
-    function isUsingAbilityOne(player: Player): boolean;
+    function isUsingAbilityOne(player: Player | Player[]): boolean;
     /**
      * isUsingAbilityTwo
      * Whether the specified player is using ability 2.
      * @param player The player whose ability 2 usage to check.
      */
-    function isUsingAbilityTwo(player: Player): boolean;
+    function isUsingAbilityTwo(player: Player | Player[]): boolean;
     /**
      * isUsingUltimate
      * Whether a player is using an ultimate ability.
      * @param player The player whose ultimate ability usage to check.
      */
-    function isUsingUltimate(player: Player): boolean;
+    function isUsingUltimate(player: Player | Player[]): boolean;
     /**
      * lastOf
      * The value at the end of the specified array. Results in 0 if the specified array is empty.
@@ -2712,7 +2712,7 @@ declare global {
      * @param relativePlayer The player to whom the resulting vector will be relative.
      * @param transformation Specifies whether the vector should receive a rotation and a translation (usually applied to positions) or only a rotation (usually applied to directions and velocities).
      */
-    function localVector(worldVector: Pos, relativePlayer: Player, transformation: Transform): Vector;
+    function localVector(worldVector: Pos, relativePlayer: Player | Player[], transformation: Transform): Vector;
     /**
      * mapOf
      * A map constant.
@@ -2731,7 +2731,7 @@ declare global {
      * The max health of a player, including armor and shields.
      * @param player The player whose max health to acquire.
      */
-    function getMaxHealth(player: Player): number;
+    function getMaxHealth(player: Player | Player[]): number;
     /**
      * min
      * The lesser of two numbers.
@@ -2782,19 +2782,19 @@ declare global {
      * The number of deaths a specific player has earned. This value only accumulates while a game is in progress.
      * @param player The player whose death count to acquire.
      */
-    function getNumberOfDeaths(player: Player): number;
+    function getNumberOfDeaths(player: Player | Player[]): number;
     /**
      * getNumberOfElims
      * The number of eliminations a specific player has earned. This value only accumulates while a game is in progress.
      * @param player The player whose elimination count to acquire.
      */
-    function getNumberOfElims(player: Player): number;
+    function getNumberOfElims(player: Player | Player[]): number;
     /**
      * getNumberOfFinalBlows
      * The number of final blows a specific player has earned. This value only accumulates while a game is in progress.
      * @param player The player whose final blow count to acquire.
      */
-    function getNumberOfFinalBlows(player: Player): number;
+    function getNumberOfFinalBlows(player: Player | Player[]): number;
     /**
      * getNumberOfHeroes
      * The number of players playing a specific hero on a team or in the match.
@@ -2851,14 +2851,14 @@ declare global {
      * @param player The player from whose reticle to search for the closest player.
      * @param team The team or teams on which to search for the closest player.
      */
-    function getPlayerClosestToReticle(player: Player, team: Team): Player;
+    function getPlayerClosestToReticle(player: Player | Player[], team: Team): Player;
     /**
      * playerVar
      * The current value of a player variable, which is a variable that belongs to a specific player.
      * @param player The player whose variable value to acquire.
      * @param variable The variable whose value to acquire.
      */
-    function playerVar(player: Player, variable: string): any;
+    function playerVar(player: Player | Player[], variable: string): any;
     /**
      * getPlayersInSlot
      * The player or array of players who occupy a specific slot in the game.
@@ -2873,7 +2873,7 @@ declare global {
      * @param team The team or teams on which to consider players.
      * @param viewAngle The view angle to compare against in degrees.
      */
-    function getPlayersInViewAngle(player: Player, team: Team, viewAngle: number): Player[];
+    function getPlayersInViewAngle(player: Player | Player[], team: Team, viewAngle: number): Player[];
     /**
      * getPlayersOnHero
      * The array of players playing a specific hero on a team or in the match.
@@ -2895,7 +2895,7 @@ declare global {
      * The current position of a player as a vector.
      * @param player The player whose position to acquire.
      */
-    function getPosition(player: Player): Vector;
+    function getPosition(player: Player | Player[]): Vector;
     /**
      * raiseToPower
      * The left-hand operand raised to the power of the right-hand operand. If the left-hand operand is negative, the result is always zero.
@@ -2938,7 +2938,7 @@ declare global {
      * @param playersToExclude Which players cannot be hit by this ray cast. This list takes precedence over players to include.
      * @param includePlayerOwnedObjects Whether player-owned objects (such as barriers or turrets) should be included in the ray cast.
      */
-    function getNormal(startPos: Pos, endPos: Pos, playersToInclude: Player, playersToExclude: Player, includePlayerOwnedObjects: boolean): Vector;
+    function getNormal(startPos: Pos, endPos: Pos, playersToInclude: Player | Player[], playersToExclude: Player | Player[], includePlayerOwnedObjects: boolean): Vector;
     /**
      * getPlayerHit
      * The player hit by the ray cast (or null if no player is hit).
@@ -2948,7 +2948,7 @@ declare global {
      * @param playersToExclude Which players cannot be hit by this ray cast. This list takes precedence over players to include.
      * @param includePlayerOwnedObjects Whether player-owned objects (such as barriers or turrets) should be included in the ray cast.
      */
-    function getPlayerHit(startPos: Pos, endPos: Pos, playersToInclude: Player, playersToExclude: Player, includePlayerOwnedObjects: boolean): Player | null;
+    function getPlayerHit(startPos: Pos, endPos: Pos, playersToInclude: Player | Player[], playersToExclude: Player | Player[], includePlayerOwnedObjects: boolean): Player | null;
     /**
      * getHitPosition
      * The position where the ray cast hits a surface, object, or player (or the end pos if no hit occurs).
@@ -2958,7 +2958,7 @@ declare global {
      * @param playersToExclude Which players cannot be hit by this ray cast. This list takes precedence over players to include.
      * @param includePlayerOwnedObjects Whether player-owned objects (such as barriers or turrets) should be included in the ray cast.
      */
-    function getHitPosition(startPos: Pos, endPos: Pos, playersToInclude: Player, playersToExclude: Player, includePlayerOwnedObjects: boolean): Vector;
+    function getHitPosition(startPos: Pos, endPos: Pos, playersToInclude: Player | Player[], playersToExclude: Player | Player[], includePlayerOwnedObjects: boolean): Vector;
     /**
      * removeFromArray
      * A copy of an array with one or more values removed (if found).
@@ -2978,7 +2978,7 @@ declare global {
      * The current score of a player. Results in 0 if the game mode is not free-for-all.
      * @param player The player whose score to acquire.
      */
-    function getScore(player: Player): number;
+    function getScore(player: Player | Player[]): number;
     /**
      * sinDeg
      * Sine of the specified angle in degrees.
@@ -2996,7 +2996,7 @@ declare global {
      * The slot number of the specified player. In team games, each team has slots 0 through 5. In free-for-all games, slots are numbered 0 through 11.
      * @param player The player whose slot number to acquire.
      */
-    function getSlot(player: Player): number;
+    function getSlot(player: Player | Player[]): number;
     /**
      * sortedArray
      * A copy of the specified array with the values sorted according to the value rank that is evaluated for each element.
@@ -3009,14 +3009,14 @@ declare global {
      * The current speed of a player in meters per second.
      * @param player The player whose speed to acquire.
      */
-    function getSpeed(player: Player): number;
+    function getSpeed(player: Player | Player[]): number;
     /**
      * getSpeedInDirection
      * The current speed of a player in a specific direction in meters per second.
      * @param player The player whose speed to acquire.
      * @param direction The direction of travel in which to measure the player's speed.
      */
-    function getSpeedInDirection(player: Player, direction: Vector): number;
+    function getSpeedInDirection(player: Player | Player[], direction: Vector): number;
     /**
      * sqrt
      * The square root of the specified value.
@@ -3056,7 +3056,7 @@ declare global {
      * The team of a player. If the game mode is free-for-all, the team is considered to be all.
      * @param player The player whose team to acquire.
      */
-    function getTeam(player: Player): Team;
+    function getTeam(player: Player | Player[]): Team;
     /**
      * teamScore
      * The current score for the specified team. Results in 0 in free-for-all game modes.
@@ -3068,13 +3068,13 @@ declare global {
      * The directional input of a player, represented by a vector with horizontal input on the x component (positive to the left) and vertical input on the z component (positive upward).
      * @param player The player whose directional input to acquire.
      */
-    function getThrottle(player: Player): Vector;
+    function getThrottle(player: Player | Player[]): Vector;
     /**
      * getUltCharge
      * The current ultimate ability charge percentage of a player.
      * @param player The player whose ultimate charge percentage to acquire.
      */
-    function getUltCharge(player: Player): number;
+    function getUltCharge(player: Player | Player[]): number;
     /**
      * valueInArray
      * The value found at a specific element of an array. Results in 0 if the element does not exist.
@@ -3102,7 +3102,7 @@ declare global {
      * The current velocity of a player as a vector. If the player is on a surface, the y component of this velocity will be 0, even when traveling up or down a slope.
      * @param player The player whose velocity to acquire.
      */
-    function getVelocity(player: Player): Vector;
+    function getVelocity(player: Player | Player[]): Vector;
     /**
      * verticalAngleOfDirection
      * The vertical angle in degrees corresponding to the specified direction vector.
@@ -3115,19 +3115,19 @@ declare global {
      * @param player The player from whose current facing the angle begins.
      * @param position The position in the world where the angle ends.
      */
-    function verticalAngleTowards(player: Player, position: Pos): number;
+    function verticalAngleTowards(player: Player | Player[], position: Pos): number;
     /**
      * getVerticalFacingAngle
      * The vertical angle in degrees of a player's current facing relative to the world. This value increases as the player looks down.
      * @param player The player whose vertical facing angle to acquire.
      */
-    function getVerticalFacingAngle(player: Player): number;
+    function getVerticalFacingAngle(player: Player | Player[]): number;
     /**
      * getVerticalSpeed
      * The current vertical speed of a player in meters per second. This measurement excludes all horizontal motion, including motion while traveling up and down slopes.
      * @param player The player whose vertical speed to acquire.
      */
-    function getVerticalSpeed(player: Player): number;
+    function getVerticalSpeed(player: Player | Player[]): number;
     /**
      * worldVector
      * The vector in world coordinates corresponding to the provided vector in local coordinates.
@@ -3135,7 +3135,7 @@ declare global {
      * @param relativePlayer The player to whom the local vector is relative.
      * @param transformation Specifies whether the vector should receive a rotation and a translation (usually applied to positions) or only a rotation (usually applied to directions and velocities).
      */
-    function worldVector(localVector: Vector, relativePlayer: Player, transformation: Transform): Vector;
+    function worldVector(localVector: Vector, relativePlayer: Player | Player[], transformation: Transform): Vector;
     /**
      * xComponentOf
      * The x component of the specified vector, usually representing a leftward amount.

@@ -1,4 +1,4 @@
-import { CompareSymbol } from "../type/compare";
+import "../helper";
 import { OWExpression } from "./expression";
 
 export interface Condition {

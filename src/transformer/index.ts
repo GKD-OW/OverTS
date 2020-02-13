@@ -3,11 +3,10 @@ import { Ast, Rule } from '../owcode/ast';
 import { Condition } from '../owcode/ast/conditions';
 import { OWEvent, SubEvent } from '../owcode/ast/event';
 import { CallExpression } from '../owcode/ast/expression';
-import { tsMatchToSymbol } from '../owcode/type/compare';
-import '../owcode/type/global';
+import '../owcode/helper';
 import { getFinalAccess, isCanToString, PropertyAccess } from './accessUtils';
 import { parseEvent, parseExpression } from './expression';
-import { createCall, createCondition, createRaw, createSubCall, getClassName, getMethod, getVariable, getVariableResult, uuid } from './utils';
+import { createCall, createCondition, createRaw, createSubCall, getClassName, getMethod, getVariable, getVariableResult, uuid, tsMatchToCompare } from './utils';
 import { DefinedContants } from './var';
 
 export default class Transformer {
@@ -160,7 +159,7 @@ export default class Transformer {
             // 条件
             decorator.expression.arguments.forEach(condition => {
               if (ts.isBinaryExpression(condition)) {
-                const symbol = tsMatchToSymbol(condition.operatorToken.kind);
+                const symbol = tsMatchToCompare(condition.operatorToken.kind);
                 // 比较
                 if (typeof(symbol) !== 'undefined') {
                   conditions.push(createCondition(this.parseExpression(condition.left), this.parseExpression(condition.right), symbol));

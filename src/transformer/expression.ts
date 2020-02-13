@@ -1,11 +1,10 @@
 import * as ts from 'typescript';
-import Constants from './constants';
 import { GlobalEvents, OWEvent, PlayerEvent, SubEvents } from '../owcode/ast/event';
 import { CallExpression, ExpressionKind, OWExpression } from '../owcode/ast/expression';
-import { tsMatchToSymbol } from '../owcode/type/compare';
-import '../owcode/type/global';
+import '../owcode/helper';
 import { getFinalAccess, isCanToString, PropertyAccess } from './accessUtils';
-import { createCall, createCompareExpression, createRaw, createSubCall, createSubEvent, getArrayAccess, uuid } from './utils';
+import Constants from './constants';
+import { createCall, createCompareExpression, createRaw, createSubCall, createSubEvent, getArrayAccess, tsMatchToCompare, uuid } from './utils';
 import { DefinedContants, ParseContext } from './var';
 
 // 普通算数运算符
@@ -177,7 +176,7 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
       );
     }
     // 其他逻辑运算（大于、小于等）
-    const logicSymbol = tsMatchToSymbol(expression.operatorToken.kind);
+    const logicSymbol = tsMatchToCompare(expression.operatorToken.kind);
     if (typeof(logicSymbol) !== 'undefined') {
       return createCall(
         'COMPARE',

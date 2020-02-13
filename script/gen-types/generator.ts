@@ -16,6 +16,7 @@ const knownType: { [x: string]: AvaliableType } = {
   BOOLEAN: ts.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
   NUMBER: ts.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
   STRING: ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+  NULL: ts.createKeywordTypeNode(ts.SyntaxKind.NullKeyword),
 }
 
 const simpleCalc = ['add', 'subtract', 'multiply', 'divide'];
@@ -179,6 +180,10 @@ export default class Generator {
         // 简单运算的那几个，参数都是NUMBER | Vector
         if (simpleCalc.includes(name)) {
           type = 'NUMBER | Vector';
+        }
+        // 参数如果是玩家，那么一定也支持多个玩家
+        if (type === 'PLAYER') {
+          type = 'PLAYER | PLAYER[]'
         }
         if (typeof(paramTypeAlias[key]) !== 'undefined') {
           type = paramTypeAlias[key];

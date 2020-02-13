@@ -1,5 +1,5 @@
 import { isPlayerEvent, isSubEvent, OWEvent } from "../ast/event";
-import '../type/global';
+import '../helper';
 import i18n from "./i18n";
 
 export function getEventText(event: OWEvent): string[] {

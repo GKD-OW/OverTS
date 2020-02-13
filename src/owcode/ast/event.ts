@@ -1,4 +1,4 @@
-import '../type/global';
+import '../helper';
 
 export const GlobalEvents = [Events.GLOBAL];
 export const SubEvents = [Events.SUBROUTINE];

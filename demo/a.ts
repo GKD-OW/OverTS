@@ -1,21 +1,21 @@
-import '../src/owcode/type/global';
+import '../src/owcode/helper';
 
 let a = [];
 let b = [];
 let c = 0;
 
-export class myClass {
-  @runAt(Events.GLOBAL)
-  @condition(Game.IS_WAITING_FOR_PLAYERS)
-  test() {
-    a[2] = 3;
-    b[1] = 2;
-    c++;
-    a[2]++;
-    c += 5;
-    a[3] += 6;
+export class ChuanHuo {
+  // 传火
+  @runAt(Events.PLAYER_TOOK_DAMAGE)
+  @condition(
+    !hasStatusEffect(Game.EVENT_PLAYER, Status.BURNING),
+    hasStatusEffect(Game.ATTACKER, Status.BURNING)
+  )
+  chuanhuo() {
+    setStatusEffect(Game.EVENT_PLAYER, null, Status.BURNING, 9999);
+    startDamageOverTime(Game.EVENT_PLAYER, null, 9999, 50);
+    setPlayerVar(Game.EVENT_PLAYER, "damage_id", Game.GET_LAST_DO_T);
   }
-
 
   @runAt(Events.EACH_PLAYER, Team.ONE, Hero.ANA)
   test2() {
