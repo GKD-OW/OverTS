@@ -278,15 +278,13 @@ export function parseEvent(exps: ts.NodeArray<ts.Expression>, defines?: DefinedC
     // 玩家事件
     const team = getFinalAccess(exps[1], defines);
     const hero = getFinalAccess(exps[2], defines);
-    let teamName = Team.ALL;
-    let heroName = Game.GET_ALL_HEROES;
+    let teamName = 'TEAM_ALL';
+    let heroName = 'GAME_GET_ALL_HEROES';
     if (team instanceof PropertyAccess && team.left === 'Team') {
-      // @ts-ignore
-      teamName = Team[team.left];
+      teamName = 'TEAM_' + team.right.toString().toUpperCase();
     }
-    if (hero instanceof PropertyAccess && hero.left === 'Heros') {
-      // @ts-ignore
-      heroName = Hero[hero.left];
+    if (hero instanceof PropertyAccess && hero.left === 'Hero') {
+      heroName = 'HERO_' + hero.right.toString().toUpperCase();
     }
     const event: PlayerEvent = {
       kind: eventName,

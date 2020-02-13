@@ -1,5 +1,3 @@
-import { CompareSymbol } from "../type/compare";
-
 export enum ExpressionKind {
   CALL,
   CONSTANT,

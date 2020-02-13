@@ -1,67 +1,77 @@
 import * as globalthis from "globalthis";
 const globals: any = globalthis();
+globals.CompareSymbol = {
+    EQUALS: 0,
+    LESS: 1,
+    LESS_EQUALS: 2,
+    GREATER: 3,
+    GREATER_EQUALS: 4,
+    NOT_EQUALS: 5 // 不等于
+};
 type Player = "_GKD_PLAYER_";
-type Vector = "_GKD_VECTOR_";
+type MapItem = "_GKD_MAPITEM_";
 declare global {
     function runAt(event: string): any;
     function runAt(event: string, team: Team, hero: Hero): any;
     function condition(...conditions: boolean[]): any;
+    enum CompareSymbol {
+        EQUALS = 0,
+        LESS = 1,
+        LESS_EQUALS = 2,
+        GREATER = 3,
+        GREATER_EQUALS = 4,
+        NOT_EQUALS = 5 // 不等于
+    }
 }
 globals.Events = { GLOBAL: "GLOBAL", EACH_PLAYER: "EACH_PLAYER", PLAYER_TOOK_DAMAGE: "PLAYER_TOOK_DAMAGE", PLAYER_DEALT_DAMAGE: "PLAYER_DEALT_DAMAGE", PLAYER_DEALT_FINAL_BLOW: "PLAYER_DEALT_FINAL_BLOW", PLAYER_DIED: "PLAYER_DIED", PLAYER_EARNED_ELIMINATION: "PLAYER_EARNED_ELIMINATION", PLAYER_DEALT_HEALING: "PLAYER_DEALT_HEALING", PLAYER_RECEIVED_HEALING: "PLAYER_RECEIVED_HEALING", PLAYER_JOINED: "PLAYER_JOINED", PLAYER_LEFT: "PLAYER_LEFT", SUBROUTINE: "SUBROUTINE" };
 declare global {
     namespace Game {
-        const GET_DAMAGE_HEROES: any;
-        const GET_ALL_HEROES: any;
-        const GET_SUPPORT_HEROES: any;
-        const GET_TANK_HEROES: any;
-        const ATTACKER: any;
-        const VECTOR_BACKWARD: any;
-        const GET_CONTROL_SCORING_TEAM: any;
+        const GET_DAMAGE_HEROES: Hero[];
+        const GET_ALL_HEROES: Hero[];
+        const GET_SUPPORT_HEROES: Hero[];
+        const GET_TANK_HEROES: Hero[];
+        const ATTACKER: Player;
+        const GET_CONTROL_SCORING_TEAM: Team;
         const CURRENT_ARRAY_ELEMENT: any;
-        const GET_CURRENT_GAMEMODE: any;
-        const GET_CURRENT_MAP: any;
-        const VECTOR_DOWN: any;
-        const EMPTY_ARRAY: any;
-        const EVENT_DAMAGE: any;
-        const EVENT_HEALING: any;
-        const EVENT_PLAYER: any;
-        const EVENT_WAS_CRITICAL_HIT: any;
-        const EVENT_WAS_HEALTH_PACK: any;
-        const FALSE: any;
-        const VECTOR_FORWARD: any;
-        const HEALEE: any;
-        const HEALER: any;
-        const HOST_PLAYER: any;
-        const IS_ASSEMBLING_HEROES: any;
-        const IS_MATCH_BETWEEN_ROUNDS: any;
-        const IS_CONTROL_POINT_LOCKED: any;
-        const IS_IN_SUDDEN_DEATH: any;
-        const IS_GAME_IN_PROGRESS: any;
-        const IS_IN_SETUP: any;
-        const IS_MATCH_COMPLETE: any;
-        const IS_WAITING_FOR_PLAYERS: any;
-        const GET_LAST_CREATED_ENTITY: any;
-        const GET_LAST_DAMAGE_MODIFICATION: any;
-        const GET_LAST_DO_T: any;
-        const GET_LAST_HO_T: any;
-        const GET_LAST_HEALING_MODIFICATION: any;
-        const GET_LAST_CREATED_TEXT: any;
-        const VECTOR_LEFT: any;
-        const GET_MATCH_ROUND: any;
-        const GET_MATCH_TIME: any;
+        const GET_CURRENT_GAMEMODE: Gamemode;
+        const GET_CURRENT_MAP: MapItem;
+        const EMPTY_ARRAY: any[];
+        const EVENT_DAMAGE: number;
+        const EVENT_HEALING: number;
+        const EVENT_PLAYER: Player;
+        const EVENT_WAS_CRITICAL_HIT: boolean;
+        const EVENT_WAS_HEALTH_PACK: boolean;
+        const FALSE: boolean;
+        const HEALEE: Player;
+        const HEALER: Player;
+        const HOST_PLAYER: Player;
+        const IS_ASSEMBLING_HEROES: boolean;
+        const IS_MATCH_BETWEEN_ROUNDS: boolean;
+        const IS_CONTROL_POINT_LOCKED: boolean;
+        const IS_IN_SUDDEN_DEATH: boolean;
+        const IS_GAME_IN_PROGRESS: boolean;
+        const IS_IN_SETUP: boolean;
+        const IS_MATCH_COMPLETE: boolean;
+        const IS_WAITING_FOR_PLAYERS: boolean;
+        const GET_LAST_CREATED_ENTITY: number;
+        const GET_LAST_DAMAGE_MODIFICATION: number;
+        const GET_LAST_DO_T: number;
+        const GET_LAST_HO_T: number;
+        const GET_LAST_HEALING_MODIFICATION: number;
+        const GET_LAST_CREATED_TEXT: number;
+        const GET_MATCH_ROUND: number;
+        const GET_MATCH_TIME: number;
         const NULL: any;
-        const GET_CURRENT_OBJECTIVE: any;
-        const GET_PAYLOAD_POSITION: any;
-        const GET_PAYLOAD_PROGRESS_PERCENTAGE: any;
-        const GET_CAPTURE_PERCENTAGE: any;
-        const VECTOR_RIGHT: any;
-        const GET_SERVER_LOAD: any;
-        const GET_AVERAGE_SERVER_LOAD: any;
-        const GET_PEAK_SERVER_LOAD: any;
-        const GET_TOTAL_TIME_ELAPSED: any;
-        const TRUE: any;
-        const VECTOR_UP: any;
-        const VICTIM: any;
+        const GET_CURRENT_OBJECTIVE: number;
+        const GET_PAYLOAD_POSITION: Vector;
+        const GET_PAYLOAD_PROGRESS_PERCENTAGE: number;
+        const GET_CAPTURE_PERCENTAGE: number;
+        const GET_SERVER_LOAD: number;
+        const GET_AVERAGE_SERVER_LOAD: number;
+        const GET_PEAK_SERVER_LOAD: number;
+        const GET_TOTAL_TIME_ELAPSED: number;
+        const TRUE: boolean;
+        const VICTIM: Team;
     }
     enum Transform {
         ROTATION = "ROTATION",
@@ -180,7 +190,7 @@ declare global {
         SPARKLES_SOUND = "SPARKLES_SOUND",
         SPHERE = "SPHERE"
     }
-    enum Comms {
+    enum Communicate {
         ACKNOWLEDGE = "ACKNOWLEDGE",
         EMOTE_DOWN = "EMOTE_DOWN",
         EMOTE_LEFT = "EMOTE_LEFT",
@@ -258,9 +268,9 @@ declare global {
         NONE = "NONE"
     }
     enum Pos {
-        LEFT = "_GKD_VECTOR_",
-        TOP = "_GKD_VECTOR_",
-        RIGHT = "_GKD_VECTOR_"
+        LEFT = "LEFT",
+        TOP = "TOP",
+        RIGHT = "RIGHT"
     }
     enum IconReeval {
         POSITION = "POSITION",
@@ -432,6 +442,14 @@ declare global {
     enum AsyncBehavior {
         RESTART = "RESTART",
         NOOP = "NOOP"
+    }
+    enum Vector {
+        BACKWARD = "BACKWARD",
+        DOWN = "DOWN",
+        FORWARD = "FORWARD",
+        LEFT = "LEFT",
+        RIGHT = "RIGHT",
+        UP = "UP"
     }
     enum Events {
         GLOBAL = "GLOBAL",
@@ -1147,20 +1165,20 @@ declare global {
      * @param relative Specifies whether direction is relative to world coordinates or the local coordinates of the player or players.
      * @param motion Specifies whether existing velocity that is counter to direction should first be cancelled out before applying the impulse.
      */
-    function applyImpulse(player: Player, direction: any, speed: number, relative: any, motion: any): void;
+    function applyImpulse(player: Player, direction: Vector, speed: number, relative: Relativity, motion: Impulse): void;
     /**
      * bigMessage
      * Displays a large message above the reticle that is visible to specific players.
      * @param visibleTo One or more players who will see the message.
      * @param header The message to be displayed.
      */
-    function bigMessage(visibleTo: Player, header: any): void;
+    function bigMessage(visibleTo: Player, header: Strings): void;
     /**
      * callSubroutine
      * Pauses execution of the current rule and begins executing a subroutine rule (which is a rule with a subroutine event type). When the subroutine rule finishes, the original rule resumes execution. The subroutine will have access to the same contextual values (such as Event Player) as the original rule.
      * @param subroutine Specifies which subroutine to call. If a rule with a subroutine event type specifies the same subroutine, then it will execute. Otherwise, this action is ignored.
      */
-    function callSubroutine(subroutine: any): void;
+    function callSubroutine(subroutine: string): void;
     /**
      * chaseGlobalVariableAtRate
      * Gradually modifies the value of a global variable at a specific rate. (A global variable is a variable that belongs to the game itself.)
@@ -1169,7 +1187,7 @@ declare global {
      * @param rate The amount of change that will happen to the variable's value each second.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. This action will keep asking for and using new values from reevaluated inputs.
      */
-    function chaseGlobalVariableAtRate(variable: any, destination: any, rate: number, reevaluation: any): void;
+    function chaseGlobalVariableAtRate(variable: string, destination: any, rate: number, reevaluation: ChaseReeval): void;
     /**
      * chaseGlobalVariableOverTime
      * Gradually modifies the value of a global variable over time. (A global variable is a variable that belongs to the game itself.)
@@ -1178,7 +1196,7 @@ declare global {
      * @param duration The amount of time, in seconds, over which the variable's value will approach the destination.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. This action will keep asking for and using new values from reevaluated inputs.
      */
-    function chaseGlobalVariableOverTime(variable: any, destination: any, duration: number, reevaluation: any): void;
+    function chaseGlobalVariableOverTime(variable: string, destination: any, duration: number, reevaluation: ChaseReeval): void;
     /**
      * chasePlayerVariableAtRate
      * Gradually modifies the value of a player variable at a specific rate. (A player variable is a variable that belongs to a specific player.)
@@ -1188,7 +1206,7 @@ declare global {
      * @param rate The amount of change that will happen to the variable's value each second.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. This action will keep asking for and using new values from reevaluated inputs.
      */
-    function chasePlayerVariableAtRate(player: Player, variable: any, destination: any, rate: number, reevaluation: any): void;
+    function chasePlayerVariableAtRate(player: Player, variable: string, destination: any, rate: number, reevaluation: ChaseReeval): void;
     /**
      * chasePlayerVariableOverTime
      * Gradually modifies the value of a player variable over time. (A player variable is a variable that belongs to a specific player.)
@@ -1198,7 +1216,7 @@ declare global {
      * @param duration The amount of time, in seconds, over which the variable's value will approach the destination.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. This action will keep asking for and using new values from reevaluated inputs.
      */
-    function chasePlayerVariableOverTime(player: Player, variable: any, destination: any, duration: any, reevaluation: any): void;
+    function chasePlayerVariableOverTime(player: Player, variable: string, destination: any, duration: number, reevaluation: ChaseReeval): void;
     /**
      * clearStatusEffect
      * Clears a status that was applied from a set status action from one or more players.
@@ -1212,7 +1230,7 @@ declare global {
      * @param player The player or players to perform the communication.
      * @param type The type of communication.
      */
-    function communicate(player: Player, type: any): void;
+    function communicate(player: Player, type: Communicate): void;
     /**
      * createBeam
      * Creates an in-world beam effect entity. This effect entity will persist until destroyed. To obtain a reference to this entity, use the last created entity value. This action will fail if too many entities have been created.
@@ -1223,7 +1241,7 @@ declare global {
      * @param color The color of the beam to be created. If a particular team is chosen, the effect will either be red or blue, depending on whether the team is hostile to the viewer. Does not apply to sound effects. Only the "good" and "bad" beam effects can have color applied.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. The effect will keep asking for and using new values from reevaluated inputs.
      */
-    function createBeam(visibleTo: Player, type: any, startPosition: Vector, endPosition: Vector, color: Color, reevaluation: any): void;
+    function createBeam(visibleTo: Player, type: Beam, startPosition: Pos, endPosition: Pos, color: Color, reevaluation: EffectReeval): void;
     /**
      * createDummy
      * Adds a new bot to the specified slot on the specified team so long as the slot is available. This bot will only move, fire, or use abilities if executing workshop actions.
@@ -1233,7 +1251,7 @@ declare global {
      * @param position The initial position where the bot will appear.
      * @param facing The initial direction that the bot will face.
      */
-    function createDummy(hero: Hero, team: Team, slot: number, position: Vector, facing: any): void;
+    function createDummy(hero: Hero, team: Team, slot: number, position: Pos, facing: Vector): void;
     /**
      * createEffect
      * Creates an in-world effect entity. This effect entity will persist until destroyed. To obtain a reference to this entity, use the last created entity value. This action will fail if too many entities have been created.
@@ -1244,7 +1262,7 @@ declare global {
      * @param radius The radius of this effect.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated.
      */
-    function createEffect(visibleTo: Player, type: any, color: Color, position: Vector, radius: number, reevaluation: any): void;
+    function createEffect(visibleTo: Player, type: Effect, color: Color, position: Pos, radius: number, reevaluation: EffectReeval): void;
     /**
      * hudText
      * Creates hud text visible to specific players at a specific location on the screen. This text will persist until destroyed. To obtain a reference to this text, use the last text id value. This action will fail if too many text elements have been created.
@@ -1260,7 +1278,7 @@ declare global {
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated.
      * @param spectators Whether spectators can see the text or not.
      */
-    function hudText(visibleTo: Player, header: any, subheader: any, text: any, location: any, sortOrder: number, headerColor: Color, subheaderColor: Color, textColor: Color, reevaluation: any, spectators: any): void;
+    function hudText(visibleTo: Player, header: Strings | null, subheader: Strings | null, text: Strings | null, location: Pos, sortOrder: number, headerColor: Color, subheaderColor: Color, textColor: Color, reevaluation: HudReeval, spectators: SpecVisibility): void;
     /**
      * createIcon
      * Creates an in-world icon entity. This icon entity will persist until destroyed. To obtain a reference to this entity, use the last created entity value. This action will fail if too many entities have been created.
@@ -1271,7 +1289,7 @@ declare global {
      * @param iconColor The color of the icon to be created. If a particular team is chosen, the effect will either be red or blue, depending on whether the team is hostile to the viewer.
      * @param showWhenOffscreen Should this icon appear even when it is behind you?
      */
-    function createIcon(visibleTo: Player, position: Vector, icon: Icon, reevaluation: any, iconColor: Color, showWhenOffscreen: boolean): void;
+    function createIcon(visibleTo: Player, position: Pos, icon: Icon, reevaluation: IconReeval, iconColor: Color, showWhenOffscreen: boolean): void;
     /**
      * createInWorldText
      * Creates in-world text visible to specific players at a specific position in the world. This text will persist until destroyed. To obtain a reference to this text, use the last text id value. This action will fail if too many text elements have been created.
@@ -1284,7 +1302,7 @@ declare global {
      * @param textColor Specifies the color of the in-world text to use.
      * @param spectators Whether spectators can see the text or not.
      */
-    function createInWorldText(visibleTo: Player, header: any, position: Vector, scale: number, clipping: any, reevaluation: any, textColor: Color, spectators: any): void;
+    function createInWorldText(visibleTo: Player, header: Strings, position: Pos, scale: number, clipping: Clip, reevaluation: WorldTextReeval, textColor: Color, spectators: SpecVisibility): void;
     /**
      * damage
      * Applies instantaneous damage to one or more players, possibly killing the players.
@@ -1473,7 +1491,7 @@ declare global {
      * @param rangeStop If the control variable reaches or passes this value, then the loop will exit, and execution jumps to the next action after the end action. Whether this value is considered passed or not is based on whether the step value is negative or positive. If the control variable has already reached or passed this value when the loop begins, then the loop exits.
      * @param step This value is added to the control variable when the end action is reached. If this modification causes the control variable to reach or pass the range stop value, then the loop exits, and execution jumps to the next action after the end action. Otherwise, the loop continues, and execution jumps to the next action after the for action.
      */
-    function forGlobalVar(controlVariable: any, rangeStart: number, rangeStop: number, step: number): void;
+    function forGlobalVar(controlVariable: string, rangeStart: number, rangeStop: number, step: number): void;
     /**
      * forPlayerVar
      * Denotes the beginning of a series of actions that will execute in a loop, modifying the control variable on each loop. The corresponding end action denotes the end of the loop. If the control variable reaches or passes the range stop value, then the loop exits, and execution jumps to the next action after the end action.
@@ -1483,7 +1501,7 @@ declare global {
      * @param rangeStop If the control variable reaches or passes this value, then the loop will exit, and execution jumps to the next action after the end action. Whether this value is considered passed or not is based on whether the step value is negative or positive. If the control variable has already reached or passed this value when the loop begins, then the loop exits.
      * @param step This value is added to the control variable when the end action is reached. If this modification causes the control variable to reach or pass the range stop value, then the loop exits, and execution jumps to the next action after the end action. Otherwise, the loop continues, and execution jumps to the next action after the for action.
      */
-    function forPlayerVar(controlPlayer: Player, controlVariable: any, rangeStart: number, rangeStop: number, step: number): void;
+    function forPlayerVar(controlPlayer: Player, controlVariable: string, rangeStart: number, rangeStop: number, step: number): void;
     /**
      * goToAssembleHeroes
      * Returns the match to the assemble heroes phase of the game mode. Only works if the game is in progress.
@@ -1532,7 +1550,7 @@ declare global {
      * @param operation The way in which the variable's value will be changed. Options include standard arithmetic operations as well as array operations for appending and removing values.
      * @param value The value used for the modification. For arithmetic operations, this is the second of the two operands, with the other being the variable's existing value. For array operations, this is the value to append or remove.
      */
-    function modifyGlobalVar(variable: any, operation: Operation, value: any): void;
+    function modifyGlobalVar(variable: string, operation: Operation, value: any): void;
     /**
      * modifyGlobalVarAtIndex
      * Modifies the value of a global variable at an index, which is a variable that belongs to the game itself.
@@ -1541,7 +1559,7 @@ declare global {
      * @param operation The way in which the variable's value will be changed. Options include standard arithmetic operations as well as array operations for appending and removing values.
      * @param value The value used for the modification. For arithmetic operations, this is the second of the two operands, with the other being the variable's existing value. For array operations, this is the value to append or remove.
      */
-    function modifyGlobalVarAtIndex(variable: any, index: number, operation: Operation, value: any): void;
+    function modifyGlobalVarAtIndex(variable: string, index: number, operation: Operation, value: any): void;
     /**
      * addToScore
      * Modifies the score (kill count) of one or more players. This action only has an effect in free-for-all modes.
@@ -1557,7 +1575,7 @@ declare global {
      * @param operation The way in which the variable's value will be changed. Options include standard arithmetic operations as well as array operations for appending and removing values.
      * @param value The value used for the modification. For arithmetic operations, this is the second of the two operands, with the other being the variable's existing value. For array operations, this is the value to append or remove.
      */
-    function modifyPlayerVar(player: Player, variable: any, operation: Operation, value: any): void;
+    function modifyPlayerVar(player: Player, variable: string, operation: Operation, value: any): void;
     /**
      * modifyPlayerVarAtIndex
      * Modifies the value of a player variable at an index, which is a variable that belongs to a specific player.
@@ -1567,7 +1585,7 @@ declare global {
      * @param operation The way in which the variable's value will be changed. Options include standard arithmetic operations as well as array operations for appending and removing values.
      * @param value The value used for the modification. For arithmetic operations, this is the second of the two operands, with the other being the variable's existing value. For array operations, this is the value to append or remove.
      */
-    function modifyPlayerVarAtIndex(player: Player, variable: any, index: number, operation: Operation, value: any): void;
+    function modifyPlayerVarAtIndex(player: Player, variable: string, index: number, operation: Operation, value: any): void;
     /**
      * addToTeamScore
      * Modifies the score of one or both teams. This action has no effect in free-for-all modes or modes without a team score.
@@ -1589,7 +1607,7 @@ declare global {
      * @param position The effect's position. If this value is a player, then the effect will play at the player's position. Otherwise, the value is interpreted as a position in the world.
      * @param radius The effect's radius in meters.
      */
-    function playEffect(visibleTo: Player, type: any, color: Color, position: Vector, radius: number): void;
+    function playEffect(visibleTo: Player, type: DynamicEffect, color: Color, position: Pos, radius: number): void;
     /**
      * preloadHero
      * Preemptively loads the specified hero or heroes into memory using the skins of the specified player or players, available memory permitting. Useful whenever rapid hero changing is possible and the next hero is known.
@@ -1664,14 +1682,14 @@ declare global {
      * @param direction The unit direction in which the player or players will face. This value is normalized internally.
      * @param relative Specifies whether direction is relative to world coordinates or the local coordinates of the player or players.
      */
-    function setFacing(player: Player, direction: any, relative: any): void;
+    function setFacing(player: Player, direction: Vector, relative: Relativity): void;
     /**
      * setGlobalVar
      * Stores a value into a global variable, which is a variable that belongs to the game itself.
      * @param variable Specifies which global variable to store the value into.
      * @param value The value that will be stored.
      */
-    function setGlobalVar(variable: any, value: any): void;
+    function setGlobalVar(variable: string, value: any): void;
     /**
      * setGlobalVarAtIndex
      * Finds or creates an array on a global variable, which is a variable that belongs to the game itself, then stores a value in the array at the specified index.
@@ -1679,7 +1697,7 @@ declare global {
      * @param index The index of the array to modify. If the index is beyond the end of the array, the array is extended with new elements given a value of zero.
      * @param value The value that will be stored into the array.
      */
-    function setGlobalVarAtIndex(variable: any, index: number, value: any): void;
+    function setGlobalVarAtIndex(variable: string, index: number, value: any): void;
     /**
      * setGravity
      * Sets the movement gravity for one or more players to a percentage regular movement gravity.
@@ -1707,7 +1725,7 @@ declare global {
      * @param player The player or players who will become invisible.
      * @param invisibleTo Specifies for whom the player or players will be invisible.
      */
-    function setInvisibility(player: Player, invisibleTo: any): void;
+    function setInvisibility(player: Player, invisibleTo: Invis): void;
     /**
      * setMatchTime
      * Sets the current match time (which is visible at the top of the screen). This can be used to shorten or extend the duration of a match or to change the duration of assemble heroes or setup.
@@ -1735,7 +1753,7 @@ declare global {
      * @param header The message to be displayed.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. The message will keep asking for and using new values from reevaluated inputs.
      */
-    function setObjectiveDescription(visibleTo: Player, header: any, reevaluation: any): void;
+    function setObjectiveDescription(visibleTo: Player, header: Strings, reevaluation: HudReeval): void;
     /**
      * setAllowedHeroes
      * Sets the list of heroes available to one or more players. If a player's current hero becomes unavailable, the player is forced to choose a different hero and respawn at an appropriate spawn location.
@@ -1757,7 +1775,7 @@ declare global {
      * @param variable Specifies which of the player's variables to store the value into.
      * @param value The value that will be stored.
      */
-    function setPlayerVar(player: Player, variable: any, value: any): void;
+    function setPlayerVar(player: Player, variable: string, value: any): void;
     /**
      * setPlayerVarAtIndex
      * Finds or creates an array on a player variable, which is a variable that belongs to a specific player, then stores a value in the array at the specified index.
@@ -1766,7 +1784,7 @@ declare global {
      * @param index The index of the array to modify. If the index is beyond the end of the array, the array is extended with new elements given a value of zero.
      * @param value The value that will be stored into the array.
      */
-    function setPlayerVarAtIndex(player: Player, variable: any, index: number, value: any): void;
+    function setPlayerVarAtIndex(player: Player, variable: string, index: number, value: any): void;
     /**
      * setPrimaryFireEnabled
      * Enables or disables primary fire for one or more players.
@@ -1857,7 +1875,7 @@ declare global {
      * @param visibleTo One or more players who will see the message.
      * @param header The message to be displayed.
      */
-    function smallMessage(visibleTo: Player, header: any): void;
+    function smallMessage(visibleTo: Player, header: Strings): void;
     /**
      * startAcceleration
      * Starts accelerating one or more players in a specified direction.
@@ -1868,7 +1886,7 @@ declare global {
      * @param relative Specifies whether direction is relative to world coordinates or the local coordinates of the player or players.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. This action will keep asking for and using new values from reevaluated inputs.
      */
-    function startAcceleration(player: Player, direction: any, rate: number, maxSpeed: number, relative: any, reevaluation: any): void;
+    function startAcceleration(player: Player, direction: Vector, rate: number, maxSpeed: number, relative: Relativity, reevaluation: AccelReeval): void;
     /**
      * setCamera
      * Places your camera at a location, facing a direction.
@@ -1877,7 +1895,7 @@ declare global {
      * @param lookAtPosition Where the camera looks at. Reevaluates continuously.
      * @param blendSpeed How fast to blend the camera speed as positions change. 0 means do not blend at all, and just change positions instantly.
      */
-    function setCamera(player: Player, eyePosition: Vector, lookAtPosition: Vector, blendSpeed: number): void;
+    function setCamera(player: Player, eyePosition: Pos, lookAtPosition: Pos, blendSpeed: number): void;
     /**
      * startDamageModification
      * Starts modifying how much damage one or more receivers will receive from one or more damagers. A reference to this damage modification can be obtained from the last damage modification id value. This action will fail if too many damage modifications have been started.
@@ -1886,7 +1904,7 @@ declare global {
      * @param damagePercent The percentage of damage that will apply to receivers when attacked by damagers.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. This action will keep asking for and using new values from reevaluated inputs.
      */
-    function startDamageModification(receivers: Player, damagers: Player, damagePercent: number, reevaluation: any): void;
+    function startDamageModification(receivers: Player, damagers: Player, damagePercent: number, reevaluation: DamageReeval): void;
     /**
      * startDoT
      * Starts an instance of damage over time. This dot will persist for the specified duration or until stopped by script. To obtain a reference to this dot, use the last damage over time id value.
@@ -1905,7 +1923,7 @@ declare global {
      * @param relative Specifies whether direction is relative to world coordinates or the local coordinates of the player or players.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. This action will keep asking for and using new values from reevaluated inputs.
      */
-    function startFacing(player: Player, direction: any, turnRate: number, relative: any, reevaluation: any): void;
+    function startFacing(player: Player, direction: Vector, turnRate: number, relative: Relativity, reevaluation: FacingReeval): void;
     /**
      * startForcingHero
      * Starts forcing one or more players to be a specific hero and, if necessary, respawns them immediately in their current location. This will be the only hero available to the player or players until the stop forcing player to be hero action is executed.
@@ -1949,7 +1967,7 @@ declare global {
      * @param healingPercent The percentage of healing that will apply to receivers when healed by healers.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. This action will keep asking for and using new values from reevaluated inputs.
      */
-    function startHealingModification(receivers: Player, healers: Player, healingPercent: number, reevaluation: any): void;
+    function startHealingModification(receivers: Player, healers: Player, healingPercent: number, reevaluation: HealingReeval): void;
     /**
      * startForcingButton
      * Forces one or more players to hold a button virtually until stopped by the stop holding button action.
@@ -1963,7 +1981,7 @@ declare global {
      * @param subroutine Specifies which subroutine to start. If a rule with a subroutine event type specifies the same subroutine, then it will execute. Otherwise, this action is ignored.
      * @param ifAlreadyExecuting Determines what should happen if the rule specified by the subroutine is already executing on the same player or global entity.
      */
-    function startRule(subroutine: any, ifAlreadyExecuting: any): void;
+    function startRule(subroutine: string, ifAlreadyExecuting: AsyncBehavior): void;
     /**
      * startThrottleInDirection
      * Sets or adds to the throttle (directional input control) of a player or players such that they begin moving in a particular direction. Any previous throttle in direction is cancelled.
@@ -1974,7 +1992,7 @@ declare global {
      * @param behavior Specifies whether preexisting throttle is replaced or added to.
      * @param reevaluation Specifies which of this action's inputs will be continuously reevaluated. This aciton will keep asking for and using new values from reevaluated inputs.
      */
-    function startThrottleInDirection(player: Player, direction: Vector, magnitude: number, relative: any, behavior: any, reevaluation: any): void;
+    function startThrottleInDirection(player: Player, direction: Vector, magnitude: number, relative: Relativity, behavior: Throttle, reevaluation: ThrottleReeval): void;
     /**
      * startTransformingThrottle
      * Starts transforming (scaling and rotating) the throttle (directional input control) of a player or players. Cancels any existing start transforming throttle behavior.
@@ -2023,14 +2041,14 @@ declare global {
      * Stops an in-progress chase of a global variable, leaving it at its current value.
      * @param variable Specifies which global variable to stop modifying.
      */
-    function stopChasingGlobalVariable(variable: any): void;
+    function stopChasingGlobalVariable(variable: string): void;
     /**
      * stopChasingPlayerVariable
      * Stops an in-progress chase of a player variable, leaving it at its current value.
      * @param player The player whose variable will stop changing. If multiple players are provided, each of their variables will stop changing.
      * @param variable Specifies which of the player's variables to stop modifying.
      */
-    function stopChasingPlayerVariable(player: Player, variable: any): void;
+    function stopChasingPlayerVariable(player: Player, variable: string): void;
     /**
      * stopDamageModification
      * Stops a damage modification that was started by the start damage modification action.
@@ -2104,7 +2122,7 @@ declare global {
      * @param player The player or players to teleport.
      * @param position The position to which the player or players will teleport. If a player is provided, the position of the player is used.
      */
-    function teleport(player: Player, position: Vector): void;
+    function teleport(player: Player, position: Pos): void;
     /**
      * unpauseMatchTime
      * Unpauses the match time.
@@ -2116,7 +2134,7 @@ declare global {
      * @param time The duration of the pause.
      * @param waitBehavior Specifies if and how the wait can be interrupted. If the condition list is ignored, the wait will not be interrupted. Otherwise, the condition list will determine if and when the action list will abort or restart.
      */
-    function wait(time: number, waitBehavior: any): void;
+    function wait(time: number, waitBehavior: Wait): void;
     /**
      * abs
      * The absolute value of the specified value.
@@ -2129,7 +2147,7 @@ declare global {
      * @param value The left-hand operand. May be any value that results in a number or a vector.
      * @param value2 The right-hand operand. May be any value that results in a number or a vector.
      */
-    function add(value: any, value2: any): number;
+    function add(value: number | Vector, value2: number | Vector): number | Vector;
     /**
      * getDeadPlayers
      * An array containing all dead players on a team or in the match.
@@ -2199,7 +2217,7 @@ declare global {
      * @param array The array to which to append.
      * @param value The value to append to the end of the array. If this value is itself an array, each element is appended.
      */
-    function appendToArray(array: any, value: any): void;
+    function appendToArray(array: any[], value: any): void;
     /**
      * acosDeg
      * Arccosine in degrees of the specified value.
@@ -2244,7 +2262,7 @@ declare global {
      * @param array The array in which to search for the specified value.
      * @param value The value for which to search.
      */
-    function arrayContains(array: any, value: any): boolean;
+    function arrayContains(array: any[], value: any): boolean;
     /**
      * arraySlice
      * A copy of the specified array containing only values from a specified index range.
@@ -2252,14 +2270,14 @@ declare global {
      * @param startIndex The first index of the range.
      * @param count The number of elements in the resulting array. The resulting array will contain fewer elements if the specified range exceeds the bounds of the array.
      */
-    function arraySlice(array: any, startIndex: number, count: number): any[];
+    function arraySlice(array: any[], startIndex: number, count: number): any[];
     /**
      * getClosestPlayer
      * The player closest to a position, optionally restricted by team.
      * @param center The position from which to measure proximity.
      * @param team The team or teams from which the closest player will come.
      */
-    function getClosestPlayer(center: Vector, team: Team): Player;
+    function getClosestPlayer(center: Pos, team: Team): Player;
     /**
      * compare
      * Whether the comparison of the two inputs is true.
@@ -2267,7 +2285,7 @@ declare global {
      * @param comparison
      * @param value2 The right-hand side of the comparison. This may be any value type if the operation is == or !=. Otherwise, real numbers are expected.
      */
-    function compare(value: any, comparison: any, value2: any): boolean;
+    function compare(value: any, comparison: CompareSymbol, value2: any): boolean;
     /**
      * getControlScorePercentage
      * The score percentage for the specified team in control mode.
@@ -2291,7 +2309,7 @@ declare global {
      * The number of elements in the specified array.
      * @param array The array whose elements will be counted.
      */
-    function len(array: any): number;
+    function len(array: any[]): number;
     /**
      * crossProduct
      * The cross product of the specified values. (Left cross up equals forward.)
@@ -2307,7 +2325,7 @@ declare global {
      * @param param1 The value that will be converted to text and used to replace {1}.
      * @param param2 The value that will be converted to text and used to replace {2}.
      */
-    function customString(string: Strings, param0: any, param1: any, param2: any): Strings;
+    function customString(string: Strings, param0: Strings, param1: Strings, param2: Strings): Strings;
     /**
      * angleToDirection
      * The unit-length direction vector corresponding to the specified angles.
@@ -2321,21 +2339,21 @@ declare global {
      * @param startPos The position from which the resulting direction vector will point.
      * @param endPos The position to which the resulting direction vector will point.
      */
-    function directionTowards(startPos: Vector, endPos: Vector): Maps;
+    function directionTowards(startPos: Pos, endPos: Pos): Maps;
     /**
      * distance
      * The distance between two positions in meters.
      * @param startPos One of the two positions used in the distance measurement.
      * @param endPos One of the two positions used in the distance measurement.
      */
-    function distance(startPos: Vector, endPos: Vector): number;
+    function distance(startPos: Pos, endPos: Pos): number;
     /**
      * divide
      * The ratio of two numbers or vectors. A vector divided by a number will yield a scaled vector. Division by zero results in zero.
      * @param value The left-hand operand. May be any value that results in a number or a vector.
      * @param value2 The right-hand operand. May be any value that results in a number or a vector.
      */
-    function divide(value: any, value2: any): number;
+    function divide(value: number | Vector, value2: number | Vector): number | Vector;
     /**
      * dotProduct
      * The dot product of the specified values.
@@ -2367,20 +2385,20 @@ declare global {
      * @param center The position from which to measure distance.
      * @param team The team or teams from which the farthest player will come.
      */
-    function getFarthestPlayer(center: Vector, team: Team): Player;
+    function getFarthestPlayer(center: Pos, team: Team): Player;
     /**
      * filteredArray
      * A copy of the specified array with any values that do not match the specified condition removed.
      * @param array The array whose copy will be filtered.
      * @param condition The condition that is evaluated for each element of the copied array. If the condition is true, the element is kept in the copied array. Use the current array element value to reference the element of the array currently being considered.
      */
-    function filteredArray(array: any, condition: boolean): any[];
+    function filteredArray(array: any[], condition: boolean): any[];
     /**
      * firstOf
      * The value at the start of the specified array. Results in 0 if the specified array is empty.
      * @param array The array from which the value is acquired.
      */
-    function firstOf(array: any): any;
+    function firstOf(array: any[]): any;
     /**
      * getFlagPosition
      * The position of a specific team's flag in capture the flag.
@@ -2392,7 +2410,7 @@ declare global {
      * The current value of a global variable, which is a variable that belongs to the game itself.
      * @param variable The variable whose value to acquire.
      */
-    function globalVar(variable: any): Vector;
+    function globalVar(variable: string): Vector;
     /**
      * hasSpawned
      * Whether an entity has spawned in the world. Results in false for players who have not chosen a hero yet.
@@ -2423,7 +2441,7 @@ declare global {
      * A hero constant.
      * @param hero A hero constant.
      */
-    function hero(hero: any): Hero;
+    function hero(hero: Hero): Hero;
     /**
      * heroIcon
      * Converts a hero parameter into a string that shows up as an icon.
@@ -2448,13 +2466,13 @@ declare global {
      * @param player The player from whose current facing the angle begins.
      * @param position The position in the world where the angle ends.
      */
-    function horizontalAngleTowards(player: Player, position: Vector): number;
+    function horizontalAngleTowards(player: Player, position: Pos): number;
     /**
      * gamemode
      * A game mode constant.
      * @param gameMode A game mode constant.
      */
-    function gamemode(gameMode: any): Gamemode;
+    function gamemode(gameMode: Gamemode): Gamemode;
     /**
      * getHorizontalFacingAngle
      * The horizontal angle in degrees of a player's current facing relative to the world. This value increases as the player rotates to the left (wrapping around at +/- 180).
@@ -2479,7 +2497,7 @@ declare global {
      * @param array The array in which to search for the specified value.
      * @param value The value for which to search.
      */
-    function indexOfArrayValue(array: any, value: number): number;
+    function indexOfArrayValue(array: any[], value: any): number;
     /**
      * isAlive
      * Whether a player is alive.
@@ -2499,7 +2517,7 @@ declare global {
      * @param player The player whose communication status to check.
      * @param type The type of communication to consider. The duration of emotes is exact, the duration of voice lines is assumed to be 4 seconds, and all other durations are assumed to be 2 seconds.
      */
-    function isCommunicating(player: Player, type: any): boolean;
+    function isCommunicating(player: Player, type: Communicate): boolean;
     /**
      * isCommunicatingAnything
      * Whether a player is using any communication type (such as emoting, using a voice line, etc.).
@@ -2580,7 +2598,7 @@ declare global {
      * @param endPos The end position for the line-of-sight check. If a player is provided, a position 2 meters above the player's feet is used.
      * @param barriers Defines how barriers affect line of sight. When considering whether a barrier belongs to an enemy, the allegiance of the player provided to start pos (if any) is used.
      */
-    function isInLineOfSight(startPos: Vector, endPos: Vector, barriers: any): boolean;
+    function isInLineOfSight(startPos: Pos, endPos: Pos, barriers: BarrierLos): boolean;
     /**
      * isInSpawnRoom
      * Whether a specific player is in the spawn room (and is thus being healed and able to change heroes).
@@ -2594,7 +2612,7 @@ declare global {
      * @param location The location to test if it's within view.
      * @param viewAngle The view angle to compare against in degrees.
      */
-    function isInViewAngle(player: Player, location: Vector, viewAngle: number): boolean;
+    function isInViewAngle(player: Player, location: Pos, viewAngle: number): boolean;
     /**
      * isMoving
      * Whether a player is moving (defined as having a nonzero current speed).
@@ -2655,14 +2673,14 @@ declare global {
      * @param array The array whose values will be considered.
      * @param condition The condition that is evaluated for each element of the specified array. Use the current array element value to reference the element of the array currently being considered.
      */
-    function allOf(array: any, condition: boolean): boolean;
+    function allOf(array: any[], condition: boolean): boolean;
     /**
      * oneOf
      * Whether the specified condition evaluates to true for any value in the specified array.
      * @param array The array whose values will be considered.
      * @param condition The condition that is evaluated for each element of the specified array. Use the current array element value to reference the element of the array currently being considered.
      */
-    function oneOf(array: any, condition: boolean): boolean;
+    function oneOf(array: any[], condition: boolean): boolean;
     /**
      * isUsingAbilityOne
      * Whether the specified player is using ability 1.
@@ -2686,7 +2704,7 @@ declare global {
      * The value at the end of the specified array. Results in 0 if the specified array is empty.
      * @param array The array from which the value is acquired.
      */
-    function lastOf(array: any): any;
+    function lastOf(array: any[]): any;
     /**
      * localVector
      * The vector in local coordinates corresponding to the provided vector in world coordinates.
@@ -2694,13 +2712,13 @@ declare global {
      * @param relativePlayer The player to whom the resulting vector will be relative.
      * @param transformation Specifies whether the vector should receive a rotation and a translation (usually applied to positions) or only a rotation (usually applied to directions and velocities).
      */
-    function localVector(worldVector: Vector, relativePlayer: Player, transformation: any): Vector;
+    function localVector(worldVector: Pos, relativePlayer: Player, transformation: Transform): Vector;
     /**
      * mapOf
      * A map constant.
      * @param map A map constant.
      */
-    function mapOf(map: any): Maps;
+    function mapOf(map: Maps): MapItem;
     /**
      * max
      * The greater of two numbers.
@@ -2734,13 +2752,13 @@ declare global {
      * @param value The left-hand operand. May be any value that results in a number or a vector.
      * @param value2 The right-hand operand. May be any value that results in a number or a vector.
      */
-    function multiply(value: any, value2: any): number;
+    function multiply(value: number | Vector, value2: number | Vector): number | Vector;
     /**
      * nearestWalkablePosition
      * The position closest to the specified position that can be stood on and is accessible from a spawn point.
      * @param position The position from which to search for the nearest walkable position.
      */
-    function nearestWalkablePosition(position: Vector): Vector;
+    function nearestWalkablePosition(position: Pos): Vector;
     /**
      * normalize
      * The unit-length normalization of a vector.
@@ -2840,7 +2858,7 @@ declare global {
      * @param player The player whose variable value to acquire.
      * @param variable The variable whose value to acquire.
      */
-    function playerVar(player: Player, variable: any): any;
+    function playerVar(player: Player, variable: string): any;
     /**
      * getPlayersInSlot
      * The player or array of players who occupy a specific slot in the game.
@@ -2871,7 +2889,7 @@ declare global {
      * @param team The team or teams to which a player must belong to be included in the resulting array.
      * @param losCheck Specifies whether and how a player must pass a line-of-sight check to be included in the resulting array.
      */
-    function getPlayersInRadius(center: Vector, radius: number, team: Team, losCheck: any): Player[];
+    function getPlayersInRadius(center: Pos, radius: number, team: Team, losCheck: LosCheck): Player[];
     /**
      * getPosition
      * The current position of a player as a vector.
@@ -2904,13 +2922,13 @@ declare global {
      * A random value from the specified array.
      * @param array The array from which to randomly take a value. If a non-array value is provided, the result is simply the provided value.
      */
-    function randomChoice(array: any): any;
+    function randomChoice(array: any[]): any;
     /**
      * randomShuffle
      * A copy of the specified array with the values in a random order.
      * @param array The array whose copy will be randomized.
      */
-    function randomShuffle(array: any): any[];
+    function randomShuffle(array: any[]): any[];
     /**
      * getNormal
      * The surface normal at the ray cast hit position (or from end pos to start pos if no hit occurs).
@@ -2920,7 +2938,7 @@ declare global {
      * @param playersToExclude Which players cannot be hit by this ray cast. This list takes precedence over players to include.
      * @param includePlayerOwnedObjects Whether player-owned objects (such as barriers or turrets) should be included in the ray cast.
      */
-    function getNormal(startPos: Vector, endPos: Vector, playersToInclude: Player, playersToExclude: Player, includePlayerOwnedObjects: boolean): Vector;
+    function getNormal(startPos: Pos, endPos: Pos, playersToInclude: Player, playersToExclude: Player, includePlayerOwnedObjects: boolean): Vector;
     /**
      * getPlayerHit
      * The player hit by the ray cast (or null if no player is hit).
@@ -2930,7 +2948,7 @@ declare global {
      * @param playersToExclude Which players cannot be hit by this ray cast. This list takes precedence over players to include.
      * @param includePlayerOwnedObjects Whether player-owned objects (such as barriers or turrets) should be included in the ray cast.
      */
-    function getPlayerHit(startPos: Vector, endPos: Vector, playersToInclude: Player, playersToExclude: Player, includePlayerOwnedObjects: boolean): Player | null;
+    function getPlayerHit(startPos: Pos, endPos: Pos, playersToInclude: Player, playersToExclude: Player, includePlayerOwnedObjects: boolean): Player | null;
     /**
      * getHitPosition
      * The position where the ray cast hits a surface, object, or player (or the end pos if no hit occurs).
@@ -2940,21 +2958,21 @@ declare global {
      * @param playersToExclude Which players cannot be hit by this ray cast. This list takes precedence over players to include.
      * @param includePlayerOwnedObjects Whether player-owned objects (such as barriers or turrets) should be included in the ray cast.
      */
-    function getHitPosition(startPos: Vector, endPos: Vector, playersToInclude: Player, playersToExclude: Player, includePlayerOwnedObjects: boolean): Vector;
+    function getHitPosition(startPos: Pos, endPos: Pos, playersToInclude: Player, playersToExclude: Player, includePlayerOwnedObjects: boolean): Vector;
     /**
      * removeFromArray
      * A copy of an array with one or more values removed (if found).
      * @param array The array from which to remove values.
      * @param value The value to remove from the array (if found). If this value is itself an array, each matching element is removed.
      */
-    function removeFromArray(array: any, value: any): void;
+    function removeFromArray(array: any[], value: any): void;
     /**
      * round
      * The integer to which the specified value rounds.
      * @param value The real number to round.
      * @param roundingType Determines the direction in which the value will be rounded.
      */
-    function round(value: number, roundingType: any): number;
+    function round(value: number, roundingType: RoundingType): number;
     /**
      * getScore
      * The current score of a player. Results in 0 if the game mode is not free-for-all.
@@ -2985,7 +3003,7 @@ declare global {
      * @param array The array whose copy will be sorted.
      * @param valueRank The value that is evaluated for each element of the copied array. The array is sorted by this rank in ascending order. Use the current array element value to reference the element of the array currently being considered.
      */
-    function sortedArray(array: any, valueRank: number): any[];
+    function sortedArray(array: any[], valueRank: number): any[];
     /**
      * getSpeed
      * The current speed of a player in meters per second.
@@ -2998,7 +3016,7 @@ declare global {
      * @param player The player whose speed to acquire.
      * @param direction The direction of travel in which to measure the player's speed.
      */
-    function getSpeedInDirection(player: Player, direction: any): number;
+    function getSpeedInDirection(player: Player, direction: Vector): number;
     /**
      * sqrt
      * The square root of the specified value.
@@ -3020,7 +3038,7 @@ declare global {
      * @param value The left-hand operand. May be any value that results in a number or a vector.
      * @param value2 The right-hand operand. May be any value that results in a number or a vector.
      */
-    function subtract(value: any, value2: any): number;
+    function subtract(value: number | Vector, value2: number | Vector): number | Vector;
     /**
      * tanDeg
      * Tangent of the specified angle in degrees.
@@ -3063,7 +3081,7 @@ declare global {
      * @param array The array whose element to acquire.
      * @param index The index of the element to acquire.
      */
-    function valueInArray(array: any, index: number): any;
+    function valueInArray(array: any[], index: number): any;
     /**
      * vect
      * A vector composed of three real numbers (x, y, z) where x is left, y is up, and z is forward. Vectors are used for position, direction, and velocity.
@@ -3078,7 +3096,7 @@ declare global {
      * @param startPos The position from which the resulting displacement vector begins.
      * @param endPos The position at which the resulting displacement vector ends.
      */
-    function vectorTowards(startPos: Vector, endPos: Vector): Vector;
+    function vectorTowards(startPos: Pos, endPos: Pos): Vector;
     /**
      * getVelocity
      * The current velocity of a player as a vector. If the player is on a surface, the y component of this velocity will be 0, even when traveling up or down a slope.
@@ -3097,7 +3115,7 @@ declare global {
      * @param player The player from whose current facing the angle begins.
      * @param position The position in the world where the angle ends.
      */
-    function verticalAngleTowards(player: Player, position: Vector): number;
+    function verticalAngleTowards(player: Player, position: Pos): number;
     /**
      * getVerticalFacingAngle
      * The vertical angle in degrees of a player's current facing relative to the world. This value increases as the player looks down.
@@ -3117,7 +3135,7 @@ declare global {
      * @param relativePlayer The player to whom the local vector is relative.
      * @param transformation Specifies whether the vector should receive a rotation and a translation (usually applied to positions) or only a rotation (usually applied to directions and velocities).
      */
-    function worldVector(localVector: Vector, relativePlayer: Player, transformation: any): Vector;
+    function worldVector(localVector: Vector, relativePlayer: Player, transformation: Transform): Vector;
     /**
      * xComponentOf
      * The x component of the specified vector, usually representing a leftward amount.

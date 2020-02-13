@@ -1,5 +1,3 @@
-import { CompareSymbol } from "../type/compare";
-
 export function compareSymbolToString(symbol: CompareSymbol): string {
   switch (symbol) {
     case CompareSymbol.EQUALS:

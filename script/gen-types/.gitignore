@@ -1,7 +1,11 @@
 *
 !.gitignore
 !index.ts
-!locales.json
-!TSWriter.ts
+!alias.ts
+!var.ts
+!utils.ts
 !global.template.ts
+!generator.ts
+!constType.json
 !returnType.json
+!locales.json

@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 import Transformer from ".";
 import { SubEvent } from "../owcode/ast/event";
 import { CallExpression, CompareExpression, ExpressionKind, OWExpression } from "../owcode/ast/expression";
-import { CompareSymbol } from "../owcode/type/compare";
 import { getFinalAccess, isCanToString, TextAccess } from "./accessUtils";
 import { parseExpression } from "./expression";
 import { DefinedContants, ParseContext } from "./var";

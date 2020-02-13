@@ -14,6 +14,11 @@ export class myClass {
     a[2]++;
     c += 5;
     a[3] += 6;
+  }
+
+
+  @runAt(Events.EACH_PLAYER, Team.ONE, Hero.ANA)
+  test2() {
     wait(a[b[1]], Wait.IGNORE_CONDITION);
   }
 }

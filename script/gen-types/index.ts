@@ -1,54 +1,19 @@
-import { resolve } from 'path';
 import * as fs from 'fs';
-import * as ts from 'typescript';
-import TSWriter from './TSWriter';
-
-type AvaliableType = ts.UnionTypeNode | ts.KeywordTypeNode | ts.TypeReferenceNode | ts.ArrayTypeNode;
-
-interface FunctionResult {
-  name: string;
-  desc: string;
-  args: {
-    name: string;
-    desc: string;
-    type: string;
-  }[];
-}
-
-const funcAlias: { [x: string]: string } = {
-  'any': 'oneOf',
-  'all': 'allOf',
-  'map': 'mapOf'
-}
-const enumAlias: { [x: string]: string } = {
-  Map: 'Maps',
-  Position: 'Pos'
-}
-const enumType: { [x: string]: string } = {
-  Pos: 'VECTOR'
-}
-const knownType: { [x: string]: AvaliableType } = {
-  PLAYER: ts.createTypeReferenceNode('Player', undefined),
-  VECTOR: ts.createTypeReferenceNode('Vector', undefined),
-  'STRING CONSTANT': ts.createTypeReferenceNode('Strings', undefined),
-  ANY: ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-  VOID: ts.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-  VARIABLE: ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-  BOOLEAN: ts.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
-  NUMBER: ts.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
-  STRING: ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-}
+import { resolve } from 'path';
+import { enumAlias, funcAlias, typeAlias } from './alias';
+import Generator from './generator';
+import { ksort } from './utils';
+import { FunctionResult, ParseResult } from './var';
 
 // 补充国际化文本
 const locales: any = require('./locales.json');
-const returnType: { [x: string]: string } = require('./returnType.json');
 const sourceDir = resolve(__dirname, 'data');
 const resultDir = resolve(__dirname, 'result');
-const result = {
-  functions: [] as FunctionResult[],
-  strings: [] as string[],
-  constants: [] as string[],
-  events: [] as string[]
+const result: ParseResult = {
+  functions: [],
+  strings: [],
+  constants: [],
+  events: []
 }
 
 const numToEng = {
@@ -216,12 +181,16 @@ function addFunc(func: FunctionResult, allLangs: any) {
   if (newName === '') {
     return;
   }
-  if (typeof(funcAlias[newName]) !== 'undefined') {
-    newName = funcAlias[newName];
-  }
   result.functions.push({ ...func, name: newName });
   // 写入语言
-  const langKey = ('FUNC_' + formatTo(newName, 'TO_FORMAT')).replace(/([_]+)/g, '_');
+  let langKey = 'FUNC_'; 
+  // 语言 alias
+  if (typeof(funcAlias[newName]) !== 'undefined') {
+    langKey += formatTo(funcAlias[newName], 'TO_FORMAT');
+  } else {
+    langKey += formatTo(newName, 'TO_FORMAT');
+  }
+  langKey = langKey.replace(/([_]+)/g, '_');
   writeLang(langKey, allLangs);
 }
 
@@ -244,8 +213,10 @@ function readConst() {
   Object.keys(constants).forEach(k => {
     const it = constants[k];
     let key = it.opy || formatTo(k, 'ToFormat');
-    if (typeof(enumAlias[key]) !== 'undefined') {
-      key = enumAlias[key];
+    // 语言 alias
+    let aliasedKey = typeof(enumAlias[key]) === 'undefined' ? key : enumAlias[key];
+    if (k && aliasedKey !== '' && k.toLowerCase() !== aliasedKey.toLowerCase()) {
+      typeAlias[k] = aliasedKey;
     }
     it.values.forEach((iit: any) => {
       let name = iit.opy;
@@ -256,7 +227,7 @@ function readConst() {
       const fullName = key + '.' + name;
       // TODO: alias
       result.constants.push(fullName);
-      const langKey = ('CONST_' + formatTo(`${key}_${name}`, 'TO_FORMAT')).replace(/([_]+)/g, '_');
+      const langKey = ('CONST_' + formatTo(`${aliasedKey}_${name}`, 'TO_FORMAT')).replace(/([_]+)/g, '_');
       writeLang(langKey, iit);
     });
   });
@@ -275,12 +246,21 @@ function readValues() {
         args: getArgs(it.args)
       }, it);
     } else {
-      let name = formatTo(it.opy, 'TO_FORMAT');
-      if (!name.includes('.')) {
-        name = 'Game.' + name;
+      let name = it.opy;
+      const point = name.indexOf('.');
+      let parentName = "";
+      if (point !== -1) {
+        parentName = name.substr(0, point);
+        name = name.substr(point + 1);
+      } else {
+        parentName = 'Game';
       }
-      result.constants.push(name);
-      const langKey = ('CONST_' + formatTo(name, 'TO_FORMAT')).replace(/([_]+)/g, '_');
+      // 语言 alias
+      const parentKey = typeof(enumAlias[parentName]) === 'undefined' ? parentName : enumAlias[parentName];
+      name = formatTo(name, 'TO_FORMAT');
+      parentName = formatTo(parentName, 'ToFormat');
+      result.constants.push(`${parentName}.${name}`);
+      const langKey = ('CONST_' + formatTo(`${parentKey}.${name}`, 'TO_FORMAT')).replace(/([_]+)/g, '_');
       writeLang(langKey, it);
     }
   });
@@ -336,127 +316,10 @@ if (Object.keys(langWarnings).length > 0) {
 }
 
 function write() {
-  const writer = new TSWriter(fs.readFileSync(resolve(__dirname, 'global.template.ts'), { encoding: 'UTF8' }));
-  // 写入事件
-  writer.pushSetGlobal('Events', ts.createObjectLiteral(result.events.map(event => {
-    const node = ts.createPropertyAssignment(ts.createIdentifier(event), ts.createStringLiteral(event));
-    return node;
-  })));
-
-  // 写常量
-  const otherNs = writer.createModule('Game', [], ts.NodeFlags.Namespace, false);
-  const enums: { [x: string]: { [x: string]: ts.Expression } } = {};
-  result.constants.map(it => {
-    const index = it.indexOf('.');
-    const parentName = it.substr(0, index);
-    const selfName = it.substr(index + 1);
-    if (parentName === 'Game') {
-      writer.insertToModule(otherNs, writer.createConst(selfName, ts.SyntaxKind.AnyKeyword));
-    } else {
-      if (typeof(enums[parentName]) === 'undefined') {
-        enums[parentName] = {};
-      }
-      if (typeof(enums[parentName][selfName]) !== 'undefined') {
-        return;
-      }
-      // 看一下有没有特别指定的类型
-      if (typeof(enumType[parentName]) !== 'undefined') {
-        enums[parentName][selfName] = ts.createStringLiteral(`_GKD_${enumType[parentName]}_`);
-      } else {
-        enums[parentName][selfName] = ts.createStringLiteral(selfName);
-      }
-    }
-  });
-  // 写事件
-  enums['Events'] = {};
-  result.events.forEach(it => enums['Events'][it] = ts.createStringLiteral(it));
-  // 写字符串
-  enums['Strings'] = {};
-  result.strings.forEach(it => enums['Strings'][it] = ts.createStringLiteral(it));
-  // 写入声明
-  writer.pushDeclare([
-    otherNs,
-    ...Object.keys(enums).map(it => writer.createEnum(it, enums[it]))
-  ]);
-
-  // 写入函数声明
-  const unknownTypes: string[] = [];
-  const enumNames = Object.keys(enums);
-  const enumAliasNames = Object.keys(enumAlias);
-  const enumNamesUpper = enumNames.map(it => it.toUpperCase());
-  const enumAliasNamesUpper = enumAliasNames.map(it => it.toUpperCase());
-  const detectType = (text: string): AvaliableType => {
-    // 如果有好几种类型
-    if (text.includes('|')) {
-      return ts.createUnionTypeNode(text.split('|').map(it => detectType(it.trim())));
-    }
-    // 可能是数组类型
-    if (/\[\]$/.test(text)) {
-      return ts.createArrayTypeNode(detectType(text.substr(0, text.length - 2)));
-    }
-    // 末尾有个?
-    if (/\?$/.test(text)) {
-      return ts.createUnionTypeNode([
-        detectType(text.substr(0, text.length - 1)),
-        ts.createKeywordTypeNode(ts.SyntaxKind.NullKeyword)
-      ]);
-    }
-    // 从已知类型中检测
-    if (typeof(knownType[text]) !== 'undefined') {
-      return knownType[text];
-    }
-    // 从之前的enum中检测
-    let typeText = text;
-    let hasGot = false;
-    if (enumAliasNamesUpper.includes(typeText)) {
-      hasGot = true;
-      typeText = enumAlias[enumAliasNames[enumAliasNamesUpper.indexOf(typeText)]];
-    }
-    if (enumNames.includes(typeText)) {
-      hasGot = true;
-    }
-    const isEnum = enumNamesUpper.indexOf(typeText);
-    if (isEnum !== -1) {
-      hasGot = true;
-      typeText = enumNames[isEnum];
-    }
-    if (typeof(enumType[typeText]) !== 'undefined') {
-      return detectType(enumType[typeText]);
-    }
-    if (hasGot) {
-      return ts.createTypeReferenceNode(enumNames[isEnum], undefined);
-    }
-
-    !unknownTypes.includes(text) && unknownTypes.push(text);
-    return knownType['ANY'];
-  }
-  const unknownReturn: string[] = [];
-  writer.pushDeclare(result.functions.map(it => {
-    let itReturn: AvaliableType = knownType['ANY'];
-    if (typeof(returnType[it.name]) === 'undefined') {
-      unknownReturn.push(it.name);
-    } else {
-      itReturn = detectType(returnType[it.name]);
-    }
-    return writer.createFunction(it.name, it.args.map(arg => {
-      return {
-        name: arg.name,
-        desc: arg.desc,
-        type: detectType(arg.type)
-      }
-    }), itReturn, it.desc);
-  }));
-
-  // 生成返回定义
-  const returns: any = {};
-  unknownReturn.forEach(it => returns[it] = "");
-  fs.writeFileSync(resolve(__dirname, 'returnType_2.json'), JSON.stringify(returns, null, '  '), { encoding: 'UTF8' });
-
-  // console.log(unknownTypes);
-  console.log(enumNames);
-
+  const gen = new Generator(fs.readFileSync(resolve(__dirname, 'global.template.ts'), { encoding: 'UTF8' }));
+  gen.set(result);
   // 生成 ts 文件
-  fs.writeFileSync(resolve(resultDir, 'global.ts'), writer.getText(), {
+  fs.writeFileSync(resolve(resultDir, 'global.ts'), gen.getText(), {
     encoding: 'UTF8'
   });
   fs.writeFileSync(resolve(resultDir, 'functions.json'), JSON.stringify(result.functions, null, '  '), {
@@ -467,6 +330,7 @@ function write() {
   });
   // 写入语言
   langs.forEach(it => {
+    langsResult[it] = ksort(langsResult[it]);
     fs.writeFileSync(resolve(resultDir, 'locales', it + '.json'), JSON.stringify(langsResult[it], null, '  '), {
       encoding: 'UTF8'
     });

@@ -12,8 +12,8 @@ export function isGlobalEvent(obj: any): obj is OWEvent {
 }
 
 export interface PlayerEvent extends OWEvent {
-  team: Team;
-  hero: Hero;
+  team: string;
+  hero: string;
 }
 
 export function isPlayerEvent(obj: any): obj is PlayerEvent {
