@@ -1,11 +1,14 @@
 import '../src/owcode/helper';
 
-let a = [];
-let b = [];
-let c = 0;
+namespace PlayerVariable {
+  let damage_id;
+}
 
 export class ChuanHuo {
-  // 传火
+  /**
+   * 传火
+   * 一个玩家打另一个，就把火传过去
+   */
   @runAt(Events.PLAYER_TOOK_DAMAGE)
   @condition(
     !hasStatusEffect(Game.EVENT_PLAYER, Status.BURNING),
@@ -14,11 +17,23 @@ export class ChuanHuo {
   chuanhuo() {
     setStatusEffect(Game.EVENT_PLAYER, null, Status.BURNING, 9999);
     startDamageOverTime(Game.EVENT_PLAYER, null, 9999, 50);
-    setPlayerVar(Game.EVENT_PLAYER, "damage_id", Game.GET_LAST_DO_T);
+    // 存到damage_id
+    setPlayerVar(Game.EVENT_PLAYER, "damage_id", Game.LAST_DAMAGE_ID);
+    stopDamageOverTime(playerVar(Game.ATTACKER, "damage_id"));
+    clearStatusEffect(Game.ATTACKER, Status.BURNING);
   }
 
-  @runAt(Events.EACH_PLAYER, Team.ONE, Hero.ANA)
-  test2() {
-    wait(a[b[1]], Wait.IGNORE_CONDITION);
+  /**
+   * 加分
+   * 所有玩家死亡后，给剩下的那个玩家+1分
+   */
+  @runAt(Events.PLAYER_DIED)
+  @condition(
+    getNumberOfLivingPlayers(Team.ALL) === 1,
+    Game.IS_GAME_IN_PROGRESS
+  )
+  jiafen() {
+    addToScore(getLivingPlayers(Team.ALL), 1);
+    resurrect(getPlayers(Team.ALL));
   }
 }

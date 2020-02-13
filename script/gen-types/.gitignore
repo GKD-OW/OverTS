@@ -1,6 +1,7 @@
 *
 !.gitignore
 !index.ts
+!lang.ts
 !alias.ts
 !var.ts
 !utils.ts

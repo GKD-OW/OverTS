@@ -1,12 +1,12 @@
 import * as ts from 'typescript';
 import { Ast, Rule } from '../owcode/ast';
 import { Condition } from '../owcode/ast/conditions';
-import { OWEvent, SubEvent } from '../owcode/ast/event';
+import { OWEvent, SubEvent, PlayerEvent } from '../owcode/ast/event';
 import { CallExpression } from '../owcode/ast/expression';
 import '../owcode/helper';
 import { getFinalAccess, isCanToString, PropertyAccess } from './accessUtils';
 import { parseEvent, parseExpression } from './expression';
-import { createCall, createCondition, createRaw, createSubCall, getClassName, getMethod, getVariable, getVariableResult, uuid, tsMatchToCompare } from './utils';
+import { createCall, createCondition, createConst, createRaw, createSubCall, getClassName, getMethod, getVariable, getVariableResult, tsMatchToCompare, uuid } from './utils';
 import { DefinedContants } from './var';
 
 export default class Transformer {
@@ -62,6 +62,41 @@ export default class Transformer {
         conditions: [],
         actions
       });
+    }
+    // 看看有没有玩家变量
+    let playerVarsArray: ts.NodeArray<ts.Statement> | undefined = undefined;
+    this.file.statements.forEach(it => {
+      if (ts.isModuleDeclaration(it) &&
+        ts.isIdentifier(it.name) &&
+        it.name.text === 'PlayerVariable' &&
+        it.body &&
+        ts.isModuleBlock(it.body)
+      ) {
+        playerVarsArray = it.body.statements;
+      }
+    });
+    if (playerVarsArray) {
+      const playerVars = getVariable.call(this, playerVarsArray, this.getDefines());
+      this.ast.variable.player = playerVars.variables;
+      // 如果有初始化，则自动增加一条初始化规则
+      const playerInitializer = playerVars.variableValues;
+      if (Object.keys(playerInitializer).length > 0) {
+        const actions: CallExpression[] = [];
+        Object.keys(playerInitializer).forEach(name => {
+          actions.push(createCall('SET_PLAYER_VAR', createConst('GAME_EVENT_PLAYER'), createRaw(name), playerInitializer[name]));
+        });
+        const event: PlayerEvent = {
+          kind: Events.EACH_PLAYER,
+          team: 'TEAM_ALL',
+          hero: 'GAME_ALL_HEROES'
+        };
+        this.ast.rules.push({
+          name: "init player",
+          event,
+          conditions: [],
+          actions
+        });
+      }
     }
   }
 

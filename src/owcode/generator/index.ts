@@ -36,7 +36,7 @@ export default function(ast: Ast, options?: GeneratorOption) {
     }
     if (ast.variable.player.length > 0) {
       result.push(i18n('G_PLAYER') + ':', 1);
-      ast.variable.global.forEach((name, index) => {
+      ast.variable.player.forEach((name, index) => {
         uglifyPlayer[name] = options?.uglify ? uuid() : name;
         result.push(`${index}: ${uglifyPlayer[name]}`);
       });

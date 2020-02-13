@@ -1,5 +1,5 @@
 import * as ts from 'typescript';
-import { enumAlias, enumType, funcAlias, typeAlias, paramTypeAlias } from './alias';
+import { enumAlias, enumType, funcAlias, typeAlias, paramTypeAlias, constAlias } from './alias';
 import { createConst, createDeclare, createEnum, createFunction, createModule, createSetGlobal, insertToModule } from './utils';
 import { AvaliableType, ParseResult } from './var';
 
@@ -146,8 +146,9 @@ export default class Generator {
       }
     });
     this.result.constants = gameConst.map(it => {
-      const type = typeof(constType[it]) === 'undefined' ? knownType['ANY'] : this.detectType(constType[it]);
-      return createConst(it, type);
+      const name = typeof(constAlias[it]) === 'undefined' ? it : constAlias[it];
+      const type = typeof(constType[name]) === 'undefined' ? knownType['ANY'] : this.detectType(constType[name]);
+      return createConst(name, type);
     });
     // 事件
     result.events.forEach(it => {

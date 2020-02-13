@@ -4,7 +4,7 @@ import { CallExpression, ExpressionKind, OWExpression } from '../owcode/ast/expr
 import '../owcode/helper';
 import { getFinalAccess, isCanToString, PropertyAccess } from './accessUtils';
 import Constants from './constants';
-import { createCall, createCompareExpression, createRaw, createSubCall, createSubEvent, getArrayAccess, tsMatchToCompare, uuid } from './utils';
+import { createCall, createCompareExpression, createConst, createRaw, createSubCall, createSubEvent, getArrayAccess, tsMatchToCompare, uuid } from './utils';
 import { DefinedContants, ParseContext } from './var';
 
 // 普通算数运算符
@@ -90,10 +90,7 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
     // 检查是否访问的内置对象
     const name = expression.expression.text;
     if (Constants.includes(name)) {
-      return {
-        kind: ExpressionKind.CONSTANT,
-        text: name.toUpperCase() + '_' + expression.name.text.toUpperCase()
-      };
+      return createConst(name.toUpperCase() + '_' + expression.name.text.toUpperCase());
     }
   }
   // 访问数组
@@ -121,10 +118,7 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
       if (!symbol) {
         throw new Error(`无法识别操作符 ${expression.operator}`);
       }
-      const symbolExp = {
-        kind: ExpressionKind.CONSTANT,
-        text: `OPERATION_${symbol}`
-      };
+      const symbolExp = createConst(`OPERATION_${symbol}`);
       const num = {
         kind: ExpressionKind.NUMBER,
         text: "1"
@@ -191,10 +185,7 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
       if (typeof(symbol) === 'undefined') {
         throw new Error(`无法识别操作符 ${expression.operatorToken.kind}`);
       }
-      const symbolExp = {
-        kind: ExpressionKind.CONSTANT,
-        text: `OPERATION_${symbol}`
-      };
+      const symbolExp = createConst(`OPERATION_${symbol}`);
       const num = ts.isNumericLiteral(expression.right) ? {
         kind: ExpressionKind.NUMBER,
         text: expression.right.text
@@ -229,15 +220,21 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
       text: 'TRUE'
     };
   }
+  if (expression.kind === ts.SyntaxKind.NullKeyword || expression.kind === ts.SyntaxKind.UndefinedKeyword) {
+    return createConst('GAME_NULL');
+  }
+  if (ts.isStringLiteral(expression)) {
+    return {
+      kind: ExpressionKind.RAW,
+      text: expression.text
+    }
+  }
   // 不支持有元素的数组
   if (ts.isArrayLiteralExpression(expression)) {
     if (expression.elements.length > 0) {
       throw new Error('数组赋值仅支持空数组');
     }
-    return {
-      kind: ExpressionKind.CONSTANT,
-      text: 'GAME_EMPTY_ARRAY'
-    };
+    return createConst('GAME_EMPTY_ARRAY');
   }
   console.error(expression);
   throw new Error('无法识别表达式');
@@ -275,15 +272,17 @@ export function parseEvent(exps: ts.NodeArray<ts.Expression>, defines?: DefinedC
       return createSubEvent("");
     }
     // 玩家事件
-    const team = getFinalAccess(exps[1], defines);
-    const hero = getFinalAccess(exps[2], defines);
     let teamName = 'TEAM_ALL';
-    let heroName = 'GAME_GET_ALL_HEROES';
-    if (team instanceof PropertyAccess && team.left === 'Team') {
-      teamName = 'TEAM_' + team.right.toString().toUpperCase();
-    }
-    if (hero instanceof PropertyAccess && hero.left === 'Hero') {
-      heroName = 'HERO_' + hero.right.toString().toUpperCase();
+    let heroName = 'GAME_ALL_HEROES';
+    if (exps.length > 1) {
+      const team = getFinalAccess(exps[1], defines);
+      const hero = getFinalAccess(exps[2], defines);
+      if (team instanceof PropertyAccess && team.left === 'Team') {
+        teamName = 'TEAM_' + team.right.toString().toUpperCase();
+      }
+      if (hero instanceof PropertyAccess && hero.left === 'Hero') {
+        heroName = 'HERO_' + hero.right.toString().toUpperCase();
+      }
     }
     const event: PlayerEvent = {
       kind: eventName,

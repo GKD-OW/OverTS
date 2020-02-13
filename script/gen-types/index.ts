@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import { resolve } from 'path';
-import { enumAlias, funcAlias, typeAlias } from './alias';
+import { typeAlias } from './alias';
 import Generator from './generator';
-import { ksort, formatTo } from './utils';
-import { FunctionResult, ParseResult } from './var';
 import Lang from './lang';
+import { formatTo } from './utils';
+import { FunctionResult, ParseResult } from './var';
 
 const rootDir = resolve(__dirname, '../..');
 const sourceDir = resolve(__dirname, 'data');

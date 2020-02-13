@@ -193,6 +193,17 @@ export function numberToRaw(exp: OWExpression): OWExpression {
 }
 
 /**
+ * 创建const类型的表达式
+ * @param text 
+ */
+export function createConst(text: string) {
+  return {
+    kind: ExpressionKind.CONSTANT,
+    text
+  }
+}
+
+/**
  * 创建raw类型的表达式
  * @param text 
  */
