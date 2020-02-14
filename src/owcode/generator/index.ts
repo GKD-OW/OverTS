@@ -1,10 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Ast, Rule } from "../ast";
-import { expressionToCode } from "./actions";
-import { conditionToCode } from "./conditions";
-import { getEventText } from "./event";
+import { getEventText } from "./utils";
 import i18n from "./i18n";
 import Result from "./result";
+import { OWExpression, ExpressionKind, CompareExpression, isCallExpression, isIfExpression, CallExpression } from '../ast/expression';
+import { Condition } from '../ast/conditions';
+import { compareSymbolToString } from './compareSymbolToString';
+
+const END_FLAG = ';';
 
 function uuid() {
   return uuidv4().replace(/\-/g, '');
@@ -13,84 +16,181 @@ function uuid() {
 interface GeneratorOption {
   uglify: boolean;
 }
-export default function(ast: Ast, options?: GeneratorOption) {
-  const result = new Result;
-  // TODO: 变量混淆
-  if (options) {
-    options.uglify = false;
-  }
+const defaultOptions: GeneratorOption = {
+  uglify: false
+}
+export default class Generator {
+  private ast: Ast;
+  private options: GeneratorOption;
+  private result: Result;
   // 变量混淆
-  const uglifyGlobal: { [x: string]: string } = {};
-  const uglifyPlayer: { [x: string]: string } = {};
-  // 变量区域
-  if (ast.variable.global.length > 0 || ast.variable.player.length > 0) {
-    result.push(i18n('G_VARIABLES'));
-    result.leftBrace();
-    if (ast.variable.global.length > 0) {
-      result.push(i18n('G_GLOBAL') + ':', 1);
-      ast.variable.global.forEach((name, index) => {
-        uglifyGlobal[name] = options?.uglify ? uuid() : name;
-        result.push(`${index}: ${uglifyGlobal[name]}`);
-      });
-      result.push('', -1);
-    }
-    if (ast.variable.player.length > 0) {
-      result.push(i18n('G_PLAYER') + ':', 1);
-      ast.variable.player.forEach((name, index) => {
-        uglifyPlayer[name] = options?.uglify ? uuid() : name;
-        result.push(`${index}: ${uglifyPlayer[name]}`);
-      });
-      result.push('', -1);
-    }
-    result.rightBrace();
-    result.push();
+  private uglifyGlobal: { [x: string]: string };
+  private uglifyPlayer: { [x: string]: string };
+  constructor(ast: Ast, options: GeneratorOption = defaultOptions) {
+    // TODO: 变量混淆
+    options.uglify = false;
+    this.options = options;
+    this.ast = ast;
+    this.result = new Result;
+    this.uglifyGlobal = {};
+    this.uglifyPlayer = {};
   }
 
+  gen() {
+    this.genVar();
+    this.genSub();
+    this.genRule();
+    return this.result.get();
+  }
 
-  const addRule = (rule: Rule) => {
-    const name = options?.uglify ? uuid() : rule.name;
-    result.push(`${i18n('G_RULE')}("${name}")`);
-    result.leftBrace();
+  private genVar() {
+    // 变量区域
+    if (this.ast.variable.global.length > 0 || this.ast.variable.player.length > 0) {
+      this.result.push(i18n('G_VARIABLES'));
+      this.result.leftBrace();
+      if (this.ast.variable.global.length > 0) {
+        this.result.push(i18n('G_GLOBAL') + ':', 1);
+        this.ast.variable.global.forEach((name, index) => {
+          this.uglifyGlobal[name] = this.options.uglify ? uuid() : name;
+          this.result.push(`${index}: ${this.uglifyGlobal[name]}`);
+        });
+        this.result.push('', -1);
+      }
+      if (this.ast.variable.player.length > 0) {
+        this.result.push(i18n('G_PLAYER') + ':', 1);
+        this.ast.variable.player.forEach((name, index) => {
+          this.uglifyPlayer[name] = this.options.uglify ? uuid() : name;
+          this.result.push(`${index}: ${this.uglifyPlayer[name]}`);
+        });
+        this.result.push('', -1);
+      }
+      this.result.rightBrace();
+      this.result.push();
+    }
+  }
+
+  private genSub() {
+    // 子程序
+    if (Object.keys(this.ast.sub).length > 0) {
+      this.result.push(i18n('G_SUB'));
+      this.result.leftBrace();
+      Object.keys(this.ast.sub).forEach((name, index) => {
+        this.result.push(`${index}: ${name}`);
+      });
+      this.result.rightBrace();
+      this.result.push();
+      Object.values(this.ast.sub).forEach(it => {
+        this.addRule(it);
+      });
+    }
+  }
+
+  private genRule() {
+    // 规则区域
+    this.ast.rules.forEach(rule => this.addRule(rule));
+  }
+
+  private addRule(rule: Rule) {
+    const name = this.options.uglify ? uuid() : rule.name;
+    this.result.push(`${i18n('G_RULE')}("${name}")`);
+    this.result.leftBrace();
     // 事件
-    result.push(i18n('G_EVENT'));
-    result.leftBrace();
-    getEventText(rule.event).forEach(text => result.push(text + ';'));
-    result.rightBrace();
+    this.result.push(i18n('G_EVENT'));
+    this.result.leftBrace();
+    getEventText(rule.event).forEach(text => this.result.push(text + END_FLAG));
+    this.result.rightBrace();
     // 条件
     if (rule.conditions.length > 0) {
-      result.push(i18n('G_CONDITIONS'));
-      result.leftBrace();
-      rule.conditions.map(conditionToCode.bind(null, uglifyGlobal, uglifyPlayer)).forEach(text => result.push(text + ';'));
-      result.rightBrace();
+      this.result.push(i18n('G_CONDITIONS'));
+      this.result.leftBrace();
+      rule.conditions.forEach(cond => this.addCondition(cond));
+      this.result.rightBrace();
     }
     // 规则
     if (rule.actions.length > 0) {
-      result.push(i18n('G_ACTIONS'));
-      result.leftBrace();
-      rule.actions.map(expressionToCode.bind(null, uglifyGlobal, uglifyPlayer)).forEach(text => result.push(text + ';'));
-      result.rightBrace();
+      this.result.push(i18n('G_ACTIONS'));
+      this.result.leftBrace();
+      rule.actions.forEach(it => this.addExpression(it));
+      this.result.rightBrace();
     }
     // 完成规则
-    result.rightBrace();
-    result.push();
+    this.result.rightBrace();
+    this.result.push();
   }
 
-  // 子程序
-  if (Object.keys(ast.sub).length > 0) {
-    result.push(i18n('G_SUB'));
-    result.leftBrace();
-    Object.keys(ast.sub).forEach((name, index) => {
-      result.push(`${index}: ${name}`);
-    });
-    result.rightBrace();
-    result.push();
-    Object.values(ast.sub).forEach(it => {
-      addRule(it);
-    });
+  private addCondition(cond: Condition) {
+    const result = [
+      this.getSimpleExpression(cond.left),
+      compareSymbolToString(cond.symbol),
+      this.getSimpleExpression(cond.right)
+    ].join(' ');
+    this.result.push(result + END_FLAG);
   }
 
-  // 规则区域
-  ast.rules.forEach(rule => addRule(rule));
+  private getSimpleExpression(exp: OWExpression) {
+    switch (exp.kind) {
+      case ExpressionKind.BOOLEAN:
+        return i18n(`CONST_GAME_${exp.text}`);
+      case ExpressionKind.CONSTANT:
+        return i18n(`CONST_${exp.text}`);
+      case ExpressionKind.COMPARE_SYMBOL:
+        return compareSymbolToString((exp as CompareExpression).compare);
+      case ExpressionKind.NUMBER:
+        let str = exp.text;
+        if (!str.includes('.')) {
+          str += '.000';
+        }
+        let fillZero = 4 - str.substr(str.indexOf('.')).length;
+        if (fillZero < 0) {
+          // 只取前三位小数
+          str = str.substr(0, str.indexOf('.') + 4);
+        } else {
+          // 补足小数点后三位
+          while (fillZero--) {
+            str += '0';
+          }
+        }
+        return str;
+      case ExpressionKind.RAW:
+        return exp.text;
+      case ExpressionKind.STRING:
+        return `"${exp.text}"`;
+    }
+    if (isCallExpression(exp)) {
+      const name = i18n(`FUNC_${exp.text}`);
+      // TODO: 如果是访问变量，那么做一个对应关系
+      const args: string = exp.arguments ? exp.arguments.map(it => this.getSimpleExpression(it)).join(', ') : '';
+      return `${name}(${args})`;
+    }
+  }
 
-  return result.get();
+  private addExpression(exp: OWExpression) {
+    const simple = this.getSimpleExpression(exp);
+    if (simple) {
+      this.result.push(simple + END_FLAG);
+      return;
+    }
+    if (isIfExpression(exp)) {
+      const callIf: CallExpression = {
+        kind: ExpressionKind.CALL,
+        text: 'IF',
+        arguments: [exp.condition]
+      };
+      this.result.push(this.getSimpleExpression(callIf) + END_FLAG, 1);
+      exp.then.forEach(it => this.addExpression(it));
+      if (exp.elseThen.length > 0) {
+        const callElse: OWExpression = {
+          kind: ExpressionKind.CONSTANT,
+          text: 'ELSE'
+        };
+        this.result.push(this.getSimpleExpression(callElse) + END_FLAG, 1, -1);
+        exp.elseThen.forEach(it => this.addExpression(it));
+      }
+      const callEnd: OWExpression = {
+        kind: ExpressionKind.CONSTANT,
+        text: 'END'
+      };
+      this.result.push(this.getSimpleExpression(callEnd) + END_FLAG, 0, -1);
+    }
+  }
 }

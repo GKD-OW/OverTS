@@ -1,9 +1,10 @@
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 import { constAlias, enumAlias, funcAlias, typeAlias } from "./alias";
+import appendLocale from './appendLocale';
 import { formatTo, ksort } from "./utils";
+import { langs, langType } from './var';
 
-const langs = ["en-US", "ja-JP", "zh-CN"];
 const locales: { [x: string]: { [x: string]: string } } = require('./locales.json');
 
 export default class Lang {
@@ -13,7 +14,7 @@ export default class Lang {
     langs.forEach(it => this.result[it] = {});
   }
 
-  public add(type: 'G' | 'CONST' | 'FUNC' | 'EVENT', name: string, items: { [x: string]: string }) {
+  public add(type: langType, name: string, items: { [x: string]: string }) {
     let newKey = formatTo(name, 'TO_FORMAT');
     if (type === 'FUNC' && typeof(funcAlias[name]) !== 'undefined') {
       newKey = formatTo(funcAlias[name], 'TO_FORMAT');
@@ -41,6 +42,7 @@ export default class Lang {
   }
 
   write(dir: string) {
+    appendLocale.forEach(it => this.add(it.type, it.name, it.items));
     // 写入语言
     langs.forEach(it => {
       this.result[it] = ksort(this.result[it]);

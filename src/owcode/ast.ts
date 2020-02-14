@@ -1,12 +1,14 @@
-import { CallExpression } from "./ast/expression";
+import { CallExpression, IfExpression } from "./ast/expression";
 import { Condition } from "./ast/conditions";
 import { OWEvent } from "./ast/event";
+
+type ActionExpression = CallExpression | IfExpression;
 
 export interface Rule {
   name: string;
   event: OWEvent;
   conditions: Condition[];
-  actions: CallExpression[];
+  actions: ActionExpression[];
 }
 
 export interface Ast {

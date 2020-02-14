@@ -6,6 +6,7 @@ import { CallExpression, CompareExpression, ExpressionKind, OWExpression } from 
 import { getFinalAccess, isCanToString, TextAccess } from "./accessUtils";
 import { parseExpression } from "./expression";
 import { DefinedContants, ParseContext } from "./var";
+import { Condition } from "../owcode/ast/conditions";
 
 export function uuid() {
   return uuidv4().replace(/\-/g, '');
@@ -94,6 +95,40 @@ export function getVariable(this: Transformer, statements: ts.Statement[] | ts.N
     }
   });
   return result;
+}
+
+export function parseCondition(this: Transformer, condition: ts.Expression) {
+  if (ts.isBinaryExpression(condition)) {
+    const symbol = tsMatchToCompare(condition.operatorToken.kind);
+    // 比较
+    if (typeof(symbol) !== 'undefined') {
+      return createCondition(this.parseExpression(condition.left), this.parseExpression(condition.right), symbol);
+    }
+    // 其他就不管了，扔到else的逻辑里面去
+  }
+  // 其他情况下，将左侧解析为OW表达式，右侧保持true
+  return createCondition(this.parseExpression(condition));
+}
+
+export function conditionToBool(condition: Condition): OWExpression {
+  let conditionExp = {
+    kind: ExpressionKind.BOOLEAN,
+    text: 'FALSE'
+  };
+  if (condition.symbol === CompareSymbol.EQUALS) {
+    if (condition.right.kind === ExpressionKind.BOOLEAN) {
+      if (condition.right.text === 'TRUE') {
+        conditionExp = condition.left;
+      } else {
+        conditionExp = createCall('NOT', condition.left);
+      }
+    } else {
+      conditionExp = createCall('COMPARE', condition.left, createCompareExpression(condition.symbol),condition.right);
+    }
+  } else {
+    conditionExp = createCall('COMPARE', condition.left, createCompareExpression(condition.symbol),condition.right);
+  }
+  return conditionExp;
 }
 
 /**

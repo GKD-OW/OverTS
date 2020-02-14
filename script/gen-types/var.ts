@@ -1,5 +1,9 @@
 import * as ts from 'typescript';
 
+export type langType = 'G' | 'CONST' | 'FUNC' | 'EVENT';
+
+export const langs = ["en-US", "ja-JP", "zh-CN"];
+
 export interface FunctionResult {
   name: string;
   desc: string;

@@ -18,9 +18,7 @@ const result: ParseResult = {
   events: []
 }
 
-// const langs = ["en-US", "es-MX", "fr-FR", "ja-JP", "pt-BR", "zh-CN"];
 const ignores = ['return', '__end__', '__else__', '__elif__', '__if__', '__while__'];
-
 const lang = new Lang();
 
 function read(file: string) {

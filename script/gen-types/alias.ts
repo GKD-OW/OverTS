@@ -15,6 +15,7 @@ export const enumAlias: { [x: string]: string } = {
   Comms: 'Communicate'
 }
 export const enumType: { [x: string]: string } = {
+  Events: 'STRING'
 }
 export const typeAlias: { [x: string]: string } = {
   DIRECTION: 'Vector',

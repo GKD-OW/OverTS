@@ -6,7 +6,7 @@ import { CallExpression } from '../owcode/ast/expression';
 import '../owcode/helper';
 import { getFinalAccess, isCanToString, PropertyAccess } from './accessUtils';
 import { parseEvent, parseExpression } from './expression';
-import { createCall, createCondition, createConst, createRaw, createSubCall, getClassName, getMethod, getVariable, getVariableResult, tsMatchToCompare, uuid } from './utils';
+import { createCall, createCondition, createConst, createRaw, createSubCall, getClassName, getMethod, getVariable, getVariableResult, tsMatchToCompare, uuid, parseCondition } from './utils';
 import { DefinedContants } from './var';
 
 export default class Transformer {
@@ -193,18 +193,7 @@ export default class Transformer {
           if (decorator.expression.expression.text === 'condition') {
             // 条件
             decorator.expression.arguments.forEach(condition => {
-              if (ts.isBinaryExpression(condition)) {
-                const symbol = tsMatchToCompare(condition.operatorToken.kind);
-                // 比较
-                if (typeof(symbol) !== 'undefined') {
-                  conditions.push(createCondition(this.parseExpression(condition.left), this.parseExpression(condition.right), symbol));
-                  return;
-                }
-                // 其他就不管了，扔到else的逻辑里面去
-              } else {
-                // 其他情况下，将左侧解析为OW表达式，右侧保持true
-                conditions.push(createCondition(this.parseExpression(condition)));
-              }
+              conditions.push(parseCondition.call(this, condition));
             });
           }
         }
@@ -301,6 +290,9 @@ export default class Transformer {
         }
         bodys.push(this.parseExpression(state.expression, defines, false) as CallExpression);
       }
+      if (ts.isIfStatement(state)) {
+        bodys.push(this.parseExpression(state, defines, false) as CallExpression);
+      }
     });
     return bodys;
   }
@@ -334,7 +326,7 @@ export default class Transformer {
     };
   }
 
-  private parseExpression(exp: ts.Expression, defines: DefinedContants = {}, merge = true) {
+  public parseExpression(exp: ts.Expression | ts.IfStatement, defines: DefinedContants = {}, merge = true) {
     return parseExpression({
       transformer: this,
       defines: merge ? this.getDefines(defines) : defines,

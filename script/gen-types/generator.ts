@@ -71,7 +71,13 @@ export default class Generator {
     }
     // 看一下有没有特别指定的类型
     if (typeof(enumType[parentName]) !== 'undefined') {
-      this.result.enums[parentName][key] = ts.createStringLiteral(`_GKD_${enumType[parentName]}_`);
+      switch (enumType[parentName]) {
+        case 'STRING':
+          this.result.enums[parentName][key] = ts.createStringLiteral(key);
+          break;
+        default:
+          this.result.enums[parentName][key] = ts.createStringLiteral(`_GKD_${enumType[parentName]}_`);
+      }
     } else {
       this.result.enums[parentName][key] = undefined;
     }

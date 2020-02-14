@@ -1,10 +1,10 @@
 import * as ts from 'typescript';
 import { GlobalEvents, OWEvent, PlayerEvent, SubEvents } from '../owcode/ast/event';
-import { CallExpression, ExpressionKind, OWExpression } from '../owcode/ast/expression';
+import { CallExpression, ExpressionKind, OWExpression, IfExpression } from '../owcode/ast/expression';
 import '../owcode/helper';
 import { getFinalAccess, isCanToString, PropertyAccess } from './accessUtils';
 import Constants from './constants';
-import { createCall, createCompareExpression, createConst, createRaw, createSubCall, createSubEvent, getArrayAccess, tsMatchToCompare, uuid } from './utils';
+import { createCall, createCompareExpression, createConst, createRaw, createSubCall, createSubEvent, getArrayAccess, tsMatchToCompare, uuid, parseCondition, conditionToBool } from './utils';
 import { DefinedContants, ParseContext } from './var';
 
 // 普通算数运算符
@@ -65,7 +65,7 @@ function getCallExpression(context: ParseContext, expression: ts.CallExpression)
  * @param context 
  * @param expression 
  */
-export function parseExpression(context: ParseContext, expression: ts.Expression): OWExpression {
+export function parseExpression(context: ParseContext, expression: ts.Expression | ts.IfStatement): OWExpression {
   if (ts.isCallExpression(expression)) {
     return getCallExpression(context, expression);
   }
@@ -236,8 +236,40 @@ export function parseExpression(context: ParseContext, expression: ts.Expression
     }
     return createConst('GAME_EMPTY_ARRAY');
   }
+  // if 表达式
+  if (ts.isIfStatement(expression)) {
+    const condition = conditionToBool(parseCondition.call(context.transformer, expression.expression));
+    const newExp: IfExpression = {
+      kind: ExpressionKind.IF,
+      text: "",
+      then: parseBlockOrExpression(context, expression.thenStatement),
+      condition: condition,
+      elseIf: undefined,
+      elseThen: parseBlockOrExpression(context, expression.elseStatement)
+    };
+    console.log(newExp);
+    return newExp;
+  }
   console.error(expression);
   throw new Error('无法识别表达式');
+}
+
+function parseBlockOrExpression(context: ParseContext, exp?: ts.Statement) {
+  const result: OWExpression[] = [];
+  if (!exp) {
+    return result;
+  }
+  if (ts.isBlock(exp)) {
+    exp.statements.forEach(it => {
+      if (ts.isExpressionStatement(it)) {
+        result.push(parseExpression(context, it.expression));
+      }
+    });
+  }
+  if (ts.isExpressionStatement(exp)) {
+    result.push(parseExpression(context, exp.expression));
+  }
+  return result;
 }
 
 /**
