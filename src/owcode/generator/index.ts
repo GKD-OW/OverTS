@@ -3,7 +3,7 @@ import { Ast, Rule } from "../ast";
 import { getEventText } from "./utils";
 import i18n from "./i18n";
 import Result from "./result";
-import { OWExpression, ExpressionKind, CompareExpression, isCallExpression, isIfExpression, CallExpression } from '../ast/expression';
+import { OWExpression, ExpressionKind, CompareExpression, isCallExpression, isIfExpression, CallExpression, isWhileExpression } from '../ast/expression';
 import { Condition } from '../ast/conditions';
 import { compareSymbolToString } from './compareSymbolToString';
 
@@ -72,7 +72,7 @@ export default class Generator {
   private genSub() {
     // 子程序
     if (Object.keys(this.ast.sub).length > 0) {
-      this.result.push(i18n('G_SUB'));
+      this.result.push(i18n('G_SUBROUTINES'));
       this.result.leftBrace();
       Object.keys(this.ast.sub).forEach((name, index) => {
         this.result.push(`${index}: ${name}`);
@@ -186,6 +186,20 @@ export default class Generator {
         this.result.push(this.getSimpleExpression(callElse) + END_FLAG, 1, -1);
         exp.elseThen.forEach(it => this.addExpression(it));
       }
+      const callEnd: OWExpression = {
+        kind: ExpressionKind.CONSTANT,
+        text: 'END'
+      };
+      this.result.push(this.getSimpleExpression(callEnd) + END_FLAG, 0, -1);
+    }
+    if (isWhileExpression(exp)) {
+      const callWhile: CallExpression = {
+        kind: ExpressionKind.CALL,
+        text: 'WHILE',
+        arguments: [exp.condition]
+      };
+      this.result.push(this.getSimpleExpression(callWhile) + END_FLAG, 1);
+      exp.then.forEach(it => this.addExpression(it));
       const callEnd: OWExpression = {
         kind: ExpressionKind.CONSTANT,
         text: 'END'

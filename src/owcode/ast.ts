@@ -1,8 +1,8 @@
-import { CallExpression, IfExpression } from "./ast/expression";
 import { Condition } from "./ast/conditions";
 import { OWEvent } from "./ast/event";
+import { CallExpression, IfExpression, WhileExpression } from "./ast/expression";
 
-type ActionExpression = CallExpression | IfExpression;
+export type ActionExpression = CallExpression | IfExpression | WhileExpression;
 
 export interface Rule {
   name: string;

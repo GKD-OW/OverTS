@@ -1,13 +1,12 @@
 import * as ts from 'typescript';
-import { Ast, Rule } from '../owcode/ast';
+import { Ast, Rule, ActionExpression } from '../owcode/ast';
 import { Condition } from '../owcode/ast/conditions';
-import { OWEvent, SubEvent, PlayerEvent } from '../owcode/ast/event';
-import { CallExpression } from '../owcode/ast/expression';
+import { OWEvent, PlayerEvent, SubEvent } from '../owcode/ast/event';
+import { CallExpression, OWExpression } from '../owcode/ast/expression';
 import '../owcode/helper';
-import { getFinalAccess, isCanToString, PropertyAccess } from './accessUtils';
-import { parseEvent, parseExpression } from './expression';
-import { createCall, createCondition, createConst, createRaw, createSubCall, getClassName, getMethod, getVariable, getVariableResult, tsMatchToCompare, uuid, parseCondition } from './utils';
-import { DefinedContants } from './var';
+import { parseStatement } from './parser';
+import { createCall, createConst, createRaw, getVariable, getVariableResult, parseCondition, parseEvent, uuid } from './utils';
+import { DefinedContants, ParseContext } from './var';
 
 export default class Transformer {
   private ast: Ast;
@@ -45,7 +44,7 @@ export default class Transformer {
   }
 
   private parseVars() {
-    this.vars = getVariable.call(this, this.file.statements);
+    this.vars = getVariable(this.getParseContext(), this.file.statements);
     this.ast.variable.global = this.vars.variables;
     // 如果有初始化，则自动增加一条初始化规则
     const globalInitializer = this.vars.variableValues;
@@ -76,7 +75,7 @@ export default class Transformer {
       }
     });
     if (playerVarsArray) {
-      const playerVars = getVariable.call(this, playerVarsArray, this.getDefines());
+      const playerVars = getVariable(this.getParseContext(), playerVarsArray);
       this.ast.variable.player = playerVars.variables;
       // 如果有初始化，则自动增加一条初始化规则
       const playerInitializer = playerVars.variableValues;
@@ -193,7 +192,7 @@ export default class Transformer {
           if (decorator.expression.expression.text === 'condition') {
             // 条件
             decorator.expression.arguments.forEach(condition => {
-              conditions.push(parseCondition.call(this, condition));
+              conditions.push(parseCondition(this.getParseContext(), condition));
             });
           }
         }
@@ -214,85 +213,17 @@ export default class Transformer {
    * @param defines 
    */
   private parseRuleBody(body: ts.Block, clazz?: ts.ClassDeclaration, parentDefines?: DefinedContants) {
+    const context = this.getParseContext(clazz);
     // 首先取出宏定义（可能有）
-    const vars = getVariable.call(this, body.statements);
+    const vars = getVariable(context, body.statements);
     const defines = this.getDefines(vars.defines, parentDefines);
+    const newContext = this.getParseContext(clazz, defines);
     // 然后开始逐句解析
-    let bodys: CallExpression[] = [];
+    let bodys: ActionExpression[] = [];
     body.statements.forEach(state => {
-      // return特殊处理
-      if (ts.isReturnStatement(state)) {
-        bodys.push(createCall('ABORT'));
-        return;
-      }
-      // 函数调用或者函数赋值都在这里面
-      if (ts.isExpressionStatement(state)) {
-        // 函数调用语句
-        if (ts.isCallExpression(state.expression)) {
-          // 获取最终访问的是谁
-          const finalExp = getFinalAccess(state.expression.expression, defines);
-          // 如果遇到this调用，则进行子程序解析
-          if (isCanToString(finalExp)) {
-            if (finalExp instanceof PropertyAccess && !isCanToString(finalExp.left)) {
-              const leftExp = finalExp.left as ts.Expression;
-              if (leftExp.kind === ts.SyntaxKind.ThisKeyword) {
-                if (!clazz) {
-                  throw new Error("Can not access 'this'");
-                }
-                const subMethodName = finalExp.right.toString();
-                const subName = getClassName(clazz) + '_' + subMethodName;
-                const subMethod = getMethod(clazz, subMethodName);
-                if (!subMethod) {
-                  throw new Error(`类 ${getClassName(clazz)} 上不存在方法 ${subName}`);
-                }
-                if (!subMethod.body) {
-                  throw new Error(`方法 ${subName} 不能为空`);
-                }
-                this.parseSub(subName, subMethod.body);
-                bodys.push(createSubCall(subName));
-                return;
-              }
-            }
-          } else if (ts.isArrowFunction(finalExp)) {
-            // 箭头函数调用
-            const body = (finalExp as ts.ArrowFunction).body;
-            if (body) {
-              if (ts.isBlock(body)) {
-                // 有很多条语句的body
-                bodys = bodys.concat(this.parseRuleBody(body, clazz, defines));
-              } else {
-                // 单条语句
-                bodys.push(this.parseExpression(body, defines, false) as CallExpression);
-              }
-            }
-            return;
-          } else if (ts.isFunctionExpression(finalExp)) {
-            // 普通函数调用也作为子程序进行解析
-            const func = finalExp as ts.FunctionExpression;
-            // 作为子程序进行
-            if (func.body) {
-              const name = `sub_${func.pos}_${func.end}`;
-              this.parseSub(name, func.body);
-              bodys.push(createSubCall(name));
-            }
-            return;
-          } else if (ts.isFunctionDeclaration(finalExp)) {
-            // 普通函数调用也作为子程序进行解析
-            const func = finalExp as ts.FunctionDeclaration;
-            // 作为子程序进行
-            if (func.body) {
-              const name = `sub_${func.pos}_${func.end}`;
-              this.parseSub(name, func.body);
-              bodys.push(createSubCall(name));
-            }
-            return;
-          }
-        }
-        bodys.push(this.parseExpression(state.expression, defines, false) as CallExpression);
-      }
-      if (ts.isIfStatement(state)) {
-        bodys.push(this.parseExpression(state, defines, false) as CallExpression);
-      }
+      context.belongTo = clazz;
+      const resultSet = parseStatement(newContext, state);
+      bodys = bodys.concat(resultSet);
     });
     return bodys;
   }
@@ -326,11 +257,12 @@ export default class Transformer {
     };
   }
 
-  public parseExpression(exp: ts.Expression | ts.IfStatement, defines: DefinedContants = {}, merge = true) {
-    return parseExpression({
+  public getParseContext(belongTo?: ts.ClassDeclaration, defines: DefinedContants = {}, merge = true): ParseContext {
+    return {
       transformer: this,
       defines: merge ? this.getDefines(defines) : defines,
-      vars: this.vars.variables
-    }, exp);
+      vars: this.vars.variables,
+      belongTo
+    };
   }
 }

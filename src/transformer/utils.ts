@@ -1,33 +1,32 @@
 import * as ts from "typescript";
 import { v4 as uuidv4 } from 'uuid';
-import Transformer from ".";
-import { SubEvent } from "../owcode/ast/event";
-import { CallExpression, CompareExpression, ExpressionKind, OWExpression } from "../owcode/ast/expression";
-import { getFinalAccess, isCanToString, TextAccess } from "./accessUtils";
-import { parseExpression } from "./expression";
-import { DefinedContants, ParseContext } from "./var";
 import { Condition } from "../owcode/ast/conditions";
+import { GlobalEvents, OWEvent, PlayerEvent, SubEvent, SubEvents } from "../owcode/ast/event";
+import { CallExpression, CompareExpression, ExpressionKind, OWExpression } from "../owcode/ast/expression";
+import { getFinalAccess, isCanToString, PropertyAccess, TextAccess } from "./accessUtils";
+import { parseArgument } from "./parser";
+import { DefinedContants, ParseContext, TransformerError } from "./var";
 
 export function uuid() {
   return uuidv4().replace(/\-/g, '');
 }
 
-function deepParse(exp: ts.Node, defines?: DefinedContants): ts.Node {
-  if (!defines) {
+function deepParse(context: ParseContext, exp: ts.Node): ts.Node {
+  if (!context.defines || Object.keys(context.defines).length === 0) {
     return exp;
   }
-  if (ts.isIdentifier(exp) && typeof(defines[exp.text]) !== 'undefined') {
-    return deepParse(defines[exp.text], defines);
+  if (ts.isIdentifier(exp) && typeof(context.defines[exp.text]) !== 'undefined') {
+    return deepParse(context, context.defines[exp.text]);
   }
   if (ts.isCallExpression(exp)) {
     const res = { ...exp };
-    res.arguments = ts.createNodeArray(res.arguments.map(it => deepParse(it, defines)) as ts.Expression[]);
+    res.arguments = ts.createNodeArray(res.arguments.map(it => deepParse(context, it)) as ts.Expression[]);
     return res;
   }
   if (ts.isBinaryExpression(exp)) {
     const res = { ...exp };
-    res.left = deepParse(res.left, defines) as ts.Expression;
-    res.right = deepParse(res.left, defines) as ts.Expression;
+    res.left = deepParse(context, res.left) as ts.Expression;
+    res.right = deepParse(context, res.right) as ts.Expression;
     return res;
   }
   return exp;
@@ -44,11 +43,17 @@ export interface getVariableResult {
  * @param statements 
  * @param defines 
  */
-export function getVariable(this: Transformer, statements: ts.Statement[] | ts.NodeArray<ts.Statement>, defines?: DefinedContants) {
+export function getVariable(context: ParseContext, statements: ts.Statement[] | ts.NodeArray<ts.Statement>) {
   const result: getVariableResult = {
     defines: {},
     variables: [],
     variableValues: {},
+  }
+  const newContext = {
+    ...context,
+    defines: {
+      ...context.defines
+    }
   }
   statements.forEach(statement => {
     // 将所有全局变量的声明提取出来
@@ -60,16 +65,14 @@ export function getVariable(this: Transformer, statements: ts.Statement[] | ts.N
               throw new Error(`宏 ${declaration.name.text} 必须有初始值`);
             }
             // 递归解析常量定义
-            result.defines[declaration.name.text] = deepParse(declaration.initializer, defines);
+            const it = deepParse(newContext, declaration.initializer);
+            result.defines[declaration.name.text] = it;
+            newContext.defines[declaration.name.text] = it;
           } else {
             // 添加到变量声明
             result.variables.push(declaration.name.text);
             if (declaration.initializer) {
-              result.variableValues[declaration.name.text] = parseExpression({
-                transformer: this,
-                defines: result.defines,
-                vars: []
-              }, declaration.initializer);
+              result.variableValues[declaration.name.text] = parseArgument(newContext, declaration.initializer);
             }
           }
         }
@@ -97,17 +100,78 @@ export function getVariable(this: Transformer, statements: ts.Statement[] | ts.N
   return result;
 }
 
-export function parseCondition(this: Transformer, condition: ts.Expression) {
+
+/**
+ * 解析为规则的条件
+ * @param context 
+ * @param condition 
+ */
+export function parseCondition(context: ParseContext, condition: ts.Expression) {
   if (ts.isBinaryExpression(condition)) {
     const symbol = tsMatchToCompare(condition.operatorToken.kind);
     // 比较
     if (typeof(symbol) !== 'undefined') {
-      return createCondition(this.parseExpression(condition.left), this.parseExpression(condition.right), symbol);
+      return createCondition(parseArgument(context, condition.left), parseArgument(context, condition.right), symbol);
     }
     // 其他就不管了，扔到else的逻辑里面去
   }
   // 其他情况下，将左侧解析为OW表达式，右侧保持true
-  return createCondition(this.parseExpression(condition));
+  return createCondition(parseArgument(context, condition));
+}
+
+
+/**
+ * 解析事件
+ * @param exps 
+ * @param defines 
+ */
+export function parseEvent(exps: ts.NodeArray<ts.Expression>, defines?: DefinedContants): OWEvent {
+  const exp = exps[0];
+  if (ts.isPropertyAccessExpression(exp)) {
+    const finalExp = getFinalAccess(exp) as PropertyAccess;
+    if (finalExp.left.toString() !== 'Events') {
+      throw new Error('runAt只接受Events.*');
+    }
+    const right = finalExp.right.toString();
+    // @ts-ignore
+    if (typeof(Events[right]) === 'undefined') {
+      throw new Error(`不存在 ${right} 事件`);
+    }
+    // @ts-ignore
+    const eventName = Events[right];
+    // 全局事件
+    if (GlobalEvents.includes(eventName)) {
+      const event: OWEvent = {
+        kind: eventName
+      }
+      return event;
+    }
+    // 子程序
+    if (SubEvents.includes(eventName)) {
+      // TODO: 子程序名称
+      return createSubEvent("");
+    }
+    // 玩家事件
+    let teamName = 'TEAM_ALL';
+    let heroName = 'GAME_ALL_HEROES';
+    if (exps.length > 1) {
+      const team = getFinalAccess(exps[1], defines);
+      const hero = getFinalAccess(exps[2], defines);
+      if (team instanceof PropertyAccess && team.left === 'Team') {
+        teamName = 'TEAM_' + team.right.toString().toUpperCase();
+      }
+      if (hero instanceof PropertyAccess && hero.left === 'Hero') {
+        heroName = 'HERO_' + hero.right.toString().toUpperCase();
+      }
+    }
+    const event: PlayerEvent = {
+      kind: eventName,
+      team: teamName,
+      hero: heroName
+    };
+    return event;
+  }
+  throw new Error('事件无效');
 }
 
 export function conditionToBool(condition: Condition): OWExpression {
@@ -258,11 +322,11 @@ export function getArrayAccess(context: ParseContext, exp: ts.ElementAccessExpre
   const left = getFinalAccess(exp.expression, context.defines);
   const index = getFinalAccess(exp.argumentExpression, context.defines);
   if (!(left instanceof TextAccess)) {
-    throw new Error('仅支持一维数组');
+    throw new TransformerError('仅支持一维数组', exp);
   }
   const name = left.toString();
   if (!context.vars.includes(name)) {
-    throw new Error(`找不到全局变量 ${name}`);
+    throw new TransformerError(`找不到全局变量 ${name}`, exp);
   }
   let indexExp: OWExpression | undefined = undefined;
   // 全局变量里面读取
@@ -271,10 +335,10 @@ export function getArrayAccess(context: ParseContext, exp: ts.ElementAccessExpre
       indexExp = createCall('GLOBAL_VAR', createRaw(index.toString()));
     }
   } else {
-    indexExp = parseExpression(context, index);
+    indexExp = parseArgument(context, index);
   }
   if (!indexExp) {
-    throw new Error('无法识别数组访问');
+    throw new TransformerError('无法识别数组访问', exp);
   }
   return {
     name: createRaw(name),

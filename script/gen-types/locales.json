@@ -20,6 +20,9 @@
     "ja-JP": "",
     "zh-CN": "停止治疗调整"
   },
+  "EVENT_SUBROUTINE": {
+    "zh-CN": "子程序"
+  },
   "G_SUBROUTINES": {
     "zh-CN": "子程序"
   }
