@@ -24,7 +24,7 @@ const simpleCalc = ['add', 'subtract', 'multiply', 'divide'];
 interface GeneratorResult {
   setGlobal: { [x: string]: ts.Expression };
   constants: ts.VariableStatement[];
-  enums: { [x: string]: { [x: string]: ts.Expression } };
+  enums: { [x: string]: { [x: string]: ts.Expression | undefined } };
   functions: ts.FunctionDeclaration[];
 }
 
@@ -73,7 +73,7 @@ export default class Generator {
     if (typeof(enumType[parentName]) !== 'undefined') {
       this.result.enums[parentName][key] = ts.createStringLiteral(`_GKD_${enumType[parentName]}_`);
     } else {
-      this.result.enums[parentName][key] = ts.createStringLiteral(key);
+      this.result.enums[parentName][key] = undefined;
     }
   }
 

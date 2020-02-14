@@ -10,12 +10,12 @@ globals.CompareSymbol = {
   NOT_EQUALS: 5 // 不等于
 }
 
-type Player = '_GKD_PLAYER_';
-type MapItem = '_GKD_MAPITEM_';
-
 declare global {
-  function runAt(event: string): any;
-  function runAt(event: string, team: Team, hero: Hero): any;
+  abstract class Player {}
+  abstract class MapItem {}
+
+  function runAt(event: Events): any;
+  function runAt(event: Events, team: Team, hero: Hero): any;
   function condition(...conditions: boolean[]): any;
 
   enum CompareSymbol {

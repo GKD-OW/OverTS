@@ -56,7 +56,7 @@ export function createModule(name: string, content: ts.Statement[], flags: ts.No
   )
 }
 
-export function createEnum(name: string, member: { [x: string]: ts.Expression }) {
+export function createEnum(name: string, member: { [x: string]: ts.Expression | undefined }) {
   return ts.createEnumDeclaration(undefined, undefined, name, Object.keys(member).map(key => {
     return ts.createEnumMember(key, member[key]);
   }));
