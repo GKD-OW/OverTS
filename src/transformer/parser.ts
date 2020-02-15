@@ -24,20 +24,11 @@ import { ActionExpression } from '../owcode/ast';
 import { ExpressionKind, IfExpression, OWExpression, WhileExpression } from '../owcode/ast/expression';
 import '../owcode/helper';
 import { getFinalAccess, isCanToString, PropertyAccess, TextAccess } from './accessUtils';
+import { simpleCalc, tryTinyCalc } from './calcParser';
 import Constants from './constants';
 import { conditionToBool, createCall, createCompareExpression, createConst, createRaw, createSubCall, getArrayAccess, getClassName, getMethod, parseCondition, tsMatchToCompare } from './utils';
 import { ParseContext, TransformerError } from './var';
 
-// 普通算数运算符
-const simpleCalc: { [x: number]: string } = {
-  [ts.SyntaxKind.PlusToken]: 'ADD',
-  [ts.SyntaxKind.MinusToken]: 'SUBTRACT',
-  [ts.SyntaxKind.AsteriskToken]: 'MULTIPLY',
-  [ts.SyntaxKind.SlashToken]: 'DIVIDE',
-  [ts.SyntaxKind.PercentToken]: 'MODULO',
-  [ts.SyntaxKind.AmpersandAmpersandToken]: 'AND',
-  [ts.SyntaxKind.BarBarToken]: 'OR',
-};
 // 运算后赋值的运算符
 const calcAndSet: { [x: number]: ts.SyntaxKind } = {
   [ts.SyntaxKind.PlusEqualsToken]: ts.SyntaxKind.PlusToken,
@@ -216,6 +207,13 @@ export function parseSimpleExpression(context: ParseContext, expression: ts.Expr
   // 运算，转化为相应函数
   if (ts.isBinaryExpression(expression)) {
     const kind: ts.SyntaxKind = expression.operatorToken.kind;
+    const tinyCalc = tryTinyCalc(expression);
+    if (typeof(tinyCalc) !== 'undefined') {
+      return {
+        kind: ExpressionKind.NUMBER,
+        text: tinyCalc.toString()
+      };
+    }
     // 赋值运算
     if (kind === ts.SyntaxKind.EqualsToken) {
       // 数组赋值和其他情况分开处理

@@ -70,12 +70,12 @@ export function parseImportModule(context: ParseContext, name: string, option?: 
   });
   const moduleAst = transformer.getResult();
   // 给模块的各种东西都加上前缀
-  moduleAst.variable.global = moduleAst.variable.global.map(it => `${moduleId}${it}`);
-  moduleAst.variable.player = moduleAst.variable.player.map(it => `${moduleId}${it}`);
+  moduleAst.variable.global = moduleAst.variable.global.map(it => `${moduleId}_${it}`);
+  moduleAst.variable.player = moduleAst.variable.player.map(it => `${moduleId}_${it}`);
   const newSub: { [x: string]: Rule } = {};
   Object.keys(moduleAst.sub).forEach(key => {
-    moduleAst.sub[key].name = `${moduleId}${moduleAst.sub[key].name}`;
-    newSub[`${moduleId}${key}`] = moduleAst.sub[key];
+    moduleAst.sub[key].name = `${moduleId}_${moduleAst.sub[key].name}`;
+    newSub[`${moduleId}_${key}`] = moduleAst.sub[key];
   });
   const argAt: { [x: string]: number } = {
     "CHASE_GLOBAL_VARIABLE_AT_RATE": 0, //"追踪全局变量频率",
@@ -97,7 +97,7 @@ export function parseImportModule(context: ParseContext, name: string, option?: 
   }
   forEachRule(moduleAst, (it, type) => {
     if (type === 'RULE') {
-      it.name = `${moduleId}${it.name}`;
+      it.name = `${moduleId}_${it.name}`;
     }
   });
   forEachCall(moduleAst, '', it => {
@@ -110,7 +110,7 @@ export function parseImportModule(context: ParseContext, name: string, option?: 
     if (it.arguments[argAt[it.text]].kind !== ExpressionKind.RAW) {
       return;
     }
-    it.arguments[argAt[it.text]].text = `${moduleId}${it.arguments[argAt[it.text]].text}`;
+    it.arguments[argAt[it.text]].text = `${moduleId}_${it.arguments[argAt[it.text]].text}`;
   });
   // 返回，合并在主程序进行
   return moduleAst;

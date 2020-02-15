@@ -27,7 +27,7 @@ export class ChuanHuo {
     d--;
     d *= 10;
     ++d;
-    d = (1+2)*((3-1)*6);
+    d = (1+2)*((3-1)*6) + Math.abs(1 - 9) * Math.floor(10 / 3) + sqrt(4);
   }
 
   /**
