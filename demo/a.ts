@@ -1,4 +1,5 @@
 import '../src/owcode/helper';
+// import '../lib/owcode/helper';
 
 let b = true;
 let c = [];

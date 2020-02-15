@@ -2,7 +2,6 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "jsx": "react",
     "lib": [
       "dom",
       "es2017"
@@ -15,7 +14,7 @@
     "preserveConstEnums": true,
     "removeComments": false,
     "skipLibCheck": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "strict": true,
     "target": "es5",
     "declaration": true

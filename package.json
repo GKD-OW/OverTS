@@ -8,7 +8,7 @@
     "start": "ts-node ./demo/index.ts",
     "debug": "node -r ts-node/register --inspect ./demo/index.ts",
     "gen-type": "ts-node ./script/gen-types/index.ts",
-    "build": ""
+    "build": "rm -rf ./lib && tsc --build tsconfig.json"
   },
   "dependencies": {
     "globalthis": "^1.0.1",
