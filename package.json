@@ -1,7 +1,7 @@
 {
   "name": "overts",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./lib/index.ts",
   "author": "ShuangYa",
   "license": "AGPL-2.0",
   "scripts": {

@@ -6,8 +6,8 @@
 yarn.lock
 
 # Code and libs
-src/
 demo/
+script/
 .idea/
 .vscode/
 ~*
