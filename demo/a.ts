@@ -72,5 +72,6 @@ export class ChuanHuo {
       test();
       wait(1, Wait.IGNORE_CONDITION);
     }
+    bigMessage(Game.EVENT_PLAYER, customString("自定义字符串", null, null, null));
   }
 }

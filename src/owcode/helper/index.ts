@@ -2327,7 +2327,7 @@ declare global {
      * @param param1 The value that will be converted to text and used to replace {1}.
      * @param param2 The value that will be converted to text and used to replace {2}.
      */
-    function customString(string: Strings, param0: Strings, param1: Strings, param2: Strings): Strings;
+    function customString(string: string, param0: Strings | null, param1: Strings | null, param2: Strings | null): Strings;
     /**
      * angleToDirection
      * The unit-length direction vector corresponding to the specified angles.

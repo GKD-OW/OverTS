@@ -33,9 +33,10 @@ export const paramTypeAlias: { [x: string]: string } = {
   'createInWorldText.header': 'Strings',
   'setObjectiveDescription.header': 'Strings',
   'smallMessage.header': 'Strings',
-  'customString.param0': 'Strings',
-  'customString.param1': 'Strings',
-  'customString.param2': 'Strings',
+  'customString.string': 'STRING',
+  'customString.param0': 'Strings?',
+  'customString.param1': 'Strings?',
+  'customString.param2': 'Strings?',
   'indexOfArrayValue.value': 'ANY',
   'setStatusEffect.assister': 'PLAYER | PLAYER[] | NULL'
 }

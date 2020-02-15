@@ -85,8 +85,14 @@ function parseCallExpression(context: ParseContext, expression: ts.CallExpressio
       if (callName === '') {
         throw new Error('无法识别调用');
       }
+      const args = parseArguments(context, expression.arguments);
+      const funcName = callName.replace(/([A-Z])/g, '_$1').toUpperCase();
+      // 特殊处理自定义字符串
+      if (funcName === 'CUSTOM_STRING' && args[0].kind === ExpressionKind.RAW) {
+        args[0].kind = ExpressionKind.STRING;
+      }
       // 内置函数调用
-      return createCall(callName.replace(/([A-Z])/g, '_$1').toUpperCase(), ...parseArguments(context, expression.arguments));
+      return createCall(funcName, ...args);
     }
   } else if (ts.isArrowFunction(finalExp)) {
     // 箭头函数调用
