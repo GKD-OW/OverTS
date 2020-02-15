@@ -1,6 +1,6 @@
-import enUS from './locales/en-US.json';
-import jaJP from './locales/ja-JP.json';
-import zhCN from './locales/zh-CN.json';
+import * as enUS from './locales/en-US.json';
+import * as jaJP from './locales/ja-JP.json';
+import * as zhCN from './locales/zh-CN.json';
 
 const locales: { [x: string]: { [x: string]: string }} = {
   'en-US': enUS,

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "./lib/index.ts",
   "author": "ShuangYa",
-  "license": "AGPL-2.0",
+  "license": "AGPL-3.0",
   "scripts": {
     "start": "ts-node ./demo/index.ts",
     "build": "rm -rf ./lib && tsc --build tsconfig.json",
