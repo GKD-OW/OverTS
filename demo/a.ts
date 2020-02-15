@@ -15,7 +15,7 @@ const test = () => {
 
 importModule('./b', {
   damage: 30
-})
+});
 
 export class ChuanHuo {
   test() {
@@ -27,6 +27,7 @@ export class ChuanHuo {
     d--;
     d *= 10;
     ++d;
+    d = (1+2)*((3-1)*6);
   }
 
   /**

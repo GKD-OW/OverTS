@@ -284,6 +284,10 @@ export function parseSimpleExpression(context: ParseContext, expression: ts.Expr
       return createCall('MODIFY_GLOBAL_VAR', createRaw(name), symbolExp, num);
     }
   }
+  // 括号
+  if (ts.isParenthesizedExpression(expression)) {
+    return parseArgument(context, expression.expression);
+  }
   if (expression.kind === ts.SyntaxKind.FalseKeyword) {
     // false
     return {
