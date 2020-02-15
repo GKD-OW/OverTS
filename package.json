@@ -1,14 +1,14 @@
 {
-  "name": "ts-to-owcode",
+  "name": "overts",
   "version": "1.0.0",
   "main": "index.js",
   "author": "ShuangYa",
-  "license": "AGPL",
+  "license": "AGPL-2.0",
   "scripts": {
     "start": "ts-node ./demo/index.ts",
+    "build": "rm -rf ./lib && tsc --build tsconfig.json",
     "debug": "node -r ts-node/register --inspect ./demo/index.ts",
-    "gen-type": "ts-node ./script/gen-types/index.ts",
-    "build": "rm -rf ./lib && tsc --build tsconfig.json"
+    "gen-type": "ts-node ./script/gen-types/index.ts"
   },
   "dependencies": {
     "globalthis": "^1.0.1",
