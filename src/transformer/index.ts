@@ -6,14 +6,20 @@ import { CallExpression, OWExpression } from '../owcode/ast/expression';
 import '../owcode/helper';
 import { parseStatement } from './parser';
 import { createCall, createConst, createRaw, getVariable, getVariableResult, parseCondition, parseEvent, uuid } from './utils';
-import { DefinedContants, ParseContext } from './var';
+import { DefinedContants, ParseContext, TransformerError } from './var';
+import { parseImportModule } from './importModule';
+import { mergeAst } from '../owcode/utils';
 
 export default class Transformer {
   private ast: Ast;
   private file: ts.SourceFile;
+  private fileStatements: ts.Statement[];
   private vars: getVariableResult;
+  public path: string;
+  private parsed = false;
 
-  constructor(content: string) {
+  constructor(content: string, path?: string) {
+    this.path = path || "";
     this.ast = {
       variable: {
         global: [],
@@ -23,29 +29,39 @@ export default class Transformer {
       rules: []
     };
     this.file = ts.createSourceFile('index.ts', content, ts.ScriptTarget.Latest, false);
+    this.fileStatements = [...this.file.statements];
     this.vars = {
       defines: {},
       variables: [],
       variableValues: {}
     };
+  }
 
-    this.parse();
+  // 将语句附加到当前语句后面
+  attach(statement: ts.Statement) {
+    this.fileStatements.push(statement);
   }
 
   getResult() {
+    if (!this.parsed) {
+      this.parse();
+    }
     return this.ast;
   }
 
   private parse() {
+    // 先进行模块导入
+    this.parseImport();
     // 第一遍遍历，提取所有变量声明
     this.parseVars();
     // 第二遍遍历
     this.parseClass();
+    this.parsed = true;
   }
 
   private parseVars() {
-    this.vars = getVariable(this.getParseContext(), this.file.statements);
-    this.ast.variable.global = this.vars.variables;
+    this.vars = getVariable(this.getParseContext(), this.fileStatements);
+    this.ast.variable.global = this.ast.variable.global.concat(this.vars.variables);
     // 如果有初始化，则自动增加一条初始化规则
     const globalInitializer = this.vars.variableValues;
     if (Object.keys(globalInitializer).length > 0) {
@@ -64,7 +80,7 @@ export default class Transformer {
     }
     // 看看有没有玩家变量
     let playerVarsArray: ts.NodeArray<ts.Statement> | undefined = undefined;
-    this.file.statements.forEach(it => {
+    this.fileStatements.forEach(it => {
       if (ts.isModuleDeclaration(it) &&
         ts.isIdentifier(it.name) &&
         it.name.text === 'PlayerVariable' &&
@@ -76,7 +92,7 @@ export default class Transformer {
     });
     if (playerVarsArray) {
       const playerVars = getVariable(this.getParseContext(), playerVarsArray);
-      this.ast.variable.player = playerVars.variables;
+      this.ast.variable.player = this.ast.variable.player.concat(playerVars.variables);
       // 如果有初始化，则自动增加一条初始化规则
       const playerInitializer = playerVars.variableValues;
       if (Object.keys(playerInitializer).length > 0) {
@@ -99,8 +115,33 @@ export default class Transformer {
     }
   }
 
+  private parseImport() {
+    this.fileStatements.forEach(statement => {
+      if (
+        ts.isExpressionStatement(statement) &&
+        ts.isCallExpression(statement.expression) &&
+        ts.isIdentifier(statement.expression.expression) &&
+        statement.expression.expression.text === 'importModule'
+      ) {
+        const args = statement.expression.arguments;
+        const moduleName = args[0];
+        const moduleArg = args[1];
+        // 必须明确指定名称，不支持const
+        if (!ts.isStringLiteral(moduleName)) {
+          throw new TransformerError('模块导入必须明确指定名称', args);
+        }
+        if (typeof(moduleArg) !== 'undefined' && !ts.isObjectLiteralExpression(moduleArg)) {
+          throw new TransformerError('模块参数必须是Object', moduleArg);
+        }
+        const moduleAst = parseImportModule(this.getParseContext(), moduleName.text, moduleArg);
+        // 合并
+        mergeAst(this.ast, moduleAst);
+      }
+    });
+  }
+
   private parseClass() {
-    this.file.statements.forEach(statement => {
+    this.fileStatements.forEach(statement => {
       // 遍历所有的类，将其中的函数作为规则
       if (ts.isClassDeclaration(statement)) {
         // 只访问带有export标志的类

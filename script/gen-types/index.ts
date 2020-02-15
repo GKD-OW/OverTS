@@ -210,7 +210,7 @@ readGlobalKeyword();
 
 function write() {
   // 生成 ts 文件
-  const gen = new Generator(fs.readFileSync(resolve(__dirname, 'global.template.ts'), { encoding: 'UTF8' }));
+  const gen = new Generator(fs.readFileSync(resolve(__dirname, 'global.template.ts'), { encoding: 'UTF8' }), lang);
   gen.set(result);
   fs.writeFileSync(helperFile, gen.getText(), {
     encoding: 'UTF8'

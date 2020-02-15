@@ -1,6 +1,5 @@
 import * as ts from "typescript";
 import Transformer from ".";
-import { OWExpression } from "../owcode/ast/expression";
 
 export type DefinedContants = { [x: string]: ts.Node };
 

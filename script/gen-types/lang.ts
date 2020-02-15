@@ -8,7 +8,7 @@ import { langs, langType } from './var';
 const locales: { [x: string]: { [x: string]: string } } = require('./locales.json');
 
 export default class Lang {
-  private result: { [x: string]: { [x: string]: string } }
+  public result: { [x: string]: { [x: string]: string } }
   constructor() {
     this.result = {};
     langs.forEach(it => this.result[it] = {});

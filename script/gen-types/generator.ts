@@ -1,6 +1,7 @@
 import * as ts from 'typescript';
-import { enumAlias, enumType, funcAlias, typeAlias, paramTypeAlias, constAlias } from './alias';
-import { createConst, createDeclare, createEnum, createFunction, createModule, createSetGlobal, insertToModule } from './utils';
+import { constAlias, enumAlias, enumType, funcAlias, paramTypeAlias, typeAlias } from './alias';
+import Lang from './lang';
+import { createConst, createDeclare, createEnum, createFunction, createModule, createSetGlobal, insertToModule, formatTo } from './utils';
 import { AvaliableType, ParseResult } from './var';
 
 const returnType: { [x: string]: string } = require('./returnType.json');
@@ -39,8 +40,10 @@ export default class Generator {
   private enumMeta: EnumMeta;
   private static enumAliasNames = Object.keys(enumAlias);
   private static enumAliasNamesUpper = Generator.enumAliasNames.map(it => it.toUpperCase());
+  private lang: Lang;
 
-  constructor(fromText: string) {
+  constructor(fromText: string, lang: Lang) {
+    this.lang = lang;
     this.text = fromText;
     this.result = {
       setGlobal: {},
@@ -177,6 +180,8 @@ export default class Generator {
       } else {
         itReturn = this.detectType(returnType[name]);
       }
+      const key = 'FUNC_' + formatTo(name, 'TO_FORMAT');
+      const commentName = typeof(this.lang.result['zh-CN'][key]) !== 'undefined' ? this.lang.result['zh-CN'][key] : name;
       return createFunction(name, it.args.map(arg => {
         const key = `${name}.${arg.name}`;
         let type = arg.type;
@@ -200,14 +205,13 @@ export default class Generator {
           desc: arg.desc,
           type: this.detectType(type)
         }
-      }), itReturn, it.desc);
+      }), itReturn, commentName, it.desc);
     });
 
     // 生成返回定义
     // const returns: any = {};
     // unknownReturn.forEach(it => returns[it] = "");
     // fs.writeFileSync(resolve(__dirname, 'returnType_2.json'), JSON.stringify(returns, null, '  '), { encoding: 'UTF8' });
-
   }
 
   getText() {
