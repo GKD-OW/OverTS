@@ -1,8 +1,7 @@
 require('ts-node/register');
 const { readFileSync, writeFileSync } = require('fs');
 const { resolve } = require('path');
-const Transformer = require('../lib').default;
-const Generator = require('../lib/owcode/generator').default;
+const { Transformer, Generator } = require('../lib');
 
 const transformer = new Transformer(
   readFileSync(resolve(__dirname, 'a.ts'), { encoding: 'UTF8' }),

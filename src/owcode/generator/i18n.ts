@@ -7,7 +7,14 @@ const locales: { [x: string]: { [x: string]: string }} = {
   'ja-JP': jaJP,
   'zh-CN': zhCN,
 };
-const activeLocale = 'zh-CN';
+let activeLocale = 'zh-CN';
+
+export function setLocale(k: string) {
+  if (typeof(locales[k]) === 'undefined') {
+    throw new Error('Can not found locale ' + k);
+  }
+  activeLocale = k;
+}
 
 export default function i18n(k: string): string {
   return locales[activeLocale][k];

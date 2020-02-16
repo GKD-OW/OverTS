@@ -1,7 +1,6 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
-import Transformer from '../src';
-import Generator from '../src/owcode/generator';
+import { Transformer, Generator } from '../src';
 
 const transformer = new Transformer(
   readFileSync(resolve(__dirname, 'a.ts'), { encoding: 'UTF8' }),

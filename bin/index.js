@@ -18,6 +18,7 @@ function mkdir(dir) {
 }
 
 const defaultConfig = {
+  locale: 'zh-CN',
   entry: './src/index.ts',
   output: './dist.ow'
 }
@@ -45,13 +46,15 @@ function build() {
     fs.unlinkSync(outputFile);
   }
   if (!fs.existsSync(dirname(outputFile))) {
-    mkdir(path.dirname(outputFile));
+    mkdir(dirname(outputFile));
   }
   
   // 开始编译
-  const Transformer = require('overts/lib').default;
-  const Generator = require('overts/lib/owcode/generator').default;
-  
+  const { Transformer, Generator, setLocale } = require('../lib');
+  if (config.locale !== 'zh-CN') {
+    setLocale(config.locale);
+  }
+
   const transformer = new Transformer(
     fs.readFileSync(entryFile, { encoding: 'UTF8' }),
     dirname(entryFile)
