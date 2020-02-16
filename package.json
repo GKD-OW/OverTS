@@ -4,6 +4,9 @@
   "main": "./lib/index.ts",
   "author": "ShuangYa",
   "license": "AGPL-3.0",
+  "bin": {
+    "overts": "bin/index.js"
+  },
   "scripts": {
     "start": "ts-node ./demo/index.ts",
     "build": "rm -rf ./lib && tsc --build tsconfig.json",
