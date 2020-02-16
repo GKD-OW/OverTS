@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+require('ts-node/register');
 const fs = require('fs');
 const { resolve, dirname } = require('path');
 const root = process.cwd();

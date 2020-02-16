@@ -1,3 +1,4 @@
+require('ts-node/register');
 const { readFileSync, writeFileSync } = require('fs');
 const { resolve } = require('path');
 const Transformer = require('../lib').default;
