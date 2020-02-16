@@ -19,7 +19,8 @@ install:
 
 script:
   - yarn run build
-  - yarn run start
+  - yarn run try-demo
+  - yarn run try-demo-js
   # - yarn run coverage
 
 deploy:

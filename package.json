@@ -8,8 +8,9 @@
     "overts": "bin/index.js"
   },
   "scripts": {
-    "start": "ts-node ./demo/index.ts",
     "build": "rm -rf ./lib && tsc --build tsconfig.json",
+    "try-demo": "ts-node ./demo/index.ts",
+    "try-demo-js": "node ./demo/index.js",
     "debug": "node -r ts-node/register --inspect ./demo/index.ts",
     "gen-type": "ts-node ./script/gen-types/index.ts"
   },
