@@ -7,6 +7,7 @@ import { ExpressionKind } from "../owcode/ast/expression";
 import { forEachCall, forEachRule } from "../owcode/utils";
 import { uuid } from "./utils";
 import { DefinedContants, ParseContext, TransformerError } from "./var";
+import * as md5 from 'js-md5';
 
 const moduleMap: { [x: string]: string } = {};
 
@@ -42,7 +43,7 @@ export function parseImportModule(context: ParseContext, name: string, option?: 
   if (typeof(moduleMap[path]) !== 'undefined') {
     throw new TransformerError(`检查到重复导入 ${path} 来源：${context.transformer.path}`, null);
   }
-  const moduleId = uuid();
+  const moduleId = md5(path);
   moduleMap[path] = moduleId;
   // 读取模块内容
   const content = readFileSync(path, {

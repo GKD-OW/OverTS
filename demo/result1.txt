@@ -1,13 +1,13 @@
 变量
 {
 	全局:
-		0: df580f238088490cafd734afccacc832_b
+		0: ebbdff7f2a14d0a0afc3f703f3b281fa_b
 		1: b
 		2: c
 		3: d
 
 	玩家:
-		0: df580f238088490cafd734afccacc832_damage_id
+		0: ebbdff7f2a14d0a0afc3f703f3b281fa_damage_id
 		1: damage_id
 
 }
@@ -38,7 +38,7 @@
 	}
 }
 
-规则("df580f238088490cafd734afccacc832_init")
+规则("ebbdff7f2a14d0a0afc3f703f3b281fa_init")
 {
 	事件
 	{
@@ -46,11 +46,11 @@
 	}
 	动作
 	{
-		设置全局变量(df580f238088490cafd734afccacc832_b, 真);
+		设置全局变量(ebbdff7f2a14d0a0afc3f703f3b281fa_b, 真);
 	}
 }
 
-规则("df580f238088490cafd734afccacc832_chuanhuo")
+规则("ebbdff7f2a14d0a0afc3f703f3b281fa_chuanhuo")
 {
 	事件
 	{
@@ -67,8 +67,8 @@
 	{
 		设置状态(事件玩家, 无, 点燃, 9999.000);
 		开始持续伤害(事件玩家, 无, 9999.000, 30.000);
-		设置玩家变量(事件玩家, df580f238088490cafd734afccacc832_damage_id, 上一个持续伤害效果ID);
-		停止持续伤害(玩家变量(攻击方, df580f238088490cafd734afccacc832_damage_id));
+		设置玩家变量(事件玩家, ebbdff7f2a14d0a0afc3f703f3b281fa_damage_id, 上一个持续伤害效果ID);
+		停止持续伤害(玩家变量(攻击方, ebbdff7f2a14d0a0afc3f703f3b281fa_damage_id));
 		清除状态(攻击方, 点燃);
 	}
 }

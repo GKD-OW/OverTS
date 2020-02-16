@@ -9,5 +9,5 @@ const transformer = new Transformer(
 );
 const gen = new Generator(transformer.getResult());
 const result = gen.gen();
-writeFileSync(resolve(__dirname, 'result.txt'), result, { encoding: 'UTF8' });
+writeFileSync(resolve(__dirname, 'result1.txt'), result, { encoding: 'UTF8' });
 // console.log(result);

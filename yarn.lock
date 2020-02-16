@@ -42,6 +42,11 @@
   resolved "https://registry.npm.taobao.org/@types/globalthis/download/@types/globalthis-1.0.0.tgz#bf6fa9dc5bbe26a5221c7e20503597e027f7bf18"
   integrity sha1-v2+p3Fu+JqUiHH4gUDWX4Cf3vxg=
 
+"@types/js-md5@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.npm.taobao.org/@types/js-md5/download/@types/js-md5-0.4.2.tgz#95b39911e2081bf2915436e61cc345e12459e5bb"
+  integrity sha1-lbOZEeIIG/KRVDbmHMNF4SRZ5bs=
+
 "@types/node@^13.7.0":
   version "13.7.0"
   resolved "https://registry.npm.taobao.org/@types/node/download/@types/node-13.7.0.tgz#b417deda18cf8400f278733499ad5547ed1abec4"
@@ -1012,6 +1017,11 @@ jest-docblock@^21.0.0:
   version "21.2.0"
   resolved "https://registry.npm.taobao.org/jest-docblock/download/jest-docblock-21.2.0.tgz?cache=0&sync_timestamp=1579655451679&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fjest-docblock%2Fdownload%2Fjest-docblock-21.2.0.tgz#51529c3b30d5fd159da60c27ceedc195faf8d414"
   integrity sha1-UVKcOzDV/RWdpgwnzu3Blfr41BQ=
+
+js-md5@^0.7.3:
+  version "0.7.3"
+  resolved "https://registry.npm.taobao.org/js-md5/download/js-md5-0.7.3.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fjs-md5%2Fdownload%2Fjs-md5-0.7.3.tgz#b4f2fbb0b327455f598d6727e38ec272cd09c3f2"
+  integrity sha1-tPL7sLMnRV9ZjWcn447Ccs0Jw/I=
 
 js-tokens@^4.0.0:
   version "4.0.0"
