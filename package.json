@@ -7,6 +7,9 @@
   "bin": {
     "overts": "bin/index.js"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "rm -rf ./lib && tsc --build tsconfig.json",
     "try-demo": "ts-node ./demo/index.ts",
