@@ -1,14 +1,14 @@
 import * as ts from 'typescript';
-import { Ast, Rule, ActionExpression } from '../owcode/ast';
-import { Condition } from '../owcode/ast/conditions';
-import { OWEvent, PlayerEvent, SubEvent } from '../owcode/ast/event';
-import { CallExpression, OWExpression } from '../owcode/ast/expression';
+import { ActionExpression, Ast, Rule } from '../owcode/ast';
 import '../owcode/helper';
+import { Condition } from '../owcode/share/ast/conditions';
+import { OWEvent, PlayerEvent, SubEvent } from '../owcode/share/ast/event';
+import { CallExpression } from '../owcode/share/ast/expression';
+import { mergeAst } from '../owcode/utils';
+import { parseImportModule } from './importModule';
 import { parseStatement } from './parser';
 import { createCall, createConst, createRaw, getVariable, getVariableResult, parseCondition, parseEvent, uuid } from './utils';
 import { DefinedContants, ParseContext, TransformerError } from './var';
-import { parseImportModule } from './importModule';
-import { mergeAst } from '../owcode/utils';
 
 export default class Transformer {
   private ast: Ast;

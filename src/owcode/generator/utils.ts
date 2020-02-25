@@ -1,6 +1,6 @@
-import { isPlayerEvent, isSubEvent, OWEvent } from "../ast/event";
 import '../helper';
-import i18n from "./i18n";
+import { isPlayerEvent, isSubEvent, OWEvent } from "../share/ast/event";
+import i18n from "../share/i18n";
 
 export function getEventText(event: OWEvent): string[] {
   if (isPlayerEvent(event)) {

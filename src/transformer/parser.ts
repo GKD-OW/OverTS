@@ -21,8 +21,8 @@
  */
 import * as ts from 'typescript';
 import { ActionExpression } from '../owcode/ast';
-import { ExpressionKind, IfExpression, OWExpression, WhileExpression } from '../owcode/ast/expression';
 import '../owcode/helper';
+import { ExpressionKind, IfExpression, OWExpression, WhileExpression } from '../owcode/share/ast/expression';
 import { getFinalAccess, isCanToString, PropertyAccess, TextAccess } from './accessUtils';
 import { simpleCalc, tryTinyCalc } from './calcParser';
 import Constants from './constants';

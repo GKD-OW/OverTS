@@ -1,8 +1,8 @@
 import * as ts from "typescript";
 import { v4 as uuidv4 } from 'uuid';
-import { Condition } from "../owcode/ast/conditions";
-import { GlobalEvents, OWEvent, PlayerEvent, SubEvent, SubEvents } from "../owcode/ast/event";
-import { CallExpression, CompareExpression, ExpressionKind, OWExpression } from "../owcode/ast/expression";
+import { Condition } from "../owcode/share/ast/conditions";
+import { GlobalEvents, OWEvent, PlayerEvent, SubEvent, SubEvents } from "../owcode/share/ast/event";
+import { CallExpression, CompareExpression, ExpressionKind, OWExpression } from "../owcode/share/ast/expression";
 import { getFinalAccess, isCanToString, PropertyAccess, TextAccess } from "./accessUtils";
 import { parseArgument } from "./parser";
 import { DefinedContants, ParseContext, TransformerError } from "./var";

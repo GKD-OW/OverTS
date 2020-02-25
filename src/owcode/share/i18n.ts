@@ -16,6 +16,10 @@ export function setLocale(k: string) {
   activeLocale = k;
 }
 
+export function getAllLocale() {
+  return locales[activeLocale];
+}
+
 export default function i18n(k: string): string {
   return locales[activeLocale][k];
 }

@@ -1,5 +1,5 @@
 import { Ast, Rule } from "../ast";
-import { CallExpression, isCallExpression } from "../ast/expression";
+import { CallExpression, isCallExpression } from "../share/ast/expression";
 
 type RuleType = 'SUB' | 'RULE';
 

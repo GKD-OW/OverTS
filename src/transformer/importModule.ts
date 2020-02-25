@@ -1,13 +1,12 @@
 import { readFileSync } from "fs";
+import * as md5 from 'js-md5';
 import { dirname } from 'path';
 import * as ts from "typescript";
 import Transformer from ".";
 import { Rule } from "../owcode/ast";
-import { ExpressionKind } from "../owcode/ast/expression";
+import { ExpressionKind } from "../owcode/share/ast/expression";
 import { forEachCall, forEachRule } from "../owcode/utils";
-import { uuid } from "./utils";
 import { DefinedContants, ParseContext, TransformerError } from "./var";
-import * as md5 from 'js-md5';
 
 const moduleMap: { [x: string]: string } = {};
 

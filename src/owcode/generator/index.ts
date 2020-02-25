@@ -1,11 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Ast, Rule } from "../ast";
-import { getEventText } from "./utils";
-import i18n from "./i18n";
-import Result from "./result";
-import { OWExpression, ExpressionKind, CompareExpression, isCallExpression, isIfExpression, CallExpression, isWhileExpression } from '../ast/expression';
-import { Condition } from '../ast/conditions';
+import { Condition } from '../share/ast/conditions';
+import { CallExpression, CompareExpression, ExpressionKind, isCallExpression, isIfExpression, isWhileExpression, OWExpression } from '../share/ast/expression';
+import i18n from "../share/i18n";
 import { compareSymbolToString } from './compareSymbolToString';
+import Result from "./result";
+import { getEventText } from "./utils";
 
 const END_FLAG = ';';
 

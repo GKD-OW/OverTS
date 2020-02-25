@@ -1,6 +1,6 @@
-import { Condition } from "./ast/conditions";
-import { OWEvent } from "./ast/event";
-import { CallExpression, IfExpression, WhileExpression } from "./ast/expression";
+import { Condition } from "./share/ast/conditions";
+import { OWEvent } from "./share/ast/event";
+import { CallExpression, IfExpression, WhileExpression } from "./share/ast/expression";
 
 export type ActionExpression = CallExpression | IfExpression | WhileExpression;
 

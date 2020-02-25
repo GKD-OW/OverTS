@@ -13,6 +13,8 @@ script/
 ~*
 
 # tests and coverages
+tslint.json
+.travis.yml
 .nyc_output/
 coverage/
 coverage/*
