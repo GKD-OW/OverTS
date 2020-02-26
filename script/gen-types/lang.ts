@@ -6,6 +6,13 @@ import { formatTo, ksort } from "./utils";
 import { langs, langType } from './var';
 
 const locales: { [x: string]: { [x: string]: string } } = require('./locales.json');
+// 对locales排序
+(() => {
+  const sorted = ksort(locales);
+  writeFileSync(resolve(__dirname, 'locales.json'), JSON.stringify(sorted, null, 2), {
+    encoding: 'UTF-8'
+  });
+})();
 
 export default class Lang {
   public result: { [x: string]: { [x: string]: string } }

@@ -10,7 +10,7 @@ const rootDir = resolve(__dirname, '../..');
 const sourceDir = resolve(__dirname, 'data');
 const resultDir = resolve(__dirname, 'result');
 const helperFile = resolve(rootDir, 'src/owcode/helper/index.ts');
-const localesDir = resolve(rootDir, 'src/owcode/generator/locales');
+const localesDir = resolve(rootDir, 'src/owcode/share/locales');
 const result: ParseResult = {
   functions: [],
   strings: [],

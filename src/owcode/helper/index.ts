@@ -1998,7 +1998,7 @@ declare global {
      */
     function startForcingButton(player: Player | Player[], button: Button): void;
     /**
-     * FUNC_START_RULE
+     * 开始规则
      * Begins simultaneous execution of a subroutine rule (which is a rule with a Subroutine event type). Execution of the original rule continues uninterrupted. The subroutine will have access to the same contextual values (such as Event Player) as the original rule.
      * @param subroutine Specifies which subroutine to start. If a rule with a subroutine event type specifies the same subroutine, then it will execute. Otherwise, this action is ignored.
      * @param ifAlreadyExecuting Determines what should happen if the rule specified by the subroutine is already executing on the same player or global entity.
