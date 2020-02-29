@@ -7,8 +7,11 @@ export enum ExpressionKind {
   STRING,
   RAW,
   IF,
+  ELSEIF,
   WHILE
 }
+
+export type RecursiveExpression = IfExpression | ElseIfExpression | WhileExpression;
 
 export interface OWExpression {
   kind: ExpressionKind;
@@ -17,7 +20,7 @@ export interface OWExpression {
 
 export interface CallExpression extends OWExpression {
   kind: ExpressionKind.CALL,
-  arguments?: OWExpression[];
+  arguments: OWExpression[];
 }
 export function isCallExpression(obj: any): obj is CallExpression {
   return obj && obj.kind === ExpressionKind.CALL;
@@ -31,11 +34,20 @@ export function isCompareExpression(obj: any): obj is CompareExpression {
   return obj && obj.kind === ExpressionKind.COMPARE_SYMBOL;
 }
 
+export interface ElseIfExpression extends OWExpression {
+  kind: ExpressionKind.ELSEIF;
+  condition: OWExpression;
+  then: OWExpression[];
+}
+export function isElseIfExpression(obj: any): obj is ElseIfExpression {
+  return obj && obj.kind === ExpressionKind.ELSEIF;
+}
+
 export interface IfExpression extends OWExpression {
   kind: ExpressionKind.IF;
   condition: OWExpression;
   then: OWExpression[];
-  elseIf: IfExpression | undefined;
+  elseIf: ElseIfExpression[];
   elseThen: OWExpression[];
 }
 export function isIfExpression(obj: any): obj is IfExpression {

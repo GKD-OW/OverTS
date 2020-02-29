@@ -9,12 +9,3 @@ export interface ParseContext {
   vars: string[];
   belongTo?: ts.ClassDeclaration;
 }
-
-export class TransformerError {
-  private obj: any;
-  private error: Error;
-  constructor(message: string, obj: any) {
-    this.obj = obj;
-    this.error = new Error(message);
-  }
-}

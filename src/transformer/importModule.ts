@@ -6,7 +6,8 @@ import Transformer from ".";
 import { Rule } from "../owcode/ast";
 import { ExpressionKind } from "../owcode/share/ast/expression";
 import { forEachCall, forEachRule } from "../owcode/utils";
-import { DefinedContants, ParseContext, TransformerError } from "./var";
+import { OverTSError } from "../share/error";
+import { DefinedContants, ParseContext } from "./var";
 
 const moduleMap: { [x: string]: string } = {};
 
@@ -27,7 +28,7 @@ function createConstDefine(name: string, value: ts.Expression) {
 
 export function parseImportModule(context: ParseContext, name: string, option?: ts.ObjectLiteralExpression) {
   if (context.transformer.path === '') {
-    throw new TransformerError('文件路径为空时，不支持模块导入', context.transformer.path);
+    throw new OverTSError('文件路径为空时，不支持模块导入', context.transformer.path);
   }
   let path = '';
   try {
@@ -37,10 +38,10 @@ export function parseImportModule(context: ParseContext, name: string, option?: 
       ]
     });
   } catch (e) {
-    throw new TransformerError(`解析模块 ${name} 失败`, e);
+    throw new OverTSError(`解析模块 ${name} 失败`, e);
   }
   if (typeof(moduleMap[path]) !== 'undefined') {
-    throw new TransformerError(`检查到重复导入 ${path} 来源：${context.transformer.path}`, null);
+    throw new OverTSError(`检查到重复导入 ${path} 来源：${context.transformer.path}`, null);
   }
   const moduleId = md5(path);
   moduleMap[path] = moduleId;
@@ -53,10 +54,10 @@ export function parseImportModule(context: ParseContext, name: string, option?: 
   if (option) {
     option.properties.forEach(it => {
       if (!ts.isPropertyAssignment(it)) {
-        throw new TransformerError('模块导入选项无效', it);
+        throw new OverTSError('模块导入选项无效', it);
       }
       if (!it.name || !ts.isIdentifier(it.name)) {
-        throw new TransformerError('模块导入选项名称无效', it);
+        throw new OverTSError('模块导入选项名称无效', it);
       }
       const name = it.name.text;
       constants[name] = it.initializer;

@@ -3,7 +3,7 @@ import { Ast, Rule } from "../ast";
 import { Condition } from '../share/ast/conditions';
 import { CallExpression, CompareExpression, ExpressionKind, isCallExpression, isIfExpression, isWhileExpression, OWExpression } from '../share/ast/expression';
 import i18n from "../share/i18n";
-import { compareSymbolToString } from './compareSymbolToString';
+import { CompareSymbolStrings } from './compareSymbolStrings';
 import Result from "./result";
 import { getEventText } from "./utils";
 
@@ -121,7 +121,7 @@ export default class Generator {
   private addCondition(cond: Condition) {
     const result = [
       this.getSimpleExpression(cond.left),
-      compareSymbolToString(cond.symbol),
+      CompareSymbolStrings[cond.symbol],
       this.getSimpleExpression(cond.right)
     ].join(' ');
     this.result.push(result + END_FLAG);
@@ -134,7 +134,7 @@ export default class Generator {
       case ExpressionKind.CONSTANT:
         return i18n(`CONST_${exp.text}`);
       case ExpressionKind.COMPARE_SYMBOL:
-        return compareSymbolToString((exp as CompareExpression).compare);
+        return CompareSymbolStrings[(exp as CompareExpression).compare];
       case ExpressionKind.NUMBER:
         let str = exp.text;
         if (!str.includes('.')) {
@@ -159,7 +159,7 @@ export default class Generator {
     if (isCallExpression(exp)) {
       const name = i18n(`FUNC_${exp.text}`);
       // TODO: 如果是访问变量，那么做一个对应关系
-      const args: string = exp.arguments ? exp.arguments.map(it => this.getSimpleExpression(it)).join(', ') : '';
+      const args: string = exp.arguments.map(it => this.getSimpleExpression(it)).join(', ');
       return `${name}(${args})`;
     }
   }
@@ -178,6 +178,16 @@ export default class Generator {
       };
       this.result.push(this.getSimpleExpression(callIf) + END_FLAG, 1);
       exp.then.forEach(it => this.addExpression(it));
+      // else if
+      exp.elseIf.forEach(it => {
+        const callElseIf: CallExpression = {
+          kind: ExpressionKind.CALL,
+          text: 'ELSEIF',
+          arguments: [exp.condition]
+        };
+        this.result.push(this.getSimpleExpression(callElseIf) + END_FLAG, 1, -1);
+        it.then.forEach(iit => this.addExpression(iit));
+      });
       if (exp.elseThen.length > 0) {
         const callElse: OWExpression = {
           kind: ExpressionKind.CONSTANT,

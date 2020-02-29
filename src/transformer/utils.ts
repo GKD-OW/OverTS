@@ -3,9 +3,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { Condition } from "../owcode/share/ast/conditions";
 import { GlobalEvents, OWEvent, PlayerEvent, SubEvent, SubEvents } from "../owcode/share/ast/event";
 import { CallExpression, CompareExpression, ExpressionKind, OWExpression } from "../owcode/share/ast/expression";
+import { OverTSError } from "../share/error";
 import { getFinalAccess, isCanToString, PropertyAccess, TextAccess } from "./accessUtils";
 import { parseArgument } from "./parser";
-import { DefinedContants, ParseContext, TransformerError } from "./var";
+import { DefinedContants, ParseContext } from "./var";
 
 export function uuid() {
   return uuidv4().replace(/\-/g, '');
@@ -322,11 +323,11 @@ export function getArrayAccess(context: ParseContext, exp: ts.ElementAccessExpre
   const left = getFinalAccess(exp.expression, context.defines);
   const index = getFinalAccess(exp.argumentExpression, context.defines);
   if (!(left instanceof TextAccess)) {
-    throw new TransformerError('仅支持一维数组', exp);
+    throw new OverTSError('仅支持一维数组', exp);
   }
   const name = left.toString();
   if (!context.vars.includes(name)) {
-    throw new TransformerError(`找不到全局变量 ${name}`, exp);
+    throw new OverTSError(`找不到全局变量 ${name}`, exp);
   }
   let indexExp: OWExpression | undefined = undefined;
   // 全局变量里面读取
@@ -338,7 +339,7 @@ export function getArrayAccess(context: ParseContext, exp: ts.ElementAccessExpre
     indexExp = parseArgument(context, index);
   }
   if (!indexExp) {
-    throw new TransformerError('无法识别数组访问', exp);
+    throw new OverTSError('无法识别数组访问', exp);
   }
   return {
     name: createRaw(name),

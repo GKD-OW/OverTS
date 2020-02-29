@@ -5,10 +5,11 @@ import { Condition } from '../owcode/share/ast/conditions';
 import { OWEvent, PlayerEvent, SubEvent } from '../owcode/share/ast/event';
 import { CallExpression } from '../owcode/share/ast/expression';
 import { mergeAst } from '../owcode/utils';
+import { OverTSError } from '../share/error';
 import { parseImportModule } from './importModule';
 import { parseStatement } from './parser';
 import { createCall, createConst, createRaw, getVariable, getVariableResult, parseCondition, parseEvent, uuid } from './utils';
-import { DefinedContants, ParseContext, TransformerError } from './var';
+import { DefinedContants, ParseContext } from './var';
 
 export default class Transformer {
   private ast: Ast;
@@ -128,10 +129,10 @@ export default class Transformer {
         const moduleArg = args[1];
         // 必须明确指定名称，不支持const
         if (!ts.isStringLiteral(moduleName)) {
-          throw new TransformerError('模块导入必须明确指定名称', args);
+          throw new OverTSError('模块导入必须明确指定名称', args);
         }
         if (typeof(moduleArg) !== 'undefined' && !ts.isObjectLiteralExpression(moduleArg)) {
-          throw new TransformerError('模块参数必须是Object', moduleArg);
+          throw new OverTSError('模块参数必须是Object', moduleArg);
         }
         const moduleAst = parseImportModule(this.getParseContext(), moduleName.text, moduleArg);
         // 合并

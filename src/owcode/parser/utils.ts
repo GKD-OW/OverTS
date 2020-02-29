@@ -1,33 +1,7 @@
-import { TransformerError } from "../../transformer/var";
+import '../helper';
 import { getAllLocale } from "../share/i18n";
-
-export function getBrace(text: string): string {
-  const left = text.indexOf('{');
-  if (left === -1) {
-    return "";
-  }
-  const right = text.indexOf('}', left);
-  if (right === -1) {
-    return "";
-  }
-  return text.substring(left + 1, right).trim();
-}
-
-export function getBraceArea(text: string, identfier: string | RegExp): string {
-  if (typeof(identfier) === 'string') {
-    const startAt = text.indexOf(identfier);
-    if (startAt === -1) {
-      return '';
-    }
-    return getBrace(text.substr(startAt + identfier.length - 1));
-  } else {
-    const match = identfier.exec(text);
-    if (!match) {
-      return '';
-    }
-    return getBraceArea(text, match[0]);
-  }
-}
+import { OWExpression, ExpressionKind } from "../share/ast/expression";
+import { OverTSError } from '../../share/error';
 
 export interface BranceArea {
   name: string;
@@ -72,7 +46,7 @@ export function parseBrances(text: string) {
     } else if (line === '}') {
       // 结束，返回上一级
       if (!cur.parent) {
-        throw new TransformerError("No match brances", cur);
+        throw new OverTSError("No match brances", cur);
       }
       cur = cur.parent;
     } else {
@@ -122,4 +96,25 @@ export function trimSemi(text: string) {
     return text.substr(0, text.length - 1);
   }
   return text;
+}
+
+export function createCompare(symbol: string): OWExpression {
+  return {
+    kind: ExpressionKind.COMPARE_SYMBOL,
+    text: symbol
+  }
+}
+
+/**
+ * 复制数组
+ * @param arr 数组
+ * @param startAt 开始索引
+ * @param endAt 结束索引（不包括这一个）
+ */
+export function copyArray(arr: any[], startAt: number, endAt: number) {
+  const result: any[] = [];
+  for (let i = startAt; i < endAt; i++) {
+    result.push(arr[i]);
+  }
+  return result;
 }

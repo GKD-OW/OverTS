@@ -1,7 +1,8 @@
-import { Ast, Rule } from "../ast";
+import { ActionExpression, Ast, Rule } from "../ast";
 import '../helper';
-import { OWEvent, SubEvents, SubEvent, PlayerEvent } from "../share/ast/event";
+import { OWEvent, PlayerEvent, SubEvent } from "../share/ast/event";
 import i18n, { setLocale } from "../share/i18n";
+import { parseBranceContent, parseCondition } from "./parser";
 import { BranceArea, detectKey, findArea, parseBrances, trimSemi } from "./utils";
 
 /**
@@ -66,12 +67,42 @@ export default class Parser {
   }
 
   private parseRule(area: BranceArea) {
-    const event = findArea(i18n('G_EVENT'), area.content);
+    // 提取规则名称
+    const ruleName = area.name.substring(area.name.indexOf('"') + 1, area.name.lastIndexOf('"'));
+    const event = this.parseRuleEvent(area);
+    if (typeof(event) === 'undefined') {
+      return;
+    }
+    const rule: Rule = {
+      name: ruleName,
+      event,
+      conditions: [],
+      actions: []
+    };
+    const cond = findArea(i18n('G_CONDITIONS'), area.content);
+    if (cond) {
+      rule.conditions = parseCondition(cond.content);
+    }
+    const actions = findArea(i18n('G_ACTIONS'), area.content);
+    if (actions) {
+      rule.actions = this.parseRuleAction(actions);
+    }
+    const isSub = rule.event.kind === Events.SUBROUTINE;
+    if (isSub) {
+      this.result.sub[rule.name] = rule;
+    } else {
+      this.result.rules.push(rule);
+    }
+    console.dir(rule, {
+      depth: 8
+    });
+  }
+
+  private parseRuleEvent(rule: BranceArea): OWEvent | undefined {
+    const event = findArea(i18n('G_EVENT'), rule.content);
     if (!event) {
       return;
     }
-    // 提取规则名称
-    const ruleName = area.name.substring(area.name.indexOf('"') + 1, area.name.lastIndexOf('"'));
     // 判断是子程序还是普通规则
     if (typeof(event.content[0]) !== 'string') {
       return;
@@ -82,14 +113,6 @@ export default class Parser {
       console.error(eventType, event.content);
       return;
     }
-    const rule: Rule = {
-      name: ruleName,
-      event: {
-        kind: Events.GLOBAL
-      },
-      conditions: [],
-      actions: []
-    };
     if (isSub) {
       // 子程序，提取子程序名称
       if (typeof(event.content[1]) !== 'string') {
@@ -101,7 +124,7 @@ export default class Parser {
         sub: subName
       };
       rule.name = subName;
-      rule.event = ev;
+      return ev;
     } else if (eventType !== 'EVENT_GLOBAL') {
       if (typeof(event.content[1]) !== 'string' || typeof(event.content[2]) !== 'string') {
         return;
@@ -121,20 +144,16 @@ export default class Parser {
       if (hero.length > 0) {
         ev.hero = hero[0];
       }
-      rule.event = ev;
-    }
-    const cond = findArea(i18n('G_CONDITIONS'), area.content);
-    const actions = findArea(i18n('G_ACTIONS'), area.content);
-    this.parseRuleDetail(cond, actions);
-    if (isSub) {
-      this.result.sub[rule.name] = rule;
+      return ev;
     } else {
-      this.result.rules.push(rule);
+      return {
+        kind: Events.GLOBAL
+      };
     }
-    console.log("rule", rule);
   }
 
-  private parseRuleDetail(cond?: BranceArea, actions?: BranceArea) {
-    //
+  // 解析规则主体
+  private parseRuleAction(actions: BranceArea) {
+    return parseBranceContent(actions.content) as ActionExpression[];
   }
 }

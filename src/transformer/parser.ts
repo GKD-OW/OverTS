@@ -22,12 +22,13 @@
 import * as ts from 'typescript';
 import { ActionExpression } from '../owcode/ast';
 import '../owcode/helper';
-import { ExpressionKind, IfExpression, OWExpression, WhileExpression } from '../owcode/share/ast/expression';
+import { ElseIfExpression, ExpressionKind, IfExpression, OWExpression, WhileExpression } from '../owcode/share/ast/expression';
+import { OverTSError } from '../share/error';
 import { getFinalAccess, isCanToString, PropertyAccess, TextAccess } from './accessUtils';
 import { simpleCalc, tryTinyCalc } from './calcParser';
 import Constants from './constants';
 import { conditionToBool, createCall, createCompareExpression, createConst, createRaw, createSubCall, getArrayAccess, getClassName, getMethod, parseCondition, tsMatchToCompare } from './utils';
-import { ParseContext, TransformerError } from './var';
+import { ParseContext } from './var';
 
 // 运算后赋值的运算符
 const calcAndSet: { [x: number]: ts.SyntaxKind } = {
@@ -228,7 +229,7 @@ export function parseSimpleExpression(context: ParseContext, expression: ts.Expr
       } else {
         const left = getFinalAccess(expression.left);
         if (!(left instanceof TextAccess)) {
-          throw new TransformerError('仅支持简单赋值', expression.left);
+          throw new OverTSError('仅支持简单赋值', expression.left);
         }
         return createCall(
           'SET_GLOBAL_VAR',
@@ -338,10 +339,10 @@ export function parseArgument(context: ParseContext, arg: ts.Expression) {
   if (ts.isCallExpression(arg)) {
     const result = parseCallExpression(context, arg);
     if (typeof(result) === 'undefined') {
-      throw new TransformerError('参数不能为 undefined', arg);
+      throw new OverTSError('参数不能为 undefined', arg);
     }
     if (Array.isArray(result)) {
-      throw new TransformerError('参数不能有多个元素', arg);
+      throw new OverTSError('参数不能有多个元素', arg);
     }
     return result;
   } else {
@@ -370,13 +371,25 @@ export function parseStatement(context: ParseContext, state?: ts.Statement) {
   }
   // if 表达式
   if (ts.isIfStatement(state)) {
+    const elseIf: ElseIfExpression[] = [];
+    // 如果else后面接着就是if，那就把后面的东西分到elseif和else里面
+    let curState = state;
+    while (curState.elseStatement && ts.isIfStatement(curState.elseStatement)) {
+      elseIf.push({
+        kind: ExpressionKind.ELSEIF,
+        text: "",
+        condition: conditionToBool(parseCondition(context, curState.expression)),
+        then: parseStatement(context, curState.thenStatement)
+      });
+      curState = curState.elseStatement;
+    }
     const newExp: IfExpression = {
       kind: ExpressionKind.IF,
       text: "",
       then: parseStatement(context, state.thenStatement),
       condition: conditionToBool(parseCondition(context, state.expression)),
-      elseIf: undefined,
-      elseThen: parseStatement(context, state.elseStatement)
+      elseIf,
+      elseThen: parseStatement(context, curState.elseStatement)
     };
     resultSet.push(newExp);
   }
