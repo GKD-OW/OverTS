@@ -15,7 +15,8 @@
     "try-demo": "ts-node ./demo/index.ts",
     "try-demo-js": "node ./demo/index.js",
     "debug": "node -r ts-node/register --inspect ./demo/index.ts",
-    "gen-type": "ts-node ./script/gen-types/index.ts"
+    "gen-type": "ts-node ./script/gen-types/index.ts",
+    "test": "mocha test/**/*.spec.ts"
   },
   "dependencies": {
     "@types/prettier": "^1.19.0",
@@ -27,15 +28,21 @@
     "uuid": "^3.4.0"
   },
   "devDependencies": {
+    "@types/chai": "^4.2.9",
     "@types/globalthis": "^1.0.0",
     "@types/js-md5": "^0.4.2",
+    "@types/mocha": "^7.0.1",
     "@types/node": "^13.7.0",
     "@types/uuid": "^3.4.7",
+    "chai": "^4.2.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-standard": "^4.0.1",
     "lint-staged": "^10.0.7",
+    "mocha": "^7.1.0",
+    "mochawesome": "^5.0.0",
+    "source-map-support": "^0.5.16",
     "tslint": "^6.0.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.1.0"

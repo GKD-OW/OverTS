@@ -6,6 +6,7 @@ import { Transformer, OWGenerator, OWParser, OWTransformer } from '../src';
 //   readFileSync(resolve(__dirname, 'a.ts'), { encoding: 'UTF8' }),
 //   __dirname
 // );
+// transformer.getResult()
 // const result = OWGenerator(transformer.getResult());
 // writeFileSync(resolve(__dirname, 'result1.txt'), result, { encoding: 'UTF8' });
 // console.log(result);

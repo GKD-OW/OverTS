@@ -10,7 +10,7 @@ function parseSimpleExpression(text: string): OWExpression {
   if (!Number.isNaN(num)) {
     return {
       kind: ExpressionKind.NUMBER,
-      text: text
+      text: num.toString()
     };
   }
   // 可能是字符串
@@ -21,14 +21,14 @@ function parseSimpleExpression(text: string): OWExpression {
     };
   }
   // 解析为特定的Key
-  const maybeKey = detectKey(text, ['BOOL_', 'CONST_']);
+  const maybeKey = detectKey(text, 'CONST_');
   if (maybeKey.length > 0) {
     const key = maybeKey[0];
-    if (key.indexOf('BOOL_') === 0) {
+    if (key === 'CONST_GAME_FALSE' || key === 'CONST_GAME_TRUE') {
       // Boolean
       return {
         kind: ExpressionKind.BOOLEAN,
-        text: key.substr(5)
+        text: key.substr(11)
       };
     } else {
       // 常量

@@ -1,0 +1,703 @@
+{
+  "variable": {
+    "global": [
+      "MOD_ID_b",
+      "b",
+      "c",
+      "d"
+    ],
+    "player": [
+      "MOD_ID_damage_id",
+      "damage_id"
+    ]
+  },
+  "sub": {
+    "ChuanHuo_test": {
+      "name": "ChuanHuo_test",
+      "event": {
+        "kind": "SUBROUTINE",
+        "sub": "ChuanHuo_test"
+      },
+      "conditions": [],
+      "actions": [
+        {
+          "kind": 0,
+          "text": "ABORT_IF",
+          "arguments": [
+            {
+              "kind": 4,
+              "text": "TRUE"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "SET_GLOBAL_VAR",
+          "arguments": [
+            {
+              "kind": 6,
+              "text": "b"
+            },
+            {
+              "kind": 4,
+              "text": "FALSE"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "SET_GLOBAL_VAR_AT_INDEX",
+          "arguments": [
+            {
+              "kind": 6,
+              "text": "c"
+            },
+            {
+              "kind": 6,
+              "text": "0"
+            },
+            {
+              "kind": 3,
+              "text": "1"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "MODIFY_GLOBAL_VAR_AT_INDEX",
+          "arguments": [
+            {
+              "kind": 6,
+              "text": "c"
+            },
+            {
+              "kind": 6,
+              "text": "0"
+            },
+            {
+              "kind": 1,
+              "text": "OPERATION_ADD"
+            },
+            {
+              "kind": 3,
+              "text": "1"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "MODIFY_GLOBAL_VAR_AT_INDEX",
+          "arguments": [
+            {
+              "kind": 6,
+              "text": "c"
+            },
+            {
+              "kind": 6,
+              "text": "0"
+            },
+            {
+              "kind": 1,
+              "text": "OPERATION_SUBTRACT"
+            },
+            {
+              "kind": 3,
+              "text": "10"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "MODIFY_GLOBAL_VAR",
+          "arguments": [
+            {
+              "kind": 6,
+              "text": "d"
+            },
+            {
+              "kind": 1,
+              "text": "OPERATION_SUBTRACT"
+            },
+            {
+              "kind": 3,
+              "text": "1"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "MODIFY_GLOBAL_VAR",
+          "arguments": [
+            {
+              "kind": 6,
+              "text": "d"
+            },
+            {
+              "kind": 1,
+              "text": "OPERATION_MULTIPLY"
+            },
+            {
+              "kind": 3,
+              "text": "10"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "MODIFY_GLOBAL_VAR",
+          "arguments": [
+            {
+              "kind": 6,
+              "text": "d"
+            },
+            {
+              "kind": 1,
+              "text": "OPERATION_ADD"
+            },
+            {
+              "kind": 3,
+              "text": "1"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "SET_GLOBAL_VAR",
+          "arguments": [
+            {
+              "kind": 6,
+              "text": "d"
+            },
+            {
+              "kind": 3,
+              "text": "62"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "rules": [
+    {
+      "name": "MOD_ID_init",
+      "event": {
+        "kind": "GLOBAL"
+      },
+      "conditions": [],
+      "actions": [
+        {
+          "kind": 0,
+          "text": "SET_GLOBAL_VAR",
+          "arguments": [
+            {
+              "kind": 6,
+              "text": "MOD_ID_b"
+            },
+            {
+              "kind": 4,
+              "text": "TRUE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MOD_ID_chuanhuo",
+      "event": {
+        "kind": "PLAYER_TOOK_DAMAGE",
+        "team": "TEAM_ALL",
+        "hero": "GAME_ALL_HEROES"
+      },
+      "conditions": [
+        {
+          "left": {
+            "kind": 0,
+            "text": "NOT",
+            "arguments": [
+              {
+                "kind": 0,
+                "text": "HAS_STATUS_EFFECT",
+                "arguments": [
+                  {
+                    "kind": 1,
+                    "text": "GAME_EVENT_PLAYER"
+                  },
+                  {
+                    "kind": 1,
+                    "text": "STATUS_BURNING"
+                  }
+                ]
+              }
+            ]
+          },
+          "symbol": 0,
+          "right": {
+            "kind": 4,
+            "text": "TRUE"
+          }
+        },
+        {
+          "left": {
+            "kind": 0,
+            "text": "HAS_STATUS_EFFECT",
+            "arguments": [
+              {
+                "kind": 1,
+                "text": "GAME_ATTACKER"
+              },
+              {
+                "kind": 1,
+                "text": "STATUS_BURNING"
+              }
+            ]
+          },
+          "symbol": 0,
+          "right": {
+            "kind": 4,
+            "text": "TRUE"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "kind": 0,
+          "text": "SET_STATUS_EFFECT",
+          "arguments": [
+            {
+              "kind": 1,
+              "text": "GAME_EVENT_PLAYER"
+            },
+            {
+              "kind": 1,
+              "text": "GAME_NULL"
+            },
+            {
+              "kind": 1,
+              "text": "STATUS_BURNING"
+            },
+            {
+              "kind": 3,
+              "text": "9999"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "START_DAMAGE_OVER_TIME",
+          "arguments": [
+            {
+              "kind": 1,
+              "text": "GAME_EVENT_PLAYER"
+            },
+            {
+              "kind": 1,
+              "text": "GAME_NULL"
+            },
+            {
+              "kind": 3,
+              "text": "9999"
+            },
+            {
+              "kind": 3,
+              "text": "30"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "SET_PLAYER_VAR",
+          "arguments": [
+            {
+              "kind": 1,
+              "text": "GAME_EVENT_PLAYER"
+            },
+            {
+              "kind": 6,
+              "text": "MOD_ID_damage_id"
+            },
+            {
+              "kind": 1,
+              "text": "GAME_LAST_DAMAGE_ID"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "STOP_DAMAGE_OVER_TIME",
+          "arguments": [
+            {
+              "kind": 0,
+              "text": "PLAYER_VAR",
+              "arguments": [
+                {
+                  "kind": 1,
+                  "text": "GAME_ATTACKER"
+                },
+                {
+                  "kind": 6,
+                  "text": "MOD_ID_damage_id"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "CLEAR_STATUS_EFFECT",
+          "arguments": [
+            {
+              "kind": 1,
+              "text": "GAME_ATTACKER"
+            },
+            {
+              "kind": 1,
+              "text": "STATUS_BURNING"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "init",
+      "event": {
+        "kind": "GLOBAL"
+      },
+      "conditions": [],
+      "actions": [
+        {
+          "kind": 0,
+          "text": "SET_GLOBAL_VAR",
+          "arguments": [
+            {
+              "kind": 6,
+              "text": "b"
+            },
+            {
+              "kind": 4,
+              "text": "TRUE"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "SET_GLOBAL_VAR",
+          "arguments": [
+            {
+              "kind": 6,
+              "text": "c"
+            },
+            {
+              "kind": 1,
+              "text": "GAME_EMPTY_ARRAY"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "SET_GLOBAL_VAR",
+          "arguments": [
+            {
+              "kind": 6,
+              "text": "d"
+            },
+            {
+              "kind": 3,
+              "text": "5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "jiafen",
+      "event": {
+        "kind": "PLAYER_DIED",
+        "team": "TEAM_ALL",
+        "hero": "GAME_ALL_HEROES"
+      },
+      "conditions": [
+        {
+          "left": {
+            "kind": 0,
+            "text": "GET_NUMBER_OF_LIVING_PLAYERS",
+            "arguments": [
+              {
+                "kind": 1,
+                "text": "TEAM_ALL"
+              }
+            ]
+          },
+          "symbol": 0,
+          "right": {
+            "kind": 3,
+            "text": "1"
+          }
+        },
+        {
+          "left": {
+            "kind": 1,
+            "text": "GAME_IS_GAME_IN_PROGRESS"
+          },
+          "symbol": 0,
+          "right": {
+            "kind": 4,
+            "text": "TRUE"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "kind": 0,
+          "text": "ADD_TO_SCORE",
+          "arguments": [
+            {
+              "kind": 0,
+              "text": "GET_LIVING_PLAYERS",
+              "arguments": [
+                {
+                  "kind": 1,
+                  "text": "TEAM_ALL"
+                }
+              ]
+            },
+            {
+              "kind": 3,
+              "text": "1"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "WAIT",
+          "arguments": [
+            {
+              "kind": 3,
+              "text": "10"
+            },
+            {
+              "kind": 1,
+              "text": "WAIT_RESTART_WHEN_TRUE"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "CALL_SUBROUTINE",
+          "arguments": [
+            {
+              "kind": 6,
+              "text": "ChuanHuo_test"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "WAIT",
+          "arguments": [
+            {
+              "kind": 3,
+              "text": "2"
+            },
+            {
+              "kind": 1,
+              "text": "WAIT_RESTART_WHEN_TRUE"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "CALL_SUBROUTINE",
+          "arguments": [
+            {
+              "kind": 6,
+              "text": "ChuanHuo_test"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "ADD_TO_SCORE",
+          "arguments": [
+            {
+              "kind": 0,
+              "text": "GET_LIVING_PLAYERS",
+              "arguments": [
+                {
+                  "kind": 1,
+                  "text": "TEAM_ALL"
+                }
+              ]
+            },
+            {
+              "kind": 3,
+              "text": "1"
+            }
+          ]
+        },
+        {
+          "kind": 0,
+          "text": "RESURRECT",
+          "arguments": [
+            {
+              "kind": 0,
+              "text": "GET_PLAYERS",
+              "arguments": [
+                {
+                  "kind": 1,
+                  "text": "TEAM_ALL"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": 7,
+          "text": "",
+          "then": [
+            {
+              "kind": 0,
+              "text": "WAIT",
+              "arguments": [
+                {
+                  "kind": 3,
+                  "text": "1"
+                },
+                {
+                  "kind": 1,
+                  "text": "WAIT_IGNORE_CONDITION"
+                }
+              ]
+            }
+          ],
+          "condition": {
+            "kind": 1,
+            "text": "GAME_IS_GAME_IN_PROGRESS"
+          },
+          "elseIf": [],
+          "elseThen": [
+            {
+              "kind": 0,
+              "text": "WAIT",
+              "arguments": [
+                {
+                  "kind": 3,
+                  "text": "2"
+                },
+                {
+                  "kind": 1,
+                  "text": "WAIT_RESTART_WHEN_TRUE"
+                }
+              ]
+            },
+            {
+              "kind": 0,
+              "text": "CALL_SUBROUTINE",
+              "arguments": [
+                {
+                  "kind": 6,
+                  "text": "ChuanHuo_test"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": 9,
+          "text": "",
+          "then": [
+            {
+              "kind": 0,
+              "text": "ADD_TO_SCORE",
+              "arguments": [
+                {
+                  "kind": 0,
+                  "text": "GET_LIVING_PLAYERS",
+                  "arguments": [
+                    {
+                      "kind": 1,
+                      "text": "TEAM_ALL"
+                    }
+                  ]
+                },
+                {
+                  "kind": 3,
+                  "text": "1"
+                }
+              ]
+            },
+            {
+              "kind": 0,
+              "text": "WAIT",
+              "arguments": [
+                {
+                  "kind": 3,
+                  "text": "10"
+                },
+                {
+                  "kind": 1,
+                  "text": "WAIT_RESTART_WHEN_TRUE"
+                }
+              ]
+            },
+            {
+              "kind": 0,
+              "text": "WAIT",
+              "arguments": [
+                {
+                  "kind": 3,
+                  "text": "1"
+                },
+                {
+                  "kind": 1,
+                  "text": "WAIT_IGNORE_CONDITION"
+                }
+              ]
+            }
+          ],
+          "condition": {
+            "kind": 0,
+            "text": "GLOBAL_VAR",
+            "arguments": [
+              {
+                "kind": 6,
+                "text": "b"
+              }
+            ]
+          }
+        },
+        {
+          "kind": 0,
+          "text": "BIG_MESSAGE",
+          "arguments": [
+            {
+              "kind": 1,
+              "text": "GAME_EVENT_PLAYER"
+            },
+            {
+              "kind": 0,
+              "text": "CUSTOM_STRING",
+              "arguments": [
+                {
+                  "kind": 5,
+                  "text": "自定义字符串"
+                },
+                {
+                  "kind": 1,
+                  "text": "GAME_NULL"
+                },
+                {
+                  "kind": 1,
+                  "text": "GAME_NULL"
+                },
+                {
+                  "kind": 1,
+                  "text": "GAME_NULL"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

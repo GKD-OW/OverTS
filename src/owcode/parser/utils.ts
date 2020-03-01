@@ -1,7 +1,7 @@
-import '../helper';
-import { getAllLocale } from "../share/i18n";
-import { OWExpression, ExpressionKind } from "../share/ast/expression";
 import { OverTSError } from '../../share/error';
+import '../helper';
+import { CompareExpression, ExpressionKind } from "../share/ast/expression";
+import { getAllLocale } from "../share/i18n";
 
 export interface BranceArea {
   name: string;
@@ -98,10 +98,12 @@ export function trimSemi(text: string) {
   return text;
 }
 
-export function createCompare(symbol: string): OWExpression {
+export function createCompare(symbol: string): CompareExpression {
   return {
     kind: ExpressionKind.COMPARE_SYMBOL,
-    text: symbol
+    text: "",
+    // @ts-ignore
+    symbol: CompareSymbol[symbol]
   }
 }
 

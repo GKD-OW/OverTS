@@ -10,6 +10,7 @@ const rootDir = resolve(__dirname, '../..');
 const sourceDir = resolve(__dirname, 'data');
 const resultDir = resolve(__dirname, 'result');
 const helperFile = resolve(rootDir, 'src/owcode/helper/index.ts');
+const helperJsonFile = resolve(rootDir, 'src/owcode/share/helper.json');
 const localesDir = resolve(rootDir, 'src/owcode/share/locales');
 const result: ParseResult = {
   functions: [],
@@ -213,6 +214,9 @@ function write() {
   const gen = new Generator(fs.readFileSync(resolve(__dirname, 'global.template.ts'), { encoding: 'UTF8' }), lang);
   gen.set(result);
   fs.writeFileSync(helperFile, gen.getText(), {
+    encoding: 'UTF8'
+  });
+  fs.writeFileSync(helperJsonFile, JSON.stringify(gen.getJson(), null, 2), {
     encoding: 'UTF8'
   });
   // 语言

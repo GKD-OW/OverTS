@@ -215,6 +215,30 @@ export default class Generator {
     // fs.writeFileSync(resolve(__dirname, 'returnType_2.json'), JSON.stringify(returns, null, '  '), { encoding: 'UTF8' });
   }
 
+  getJson() {
+    const result = {
+      enums: Object.keys(this.result.enums),
+      constants: this.result.constants.map(it => (it.declarationList.declarations[0].name as ts.Identifier).text),
+      functions: {} as any
+    };
+    this.result.functions.forEach(it => {
+      if (!it.name) {
+        return;
+      }
+      const name = it.name.text;
+      result.functions[name] = {
+        returnType: it.type,
+        arguments: it.parameters.map(paramItem => {
+          return {
+            name: (paramItem.name as ts.Identifier).text,
+            type: paramItem.type
+          }
+        })
+      };
+    });
+    return result;
+  }
+
   getText() {
     const file = ts.createSourceFile('helper.ts', this.text, ts.ScriptTarget.Latest, false);
     const statements = [...file.statements];
