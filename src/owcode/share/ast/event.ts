@@ -7,7 +7,10 @@ export interface OWEvent {
   kind: string;
 }
 
-export function isGlobalEvent(obj: any): obj is OWEvent {
+export interface GlobalEvent {
+  kind: Events.GLOBAL;
+}
+export function isGlobalEvent(obj: any): obj is GlobalEvent {
   return obj && GlobalEvents.includes(obj.kind);
 }
 

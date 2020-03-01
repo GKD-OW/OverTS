@@ -23,11 +23,12 @@ import * as ts from 'typescript';
 import { ActionExpression } from '../owcode/ast';
 import '../owcode/helper';
 import { ElseIfExpression, ExpressionKind, IfExpression, OWExpression, WhileExpression } from '../owcode/share/ast/expression';
+import { mapTsToCompare } from '../owcode/share/compareSymbol';
 import { OverTSError } from '../share/error';
 import { getFinalAccess, isCanToString, PropertyAccess, TextAccess } from './accessUtils';
 import { simpleCalc, tryTinyCalc } from './calcParser';
 import Constants from './constants';
-import { conditionToBool, createCall, createCompareExpression, createConst, createRaw, createSubCall, getArrayAccess, getClassName, getMethod, parseCondition, tsMatchToCompare } from './utils';
+import { conditionToBool, createCall, createCompareExpression, createConst, createRaw, createSubCall, getArrayAccess, getClassName, getMethod, parseCondition } from './utils';
 import { ParseContext } from './var';
 
 // 运算后赋值的运算符
@@ -247,7 +248,7 @@ export function parseSimpleExpression(context: ParseContext, expression: ts.Expr
       );
     }
     // 其他逻辑运算（大于、小于等）
-    const logicSymbol = tsMatchToCompare(expression.operatorToken.kind);
+    const logicSymbol = mapTsToCompare[expression.operatorToken.kind];
     if (typeof(logicSymbol) !== 'undefined') {
       return createCall(
         'COMPARE',

@@ -1,5 +1,5 @@
 import { OverTSError } from "../../share/error";
-import { CompareSymbolStrings } from "../generator/compareSymbolStrings";
+import { CompareSymbolStrings } from "../share/compareSymbol";
 import { Condition } from "../share/ast/conditions";
 import { CallExpression, ElseIfExpression, ExpressionKind, IfExpression, isCallExpression, isIfExpression, OWExpression, RecursiveExpression, WhileExpression } from "../share/ast/expression";
 import { BranceArea, copyArray, createCompare, detectKey, trimSemi } from "./utils";
@@ -146,7 +146,6 @@ function recursiveParse(exps: OWExpression[]) {
   let finalResult: OWExpression[] = [];
   let thisRecursiveExp: RecursiveExpression | undefined;
   exps.forEach((it, idx) => {
-    console.log(`${idx}: ${it.text}`);
     if (it.text === 'IF' || it.text === 'WHILE' || it.text === 'ELSEIF') {
       if (!isCallExpression(it)) {
         throw new OverTSError("Not a function call", it);
@@ -245,8 +244,7 @@ const CompareSymbolStringArr = Object.entries(CompareSymbolStrings);
 function getCompareSymbol(text: string, startIndex: number): CompareSymbol | undefined {
   for (const it of CompareSymbolStringArr) {
     if (text.substr(startIndex, it[1].length) === it[1]) {
-      // @ts-ignore
-      return it[0];
+      return typeof(it[0]) === 'string' ? parseInt(it[0]) : it[0];
     }
   }
 }
@@ -267,10 +265,10 @@ export function parseCondition(content: (string | BranceArea)[]) {
         bracket--;
       }
       if (bracket === 0) {
-        const text = getCompareSymbol(it, i);
-        if (text) {
+        const symbol = getCompareSymbol(it, i);
+        if (typeof(symbol) !== 'undefined') {
           symbolIndex = i;
-          symbolType = text;
+          symbolType = symbol;
           break;
         }
       }

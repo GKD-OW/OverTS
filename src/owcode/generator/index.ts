@@ -2,8 +2,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { Ast, Rule } from "../ast";
 import { Condition } from '../share/ast/conditions';
 import { CallExpression, CompareExpression, ExpressionKind, isCallExpression, isIfExpression, isWhileExpression, OWExpression } from '../share/ast/expression';
+import { CompareSymbolStrings } from '../share/compareSymbol';
 import i18n from "../share/i18n";
-import { CompareSymbolStrings } from './compareSymbolStrings';
 import Result from "./result";
 import { getEventText } from "./utils";
 
@@ -19,7 +19,7 @@ interface GeneratorOption {
 const defaultOptions: GeneratorOption = {
   uglify: false
 }
-export default class Generator {
+class Generator {
   private ast: Ast;
   private options: GeneratorOption;
   private result: Result;
@@ -217,4 +217,8 @@ export default class Generator {
       this.result.push(this.getSimpleExpression(callEnd) + END_FLAG, 0, -1);
     }
   }
+}
+
+export default function(ast: Ast, options: GeneratorOption = defaultOptions) {
+  return new Generator(ast, options).gen();
 }

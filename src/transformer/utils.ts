@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Condition } from "../owcode/share/ast/conditions";
 import { GlobalEvents, OWEvent, PlayerEvent, SubEvent, SubEvents } from "../owcode/share/ast/event";
 import { CallExpression, CompareExpression, ExpressionKind, OWExpression } from "../owcode/share/ast/expression";
+import { mapTsToCompare } from "../owcode/share/compareSymbol";
 import { OverTSError } from "../share/error";
 import { getFinalAccess, isCanToString, PropertyAccess, TextAccess } from "./accessUtils";
 import { parseArgument } from "./parser";
@@ -109,7 +110,7 @@ export function getVariable(context: ParseContext, statements: ts.Statement[] | 
  */
 export function parseCondition(context: ParseContext, condition: ts.Expression) {
   if (ts.isBinaryExpression(condition)) {
-    const symbol = tsMatchToCompare(condition.operatorToken.kind);
+    const symbol = mapTsToCompare[condition.operatorToken.kind];
     // 比较
     if (typeof(symbol) !== 'undefined') {
       return createCondition(parseArgument(context, condition.left), parseArgument(context, condition.right), symbol);
@@ -345,23 +346,4 @@ export function getArrayAccess(context: ParseContext, exp: ts.ElementAccessExpre
     name: createRaw(name),
     index: numberToRaw(indexExp)
   };
-}
-
-export function tsMatchToCompare(kind: ts.SyntaxKind) {
-  switch (kind) {
-    case ts.SyntaxKind.EqualsEqualsToken:
-    case ts.SyntaxKind.EqualsEqualsEqualsToken:
-      return CompareSymbol.EQUALS;
-    case ts.SyntaxKind.LessThanToken:
-      return CompareSymbol.LESS;
-    case ts.SyntaxKind.LessThanEqualsToken:
-      return CompareSymbol.LESS_EQUALS;
-    case ts.SyntaxKind.GreaterThanToken:
-      return CompareSymbol.GREATER;
-    case ts.SyntaxKind.GreaterThanEqualsToken:
-      return CompareSymbol.GREATER_EQUALS;
-    case ts.SyntaxKind.ExclamationEqualsToken:
-    case ts.SyntaxKind.ExclamationEqualsEqualsToken:
-      return CompareSymbol.NOT_EQUALS;
-  }
 }

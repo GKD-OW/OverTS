@@ -8,7 +8,7 @@ import { BranceArea, detectKey, findArea, parseBrances, trimSemi } from "./utils
 /**
  * 将OW代码转为AST
  */
-export default class Parser {
+class Parser {
   private result: Ast;
   constructor(text: string, locale: string) {
     this.result = {
@@ -54,7 +54,7 @@ export default class Parser {
           varContent[currentContent] = [];
         }
       } else {
-        varContent[currentContent].push(line.substr(line.indexOf(':')));
+        varContent[currentContent].push(line.substr(line.indexOf(':') + 1).trim());
       }
     });
     // 区分全局、用户
@@ -93,9 +93,6 @@ export default class Parser {
     } else {
       this.result.rules.push(rule);
     }
-    console.dir(rule, {
-      depth: 8
-    });
   }
 
   private parseRuleEvent(rule: BranceArea): OWEvent | undefined {
@@ -136,13 +133,13 @@ export default class Parser {
         team: 'TEAM_ALL',
         hero: 'GAME_ALL_HEROES'
       }
-      const team = detectKey(trimSemi(event.content[1]), 'TEAM_');
+      const team = detectKey(trimSemi(event.content[1]), 'CONST_TEAM_');
       const hero = detectKey(trimSemi(event.content[2]));
       if (team.length > 0) {
-        ev.team = team[0];
+        ev.team = team[0].substr(6);
       }
       if (hero.length > 0) {
-        ev.hero = hero[0];
+        ev.hero = hero[0].substr(6);
       }
       return ev;
     } else {
@@ -156,4 +153,12 @@ export default class Parser {
   private parseRuleAction(actions: BranceArea) {
     return parseBranceContent(actions.content) as ActionExpression[];
   }
+
+  getResult() {
+    return this.result;
+  }
+}
+
+export default function(text: string, locale: string) {
+  return new Parser(text, locale).getResult();
 }

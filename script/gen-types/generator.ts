@@ -3,6 +3,7 @@ import { constAlias, enumAlias, enumType, funcAlias, paramTypeAlias, typeAlias }
 import Lang from './lang';
 import { createConst, createDeclare, createEnum, createFunction, createModule, createSetGlobal, insertToModule, formatTo } from './utils';
 import { AvaliableType, ParseResult } from './var';
+import * as prettier from 'prettier';
 
 const returnType: { [x: string]: string } = require('./returnType.json');
 const constType: { [x: string]: string } = require('./constType.json');
@@ -235,6 +236,12 @@ export default class Generator {
     const printer = ts.createPrinter({
       newLine: ts.NewLineKind.LineFeed,
     });
-    return printer.printNode(ts.EmitHint.Unspecified, file, file);
+    const text = printer.printNode(ts.EmitHint.SourceFile, file, file);
+    return prettier.format(text, {
+      semi: true,
+      tabWidth: 2,
+      useTabs: false,
+      parser: 'typescript'
+    });
   }
 }

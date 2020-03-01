@@ -18,8 +18,10 @@
     "gen-type": "ts-node ./script/gen-types/index.ts"
   },
   "dependencies": {
+    "@types/prettier": "^1.19.0",
     "globalthis": "^1.0.1",
     "js-md5": "^0.7.3",
+    "prettier": "^1.19.1",
     "ts-node": "^8.6.2",
     "typescript": "^3.7.5",
     "uuid": "^3.4.0"
@@ -34,7 +36,6 @@
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-standard": "^4.0.1",
     "lint-staged": "^10.0.7",
-    "prettier": "^1.19.1",
     "tslint": "^6.0.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.1.0"
