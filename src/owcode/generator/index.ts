@@ -84,9 +84,11 @@ class Generator {
     // 混淆变量
     this.ast.variable.global.forEach((name, index) => {
       this.uglifyGlobal[name] = getUglifyName();
+      this.ast.variable.global[index] = this.uglifyGlobal[name];
     });
     this.ast.variable.player.forEach((name, index) => {
       this.uglifyPlayer[name] = getUglifyName();
+      this.ast.variable.player[index] = this.uglifyPlayer[name];
     });
     // 访问所有相关调用
     const argAt: { [x: string]: number } = {
@@ -143,14 +145,14 @@ class Generator {
       if (this.ast.variable.global.length > 0) {
         this.result.push(i18n('G_GLOBAL') + ':', 1);
         this.ast.variable.global.forEach((name, index) => {
-          this.result.push(`${index}: ${this.uglifyGlobal[name]}`);
+          this.result.push(`${index}: ${name}`);
         });
         this.result.push('', -1);
       }
       if (this.ast.variable.player.length > 0) {
         this.result.push(i18n('G_PLAYER') + ':', 1);
         this.ast.variable.player.forEach((name, index) => {
-          this.result.push(`${index}: ${this.uglifyPlayer[name]}`);
+          this.result.push(`${index}: ${name}`);
         });
         this.result.push('', -1);
       }

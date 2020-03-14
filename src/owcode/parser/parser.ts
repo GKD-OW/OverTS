@@ -34,9 +34,11 @@ export function parseSimpleExpression(text: string, type: ExceptedType[]): OWExp
   const maybeKey = detectKey(text, 'CONST_');
   if (maybeKey.length > 0) {
     // 找到类型最合适的一个
-    let thisKey = maybeKey[0];
+    let thisKey = "";
     // 如果就一个，那就不用找了
-    if (maybeKey.length > 1) {
+    if (maybeKey.length === 1) {
+      thisKey = maybeKey[0];
+    } else {
       const enumPrefixs = type.filter(it => it.prefix).map(it => 'CONST_' + formatTo(it.prefix!, 'TO_FORMAT'));
       for (const key of maybeKey) {
         if (key.indexOf('CONST_GAME_') === 0) {
