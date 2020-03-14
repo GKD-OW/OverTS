@@ -1,5 +1,5 @@
 import { Ast, Rule } from "../ast";
-import { CallExpression, isCallExpression } from "../share/ast/expression";
+import { CallExpression, isCallExpression, isElseIfExpression, isIfExpression, isWhileExpression, OWExpression } from "../share/ast/expression";
 
 type RuleType = 'SUB' | 'RULE';
 
@@ -21,16 +21,33 @@ export function forEachCall(ast: Ast, callName: string, callback: (it: CallExpre
       });
     }
   }
+  const forEachActions = (actions: OWExpression[]) => {
+    actions.forEach(action => {
+      if (isCallExpression(action)) {
+        forEachCallExp(action);
+      }
+      if (isIfExpression(action)) {
+        if (isCallExpression(action.condition)) forEachCallExp(action.condition);
+        forEachActions(action.then);
+        forEachActions(action.elseThen);
+        forEachActions(action.elseIf);
+      }
+      if (isElseIfExpression(action)) {
+        if (isCallExpression(action.condition)) forEachCallExp(action.condition);
+        forEachActions(action.then);
+      }
+      if (isWhileExpression(action)) {
+        if (isCallExpression(action.condition)) forEachCallExp(action.condition);
+        forEachActions(action.then);
+      }
+    });
+  }
   forEachRule(ast, (it: Rule, type: RuleType) => {
     it.conditions.forEach(cond => {
       if (isCallExpression(cond.left)) forEachCallExp(cond.left);
       if (isCallExpression(cond.right)) forEachCallExp(cond.right);
     });
-    it.actions.forEach(action => {
-      if (isCallExpression(action)) {
-        forEachCallExp(action);
-      }
-    });
+    forEachActions(it.actions);
   });
 }
 

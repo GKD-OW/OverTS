@@ -217,10 +217,16 @@ export default class Generator {
 
   getJson() {
     const result = {
+      classes: ['Player', 'MapItem'],
       enums: Object.keys(this.result.enums),
-      constants: this.result.constants.map(it => (it.declarationList.declarations[0].name as ts.Identifier).text),
+      constants: {} as any,
       functions: {} as any
     };
+    this.result.constants.forEach(it => {
+      const declareItem = it.declarationList.declarations[0];
+      result.constants[(declareItem.name as ts.Identifier).text] = declareItem.type;
+    });
+    result.constants['ELSE'] = result.functions['END'] = ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword);
     this.result.functions.forEach(it => {
       if (!it.name) {
         return;
@@ -236,6 +242,13 @@ export default class Generator {
         })
       };
     });
+    result.functions['If'] = result.functions['While'] = {
+      returnType: ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+      arguments: [{
+        name: 'condition',
+        type: ts.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword)
+      }]
+    };
     return result;
   }
 

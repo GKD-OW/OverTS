@@ -23,6 +23,7 @@
     "globalthis": "^1.0.1",
     "js-md5": "^0.7.3",
     "prettier": "^1.19.1",
+    "random-int": "^2.0.1",
     "ts-node": "^8.6.2",
     "typescript": "^3.7.5",
     "uuid": "^3.4.0"

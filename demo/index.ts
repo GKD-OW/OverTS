@@ -13,8 +13,25 @@ import { Transformer, OWGenerator, OWParser, OWTransformer } from '../src';
 
 // import 
 
-const parser = OWParser(
+
+// import Types from '../src/owcode/parser/types';
+// import { parseExpression } from '../src/owcode/parser/parser';
+// import { ExpressionKind } from '../src/owcode/share/ast/expression';
+// const func = Types.getFunctionType('getCurrentHero');
+// console.log(parseExpression("End", [{
+//   kind: ExpressionKind.CONSTANT,
+//   isAny: true
+// }]));
+
+const ast = OWParser(
   readFileSync(resolve(__dirname, 'result1.txt'), { encoding: 'UTF8' }),
   'zh-CN'
 );
-console.log(new OWTransformer(parser).genText());
+const result = OWGenerator(ast, {
+  uglify: true
+});
+console.log(result);
+// console.dir(ast, {
+//   depth: 8
+// });
+// console.log(new OWTransformer(ast).genText());

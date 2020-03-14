@@ -1,41 +1,81 @@
 import { OverTSError } from "../../share/error";
-import { CompareSymbolStrings } from "../share/compareSymbol";
+import { formatTo } from "../../share/utils";
 import { Condition } from "../share/ast/conditions";
 import { CallExpression, ElseIfExpression, ExpressionKind, IfExpression, isCallExpression, isIfExpression, OWExpression, RecursiveExpression, WhileExpression } from "../share/ast/expression";
+import { CompareSymbolStrings } from "../share/compareSymbol";
+import Types, { createAny, ExceptedType, isPrefixMatch, isTypeMatch, isTypesMatch } from "./types";
 import { BranceArea, copyArray, createCompare, detectKey, trimSemi } from "./utils";
 
-function parseSimpleExpression(text: string): OWExpression {
+export function parseSimpleExpression(text: string, type: ExceptedType[]): OWExpression {
   // 尝试解析为数字
-  const num = parseFloat(text);
-  if (!Number.isNaN(num)) {
-    return {
-      kind: ExpressionKind.NUMBER,
-      text: num.toString()
-    };
+  if (isTypeMatch(type, {
+    kind: ExpressionKind.NUMBER
+  })) {
+    const num = parseFloat(text);
+    if (!Number.isNaN(num)) {
+      return {
+        kind: ExpressionKind.NUMBER,
+        text: num.toString()
+      };
+    }
   }
   // 可能是字符串
-  if (text.charAt(0) === '"') {
-    return {
-      kind: ExpressionKind.STRING,
-      text: text.substring(1, text.length - 1)
-    };
+  if (isTypeMatch(type, {
+    kind: ExpressionKind.STRING
+  })) {
+    if (text.charAt(0) === '"') {
+      return {
+        kind: ExpressionKind.STRING,
+        text: text.substring(1, text.length - 1)
+      };
+    }
   }
   // 解析为特定的Key
   const maybeKey = detectKey(text, 'CONST_');
   if (maybeKey.length > 0) {
-    const key = maybeKey[0];
-    if (key === 'CONST_GAME_FALSE' || key === 'CONST_GAME_TRUE') {
-      // Boolean
-      return {
-        kind: ExpressionKind.BOOLEAN,
-        text: key.substr(11)
-      };
-    } else {
-      // 常量
-      return {
-        kind: ExpressionKind.CONSTANT,
-        text: key.substr(6)
-      };
+    // 找到类型最合适的一个
+    let thisKey = maybeKey[0];
+    // 如果就一个，那就不用找了
+    if (maybeKey.length > 1) {
+      const enumPrefixs = type.filter(it => it.prefix).map(it => 'CONST_' + formatTo(it.prefix!, 'TO_FORMAT'));
+      for (const key of maybeKey) {
+        if (key.indexOf('CONST_GAME_') === 0) {
+          const realKey = key.substr(6);
+          const keyType = Types.getConstType(realKey);
+          if (isPrefixMatch(type, realKey) || isTypeMatch(type, keyType)) {
+            thisKey = key;
+            break;
+          }
+        } else {
+          // enum类型，拼接预期类型即可
+          if (enumPrefixs.length) {
+            for (const prefix of enumPrefixs) {
+              if (key.indexOf(prefix) === 0) {
+                thisKey = key;
+                break;
+              }
+            }
+            if (thisKey !== '') {
+              break;
+            }
+          }
+        }
+      }
+    }
+    if (thisKey !== '') {
+      if (thisKey === 'CONST_GAME_FALSE' || thisKey === 'CONST_GAME_TRUE') {
+        // Boolean
+        return {
+          kind: ExpressionKind.BOOLEAN,
+          text: thisKey.substr(11)
+        };
+      } else {
+        // 常量
+        return {
+          kind: ExpressionKind.CONSTANT,
+          text: thisKey.substr(6)
+        };
+      }
     }
   }
   // 对比较符号特殊处理
@@ -59,7 +99,7 @@ function parseSimpleExpression(text: string): OWExpression {
   };
 }
 
-export function parseExpression(text: string): OWExpression | undefined {
+export function parseExpression(text: string, type: ExceptedType[]): OWExpression | undefined {
   // 忽略掉注释
   if (text.indexOf('//') === 0) {
     return;
@@ -68,7 +108,7 @@ export function parseExpression(text: string): OWExpression | undefined {
   const firstBracket = text.indexOf('(');
   if (firstBracket === -1) {
     // 非函数调用，返回简单结果
-    return parseSimpleExpression(trimSemi(text));
+    return parseSimpleExpression(trimSemi(text), type);
   }
   // 返回函数调用解析结果
   const funcName = text.substr(0, firstBracket);
@@ -76,7 +116,17 @@ export function parseExpression(text: string): OWExpression | undefined {
   if (funcKeys.length === 0) {
     throw new OverTSError(`Can not detect function of "${funcName}"`, text);
   }
-  const funcKey = funcKeys[0].substr(5);
+  // 如果有多个函数，找到返回类型正确的函数
+  let funcKey = funcKeys[0];
+  if (funcKeys.length > 1) {
+    for (const it of funcKeys) {
+      if (isTypesMatch(Types.getFunctionType(it.substr(5)).returnType, type)) {
+        funcKey = it;
+        break;
+      }
+    }
+  }
+  funcKey = funcKey.substr(5);
   const result: CallExpression = {
     kind: ExpressionKind.CALL,
     text: funcKey,
@@ -114,24 +164,28 @@ export function parseExpression(text: string): OWExpression | undefined {
       }
     }
   }
+  // 获取参数类型
+  const argsType = Types.getFunctionType(funcKey).arguments;
   // 把参数取出来，然后按照之前找到的顺序分隔开
   const argStart = firstBracket + 1;
-  const addResult = (resultText: string) => {
-    const res = parseExpression(resultText.trim());
+  const addResult = (resultText: string, index: number) => {
+    const res = parseExpression(resultText.trim(), argsType[index]);
     if (res) {
       result.arguments.push(res);
     }
   }
   if (argPos.length === 0) {
     // 只有一个参数
-    addResult(text.substring(argStart, argEnd));
+    addResult(text.substring(argStart, argEnd), 0);
   } else {
     // 记录的是逗号位置，所以后续使用的时候，有些地方要+1
+    let lastIndex = 0;
     argPos.forEach((it, idx) => {
-      addResult(text.substring(idx === 0 ? argStart : (argPos[idx - 1] + 1), it));
+      addResult(text.substring(idx === 0 ? argStart : (argPos[idx - 1] + 1), it), idx);
+      lastIndex = idx;
     });
     // 把最后一个参数放进去
-    addResult(text.substring(argPos[argPos.length - 1] + 1, argEnd));
+    addResult(text.substring(argPos[argPos.length - 1] + 1, argEnd), lastIndex + 1);
   }
   return result;
 }
@@ -232,7 +286,7 @@ export function parseBranceContent(content: (string | BranceArea)[]) {
   const firstResult: OWExpression[] = [];
   content.forEach(it => {
     if (typeof(it) === 'string') {
-      const res = parseExpression(it);
+      const res = parseExpression(it, [ createAny() ]);
       res && firstResult.push(res);
     }
   });
@@ -277,9 +331,9 @@ export function parseCondition(content: (string | BranceArea)[]) {
       throw new OverTSError('Compare symbol not found', it);
     }
     // 左右分别进行解析
-    const left = parseExpression(it.substr(0, symbolIndex).trim());
+    const left = parseExpression(it.substr(0, symbolIndex).trim(), [ createAny() ]);
     const symbolLeng = CompareSymbolStrings[symbolType].length;
-    const right = parseExpression(trimSemi(it.substr(symbolIndex + symbolLeng).trim()));
+    const right = parseExpression(trimSemi(it.substr(symbolIndex + symbolLeng).trim()), [ createAny() ]);
     if (left && right) {
       result.push({
         left,

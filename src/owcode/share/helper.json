@@ -1,4 +1,8 @@
 {
+  "classes": [
+    "Player",
+    "MapItem"
+  ],
   "enums": [
     "Transform",
     "Invis",
@@ -40,55 +44,587 @@
     "Events",
     "Strings"
   ],
-  "constants": [
-    "DAMAGE_HEROES",
-    "ALL_HEROES",
-    "SUPPORT_HEROES",
-    "TANK_HEROES",
-    "ATTACKER",
-    "CONTROL_SCORING_TEAM",
-    "CURRENT_ARRAY_ELEMENT",
-    "CURRENT_GAMEMODE",
-    "CURRENT_MAP",
-    "EMPTY_ARRAY",
-    "EVENT_DAMAGE",
-    "EVENT_HEALING",
-    "EVENT_PLAYER",
-    "EVENT_WAS_CRITICAL_HIT",
-    "EVENT_WAS_HEALTH_PACK",
-    "FALSE",
-    "HEALEE",
-    "HEALER",
-    "HOST_PLAYER",
-    "IS_ASSEMBLING_HEROES",
-    "IS_MATCH_BETWEEN_ROUNDS",
-    "IS_CONTROL_POINT_LOCKED",
-    "IS_IN_SUDDEN_DEATH",
-    "IS_GAME_IN_PROGRESS",
-    "IS_IN_SETUP",
-    "IS_MATCH_COMPLETE",
-    "IS_WAITING_FOR_PLAYERS",
-    "LAST_CREATED_ENTITY",
-    "LAST_DAMAGE_MODIFICATION",
-    "LAST_DAMAGE_ID",
-    "LAST_HEAL_ID",
-    "LAST_HEALING_MODIFICATION",
-    "LAST_CREATED_TEXT",
-    "MATCH_ROUND",
-    "MATCH_TIME",
-    "NULL",
-    "CURRENT_OBJECTIVE",
-    "PAYLOAD_POSITION",
-    "PAYLOAD_PROGRESS_PERCENTAGE",
-    "CAPTURE_PERCENTAGE",
-    "SERVER_LOAD",
-    "AVERAGE_SERVER_LOAD",
-    "PEAK_SERVER_LOAD",
-    "TOTAL_TIME_ELAPSED",
-    "TRUE",
-    "VICTIM"
-  ],
+  "constants": {
+    "DAMAGE_HEROES": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 173,
+      "elementType": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 168,
+        "typeName": {
+          "pos": -1,
+          "end": -1,
+          "flags": 8,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 75,
+          "escapedText": "Hero",
+          "autoGenerateFlags": 0,
+          "autoGenerateId": 0
+        }
+      }
+    },
+    "ALL_HEROES": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 173,
+      "elementType": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 168,
+        "typeName": {
+          "pos": -1,
+          "end": -1,
+          "flags": 8,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 75,
+          "escapedText": "Hero",
+          "autoGenerateFlags": 0,
+          "autoGenerateId": 0
+        }
+      }
+    },
+    "SUPPORT_HEROES": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 173,
+      "elementType": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 168,
+        "typeName": {
+          "pos": -1,
+          "end": -1,
+          "flags": 8,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 75,
+          "escapedText": "Hero",
+          "autoGenerateFlags": 0,
+          "autoGenerateId": 0
+        }
+      }
+    },
+    "TANK_HEROES": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 173,
+      "elementType": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 168,
+        "typeName": {
+          "pos": -1,
+          "end": -1,
+          "flags": 8,
+          "modifierFlagsCache": 0,
+          "transformFlags": 0,
+          "kind": 75,
+          "escapedText": "Hero",
+          "autoGenerateFlags": 0,
+          "autoGenerateId": 0
+        }
+      }
+    },
+    "ATTACKER": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 168,
+      "typeName": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 75,
+        "escapedText": "Player",
+        "autoGenerateFlags": 0,
+        "autoGenerateId": 0
+      }
+    },
+    "CONTROL_SCORING_TEAM": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 168,
+      "typeName": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 75,
+        "escapedText": "Team",
+        "autoGenerateFlags": 0,
+        "autoGenerateId": 0
+      }
+    },
+    "CURRENT_ARRAY_ELEMENT": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 124
+    },
+    "CURRENT_GAMEMODE": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 168,
+      "typeName": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 75,
+        "escapedText": "Gamemode",
+        "autoGenerateFlags": 0,
+        "autoGenerateId": 0
+      }
+    },
+    "CURRENT_MAP": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 168,
+      "typeName": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 75,
+        "escapedText": "MapItem",
+        "autoGenerateFlags": 0,
+        "autoGenerateId": 0
+      }
+    },
+    "EMPTY_ARRAY": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 173,
+      "elementType": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 124
+      }
+    },
+    "EVENT_DAMAGE": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 139
+    },
+    "EVENT_HEALING": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 139
+    },
+    "EVENT_PLAYER": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 168,
+      "typeName": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 75,
+        "escapedText": "Player",
+        "autoGenerateFlags": 0,
+        "autoGenerateId": 0
+      }
+    },
+    "EVENT_WAS_CRITICAL_HIT": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 127
+    },
+    "EVENT_WAS_HEALTH_PACK": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 127
+    },
+    "FALSE": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 127
+    },
+    "HEALEE": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 168,
+      "typeName": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 75,
+        "escapedText": "Player",
+        "autoGenerateFlags": 0,
+        "autoGenerateId": 0
+      }
+    },
+    "HEALER": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 168,
+      "typeName": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 75,
+        "escapedText": "Player",
+        "autoGenerateFlags": 0,
+        "autoGenerateId": 0
+      }
+    },
+    "HOST_PLAYER": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 168,
+      "typeName": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 75,
+        "escapedText": "Player",
+        "autoGenerateFlags": 0,
+        "autoGenerateId": 0
+      }
+    },
+    "IS_ASSEMBLING_HEROES": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 127
+    },
+    "IS_MATCH_BETWEEN_ROUNDS": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 127
+    },
+    "IS_CONTROL_POINT_LOCKED": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 127
+    },
+    "IS_IN_SUDDEN_DEATH": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 127
+    },
+    "IS_GAME_IN_PROGRESS": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 127
+    },
+    "IS_IN_SETUP": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 127
+    },
+    "IS_MATCH_COMPLETE": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 127
+    },
+    "IS_WAITING_FOR_PLAYERS": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 127
+    },
+    "LAST_CREATED_ENTITY": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 139
+    },
+    "LAST_DAMAGE_MODIFICATION": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 139
+    },
+    "LAST_DAMAGE_ID": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 124
+    },
+    "LAST_HEAL_ID": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 124
+    },
+    "LAST_HEALING_MODIFICATION": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 139
+    },
+    "LAST_CREATED_TEXT": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 139
+    },
+    "MATCH_ROUND": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 139
+    },
+    "MATCH_TIME": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 139
+    },
+    "NULL": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 124
+    },
+    "CURRENT_OBJECTIVE": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 139
+    },
+    "PAYLOAD_POSITION": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 168,
+      "typeName": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 75,
+        "escapedText": "Vector",
+        "autoGenerateFlags": 0,
+        "autoGenerateId": 0
+      }
+    },
+    "PAYLOAD_PROGRESS_PERCENTAGE": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 139
+    },
+    "CAPTURE_PERCENTAGE": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 139
+    },
+    "SERVER_LOAD": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 139
+    },
+    "AVERAGE_SERVER_LOAD": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 139
+    },
+    "PEAK_SERVER_LOAD": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 139
+    },
+    "TOTAL_TIME_ELAPSED": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 139
+    },
+    "TRUE": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 127
+    },
+    "VICTIM": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 168,
+      "typeName": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 75,
+        "escapedText": "Team",
+        "autoGenerateFlags": 0,
+        "autoGenerateId": 0
+      }
+    },
+    "ELSE": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 124
+    }
+  },
   "functions": {
+    "END": {
+      "pos": -1,
+      "end": -1,
+      "flags": 8,
+      "modifierFlagsCache": 0,
+      "transformFlags": 0,
+      "kind": 124
+    },
     "abortIf": {
       "returnType": {
         "pos": -1,
@@ -20032,6 +20568,52 @@
               "autoGenerateFlags": 0,
               "autoGenerateId": 0
             }
+          }
+        }
+      ]
+    },
+    "While": {
+      "returnType": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 124
+      },
+      "arguments": [
+        {
+          "name": "condition",
+          "type": {
+            "pos": -1,
+            "end": -1,
+            "flags": 8,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 127
+          }
+        }
+      ]
+    },
+    "If": {
+      "returnType": {
+        "pos": -1,
+        "end": -1,
+        "flags": 8,
+        "modifierFlagsCache": 0,
+        "transformFlags": 0,
+        "kind": 124
+      },
+      "arguments": [
+        {
+          "name": "condition",
+          "type": {
+            "pos": -1,
+            "end": -1,
+            "flags": 8,
+            "modifierFlagsCache": 0,
+            "transformFlags": 0,
+            "kind": 127
           }
         }
       ]
